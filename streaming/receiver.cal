@@ -15,7 +15,7 @@ namespace streaming:
         ==> :
 
         entities
-            receiver = art_Streaming(port="12345");
+            receiver = art_Streaming(activeMode=1, port="12345");
             sink = Sink();
         structure
             receiver.Out --> sink.IN;
