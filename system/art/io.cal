@@ -1,0 +1,23 @@
+namespace system.io:
+
+    external procedure print_i(int value) end
+
+    external procedure print_f(float value) end
+
+    external procedure print_d(double value) end
+
+    external procedure print_s(String value) end
+
+    external procedure println() end
+
+    external procedure println_i(int value) end
+
+    external procedure println_f(float value) end
+
+    external procedure println_d(double value) end
+
+    external procedure println_s(String value) end
+
+    external procedure println_s_i(String id, int value) end
+
+end

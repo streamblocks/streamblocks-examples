@@ -1,11 +1,15 @@
 namespace streaming:
 
+    import var system.io.println_s_i;
+
     import entity ART.art_Streaming;
 
     actor Sink()
         int IN ==> :
 
         action IN:[token] ==>
+        do
+            println_s_i("Value", token);    
         end
 
     end
