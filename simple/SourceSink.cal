@@ -1,0 +1,37 @@
+namespace simple:
+
+
+    actor Source()
+        ==> int OUT:
+
+        int Counter := 0;
+
+        action ==> OUT:[token]
+        guard
+            Counter < 16
+        var
+            int token = Counter
+        do
+            Counter := Counter + 1;
+        end
+
+    end
+
+    actor Sink()
+        int IN ==> :
+    
+        action IN:[token] ==>
+        end
+    end
+
+    network SourceSink() 
+        ==> :
+
+        entities
+            source = Source();
+            sink = Sink();
+        structure
+            source.OUT --> sink.IN;
+    end
+
+end
