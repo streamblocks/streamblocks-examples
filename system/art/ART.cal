@@ -16,5 +16,5 @@ namespace ART :
   external actor art_Source_byte(String fileName) ==> uint(size=8) Out;
 
   // -- Streaming
-  external actor art_Streaming(String port) ==> int OUT;
+  external actor art_Streaming(String port) ==> int Out;
 end

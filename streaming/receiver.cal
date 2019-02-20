@@ -1,0 +1,25 @@
+namespace streaming:
+
+    import entity ART.art_Streaming;
+
+    actor Sink()
+        int IN ==> :
+
+        action IN:[token] ==>
+        end
+
+    end
+
+
+    network Receiver() 
+        ==> :
+
+        entities
+            receiver = art_Streaming(port="12345");
+            sink = Sink();
+        structure
+            receiver.Out --> sink.IN;
+    end
+
+
+end
