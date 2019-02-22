@@ -18,9 +18,9 @@ To use these applications, first you need to compile the Streamblocks compiler. 
 
 Example        | Description           | Key Concepts | Keywords
 ---------------|-----------------------|--------------|----------
-[system/][]    | A project for using external actors, functions, and procedures<br> supported by the actors runtime <br>   |  How to write external actors function and procedures  | - external<br> 
-[simple/][]    |  Simple examples of Dataflow Applications<br> | How to define actors, processes and how to connect them| - actor<br> - action<br> - process<br> - network<br> - import <br>
-[jpeg/][]      |  A 4:2:0 YUV movie JPEG decoder description in CAL<br> | How to define state machines in CAL, functions, procedures, <br> instantiation of networks and external actors | - import entity<br> - fsm<br> - priority<br> - function<br> - procedure<br> 
+[system/][]    | A project for using external actors, functions, and procedures<br> supported by the actors runtime <br>   |  How to write external actors function and procedures  |  external<br> 
+[simple/][]    |  Simple examples of Dataflow Applications<br> | How to define actors, processes and how to connect them|  actor<br>  action<br>  process<br>  network<br>  import <br>
+[jpeg/][]      |  A 4:2:0 YUV movie JPEG decoder description in CAL<br> | How to define state machines in CAL, functions, procedures, <br> instantiation of networks and external actors |  import entity <br>  fsm<br>  priority<br>  function<br>  procedure<br> 
 
 ### 3. Dependencies
 
