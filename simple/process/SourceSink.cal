@@ -1,0 +1,43 @@
+namespace simple.process:
+
+    import var system.io.println_s_i;
+
+    actor Source() ==> int OUT:
+
+        int Counter := 0;
+
+        do
+            while Counter < 16 do
+                OUT <-- Counter;
+                Counter := Counter + 1;
+            end
+        end
+
+    end
+
+    actor Sink() int IN ==> :
+
+        repeat 
+            begin
+            var
+                int token
+            do
+                IN --> token;
+                println_s_i("Value", token);
+            end
+            
+        end
+
+    end
+
+    network SourceSink() 
+        ==> :
+
+        entities
+            source = Source();
+            sink = Sink();
+        structure
+            source.OUT --> sink.IN;
+    end
+
+end
