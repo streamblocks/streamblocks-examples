@@ -1,0 +1,94 @@
+namespace sw.utils:
+
+	import all sw.configuration;
+
+    import var system.io.println_s_i;
+	import var system.io.print_s;
+    import var system.io.print_i;
+
+	function max2(int(size=16) v1, int(size=16) v2) --> int(size=16) :
+		if v1 > v2 then
+			v1
+		else
+			v2
+		end
+	end
+
+	function max4(int(size=16) v1, int(size=16) v2, int(size=16) v3, int(size=16) v4) --> int(size=16) :
+		max2(v1, max2(v2, max2(v3, v4)))
+	end
+	
+	procedure printDir(uint(size=16) d)
+	begin
+		d := d & MASK_DIR;
+		if (d = UP) then
+			print_s("U");
+		else
+			if (d = LEFT) then
+				print_s("L");
+			else
+				if (d = DIAGONAL) then
+					print_s("D");
+				else
+					if (d = UNDEFINED) then
+						print_s("X");
+					end
+				end
+			end
+		end
+	end
+	
+	procedure printChar(uint(size=3) v)
+	begin
+		if v = A then
+			print_s("A");
+		else
+			if v = C then
+				print_s("C");
+			else
+				if v = G then
+					print_s("G");
+				else
+					if v = T then
+						print_s("T");
+					else
+						if v = N then
+							print_s("-");
+						else
+							if v = EOS then
+								print_s(".");
+							else
+								print_s(":");
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	function toChar(uint(size=8) value) --> uint(size=3) :
+		if (value = 65) then
+			A
+		else
+			if (value = 67) then
+				C
+			else
+				if (value = 71) then
+					G
+				else
+					if value = 84 then
+						T
+					else
+						if value = 10 then
+							EOS
+						else
+							N
+						end
+					end
+				end
+			end
+		end
+	end
+
+end

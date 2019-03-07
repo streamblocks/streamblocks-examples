@@ -1,0 +1,231 @@
+namespace sw.systolic:
+
+    import all sw.configuration;
+    import all sw.utils;
+    import var system.io.println_s;
+    import var system.io.print_s;
+    import var system.io.print_i;
+
+    actor Aligner() 	
+            uint(size=8) SIZE_READ,
+            uint(size=8) SIZE_REF_CUTS,
+            int(size=16) PE_A_v,   
+            int(size=16) PE_B_v,  
+            int(size=16) PE_C_v,    
+            int(size=16) PE_D_v
+            ==>
+            int(size=16) ENC_AL_REF, 
+            int(size=16) ENC_AL_READ, 
+            int(size=16) SCORE:
+                            
+        List(type:List(type:int(size=16), size=MAX_STRING_SIZE), size=MAX_STRING_SIZE) H;
+
+        
+        List(type:int(size=16), size=MAX_STRING_SIZE) encodedAA;
+        List(type:int(size=16), size=MAX_STRING_SIZE) encodedAB;
+
+        uint(size=8) sizeRead := 0;
+        uint(size=8) sizeE := 0; 
+        uint(size=8) macroblocks; 
+        
+        uint(size=8) m;
+        uint(size=8) bi;
+        uint(size=8) Aai;
+        uint(size=8) Bai;
+        uint(size=8) Cai;
+        uint(size=8) Dai;
+        uint(size=8) mPE;
+        
+        int(size=16) maxV; 
+        uint(size=8) maxAi;
+        uint(size=8) maxBi;
+
+        uint(size=8) idxE := 0; 
+        
+        getSize: action SIZE_READ:[sb], SIZE_REF_CUTS:[sm]==>  
+        do
+            macroblocks := sm;
+            sizeRead := sb;
+                    
+            m := 0;
+            bi := 0;
+            
+            mPE := 0;
+            
+            Aai :=  PE_A + 1;
+            Bai :=  PE_B + 1;
+            Cai :=  PE_C + 1;
+            Dai :=  PE_D + 1;
+        end
+        
+        getValues: action PE_A_v:[va],  PE_B_v:[vb],  PE_C_v:[vc],  PE_D_v:[vd] ==>
+        guard
+            m < macroblocks
+        var
+            uint(size=16) tmpa, uint(size=16) tmpb, uint(size=16) tmpc, uint(size=16) tmpd
+        do
+            bi := bi + 1;
+            
+            //print("j: "+j+", m: " +m+"/"+macroblocks+" ");
+            //print((va & MASK_VALUE)+"/"+(vb& MASK_VALUE)+"/"+(vc& MASK_VALUE)+"/"+(vd& MASK_VALUE)+"\n");
+            
+            H[bi][Aai] := va;
+            H[bi][Bai] := vb;
+            H[bi][Cai] := vc;
+            H[bi][Dai] := vd;
+            
+            tmpa := va & MASK_VALUE;
+            if(tmpa> maxV) then
+                maxV := tmpa;
+                maxAi := Aai;
+                maxBi := bi;
+            end
+        
+            
+            tmpb := vb & MASK_VALUE;
+            if(tmpb > maxV) then
+                maxV := tmpb;
+                maxAi := Bai;
+                maxBi := bi;
+            end
+        
+            
+            tmpc := vc & MASK_VALUE;
+            if(tmpc > maxV) then
+                maxV := tmpc;
+                maxAi := Cai;
+                maxBi := bi;
+            end
+        
+            tmpd := vd & MASK_VALUE;
+            if(tmpd > maxV) then
+                maxV := tmpd;
+                maxAi := Dai;
+                maxBi := bi;
+            end
+            
+            if(bi=sizeRead) then
+                bi := 0;
+                m := m+1;
+                mPE := mPE + PE;
+                
+                // increase the Ai indexes
+                Aai :=  mPE + PE_A + 1;
+                Bai :=  mPE + PE_B + 1;
+                Cai :=  mPE + PE_C + 1;
+                Dai :=  mPE + PE_D + 1;
+            end
+            
+        end
+        
+        sendScore: action ==> SCORE:[maxV]
+        guard
+            m = macroblocks
+        end
+        
+        computeAlignement: action ==>
+        var
+            int(size=16) v, uint(size=16) dir, uint(size=8) ca, uint(size=8) cb
+        do
+            
+            
+            if DEBUG_MODE then
+                println_s("H matrix");
+                foreach int ib in 0 .. sizeRead  do
+                    foreach int ia in 0 .. macroblocks * PE do
+                        print_i(H[ib][ia] & MASK_VALUE);
+                        print_s("\t");                        
+                    end
+                    print_s("\n");
+                end
+                
+                print_s("\n");
+                
+                println_s("D matrix");
+                foreach int ib in 0 .. sizeRead  do
+                    foreach int ia in 0 .. macroblocks * PE do
+                        printDir(H[ib][ia]);
+                        print_s("\t");
+                    end
+                    print_s("\n");
+                end
+                
+                print_s("\n");
+            end
+            
+            
+            // print("vmax: "+ maxV+", maxAi: "+ maxAi+", maxBi: "+maxBi+"\n");
+            
+            sizeE := 0; 
+            v:= maxV;
+            ca := maxAi;
+            cb := maxBi;
+            while(v > 0) do
+                    dir := H[cb][ca] & MASK_DIR;
+                    if dir = DIAGONAL then
+                        ca := ca - 1;
+                        cb := cb - 1;
+                        encodedAA[sizeE] := ca;
+                        encodedAB[sizeE] := cb;
+                        v := H[cb][ca] & MASK_VALUE;
+                        sizeE := sizeE + 1; 
+                    else
+                        if dir = LEFT then
+                            ca := ca - 1;
+                            encodedAA[sizeE] := ca;
+                            encodedAB[sizeE] := INDEL;
+                            v := H[cb][ca] & MASK_VALUE;
+                            sizeE := sizeE + 1; 
+                        else
+                            if dir = UP then
+                                cb := cb - 1;
+                                encodedAA[sizeE] := INDEL;
+                                encodedAB[sizeE] := cb;
+                                v := H[cb][ca] & MASK_VALUE;
+                                sizeE := sizeE + 1; 
+                            else
+                                v := 0;
+                            end
+                        end
+                    end
+            end 
+            idxE := sizeE; 
+        end
+        
+        sendStringAB: action ==> ENC_AL_REF:[ a ],  ENC_AL_READ:[ b ]
+        guard
+            idxE != 0 
+        var
+            int(size=16) a, int(size=16) b
+        do
+            idxE := idxE - 1; 
+            a := encodedAA[idxE];
+            b := encodedAB[idxE];
+        end
+        
+        sendEOSs: action ==> ENC_AL_REF:[EOE], ENC_AL_READ:[EOE]
+        guard
+            idxE = 0
+        end
+        
+        reset: action ==>
+        do
+            sizeRead := 0;
+            maxV := 0;
+            maxAi := 0;
+            maxBi := 0;
+        end
+        
+        schedule fsm s0 :
+            s0  (getSize)           --> s1;
+            s1  (getValues)         --> s1;
+            s1  (sendScore)         --> s2;
+            s2  (computeAlignement) --> s3;
+            s3  (sendStringAB)      --> s3;
+            s3  (sendEOSs)          --> s4;
+            s4  (reset)             --> s0;
+        end
+        
+    end
+
+end

@@ -1,0 +1,66 @@
+namespace sw.systolic:
+
+    network SW()
+        uint(size=3) REF,
+        uint(size=3) READ
+        ==>
+        uint(size=3) AL_REF,
+        uint(size=3) AL_READ,
+        int(size=16) SCORE:
+
+        entities
+            controller = Controller();
+            
+            pe_a = SwCell();
+            pe_b = SwCell();
+            pe_c = SwCell();
+            pe_d = SwCell();
+
+            buffer = LeftBuffer();
+
+            aligner = Aligner();
+
+            decoder = Decoder();
+        structure
+            REF --> controller.REF;
+            REF --> decoder.REF;
+            
+            READ --> controller.READ;
+            READ --> decoder.READ;
+
+            controller.SIZE_READ --> aligner.SIZE_READ;
+            controller.SIZE_READ --> buffer.SIZE_READ;
+            controller.SIZE_REF_CUTS --> aligner.SIZE_REF_CUTS;
+            controller.SIZE_REF_CUTS --> buffer.SIZE_REF_CUTS;
+            controller.PE_A_REF --> pe_a.REF;
+            controller.PE_B_REF --> pe_b.REF;
+            controller.PE_C_REF --> pe_c.REF;
+            controller.PE_D_REF --> pe_d.REF;
+            controller.PE_ALL_READ --> pe_a.READ;
+            controller.PE_ALL_READ --> pe_b.READ;
+            controller.PE_ALL_READ --> pe_c.READ;
+            controller.PE_ALL_READ --> pe_d.READ;
+
+            buffer.O --> pe_a.IN_LEFT;
+
+            pe_a.V --> pe_b.IN_LEFT;
+            pe_a.V --> aligner.PE_A_v;
+
+            pe_b.V --> pe_c.IN_LEFT;
+            pe_b.V --> aligner.PE_B_v;
+
+            pe_c.V --> pe_d.IN_LEFT;
+            pe_c.V --> aligner.PE_C_v;
+
+            pe_d.V --> buffer.V;
+            pe_d.V --> aligner.PE_D_v;
+
+            aligner.ENC_AL_REF --> decoder.ENC_AL_REF;
+            aligner.ENC_AL_READ --> decoder.ENC_AL_READ;
+            aligner.SCORE --> SCORE;
+
+            decoder.AL_REF --> AL_REF;
+            decoder.AL_READ --> AL_READ;
+    end        
+
+end

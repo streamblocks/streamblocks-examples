@@ -1,0 +1,23 @@
+namespace sw.dut:
+
+    import entity sw.dut.ArrayStreamer;
+    import entity sw.systolic.SW;
+    import entity sw.io.Display;
+
+    network Top_SW_array()
+        ==> :
+
+        entities
+            arrayStreamer = ArrayStreamer();
+            sw = SW();
+            display = Display();
+        structure
+            arrayStreamer.REF --> sw.REF;
+            arrayStreamer.READ --> sw.READ;
+
+            sw.AL_REF   --> display.AL_REF;
+            sw.AL_READ  --> display.AL_READ;
+            sw.SCORE    --> display.SCORE;
+    end
+
+end

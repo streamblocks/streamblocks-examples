@@ -10,20 +10,20 @@ actor HuffmanDecoder()
 	int v_read_HT := 0;
 	uint(size=16) cur_val := 0;
 	int cur_len := 0;
-	int(size=32) to_read := 0;
-	int(size=32) cur_HT :=0;
+	uint to_read := 0;
+	uint(size=8) cur_HT :=0;
 	int idx :=0;
-	int code := 0;
+	uint code := 0;
 	int count := 0;
 	int mbcount :=0;
 	int bit_pos := 0;
 	uint(size=8) bits := 0;
 	
 	// The indexes of each HT.
-	List(type:int, size=3) dctab = [0, 1, 1];
-	List(type:int, size=3) actab = [2, 3, 3];
+	List(type:uint(size=8), size=3) dctab = [0, 1, 1];
+	List(type:uint(size=8), size=3) actab = [2, 3, 3];
 	
-	List(type:List(type:int ,size=256),size=4) ht_lookup_codelen;
+	List(type:List(type:uint ,size=256),size=4) ht_lookup_codelen;
 	// Values have to be adjusted!!!
 	int GUESSEDSIZE = 256;
 	
@@ -31,7 +31,7 @@ actor HuffmanDecoder()
 	List(type:List(type:int,size=GUESSEDSIZE),size=4) ht_lookup_code_value;
 	
 	
-	List(type:int, size=16) ht_codes_len;
+	List(type:uint(size=8), size=16) ht_codes_len;
 	List(type:uint(size=8), size=256) ht_codes_list;
 	
 	uint cur_count := 0;
@@ -86,7 +86,7 @@ actor HuffmanDecoder()
 	procedure generate_HT()
 	var
 		int v,
-		int len,
+		uint len,
 		int code_idx,
 		int spread,
 		int u
@@ -99,10 +99,10 @@ actor HuffmanDecoder()
 		// prefixed by this sequence refers to the same code.
 		// For example if the code 23 is encoded by 1111110111 (10 bits), in the array all values ranging from
 		// 1111110111000000 (16 bits) to 1111110111111111 (16 bits) refers to code 23.
-		foreach int i in 0 .. 15
+		foreach uint i in 0 .. 15
 		do
 			len := i + 1;
-			foreach int j in 0 .. ht_codes_len[i] - 1
+			foreach uint(size=8) j in 0 .. ht_codes_len[i] - 1
 			do
 				ht_lookup_codelen[cur_HT][ht_codes_list[code_idx]] := len;
 				ht_lookup_code_index[cur_HT][u] := v;

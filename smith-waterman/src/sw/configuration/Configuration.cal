@@ -1,0 +1,40 @@
+namespace sw.configuration:
+
+    // activate debug mode
+	bool DEBUG_MODE = false;
+
+	// number of processing elements
+	int PE = 4;
+	
+	// maximum string size
+	int MAX_STRING_SIZE = 256;
+	
+	// the identifier of each processing element
+	int PE_A = 0;
+	int PE_B = 1;
+	int PE_C = 2;
+	int PE_D = 3;
+	
+	// masks for retrieving the cell value or the cell direction 
+	uint(size=16) MASK_VALUE = 8191; //0b0001111111111111
+	uint(size=16) MASK_DIR = 57344;  //0b1110000000000000
+	
+	// the directions
+	uint(size=16) UP = 8192;        //0b0010000000000000
+	uint(size=16) LEFT = 16384;     //0b0100000000000000
+	uint(size=16) DIAGONAL = 24576; //0b0110000000000000 
+	uint(size=16) UNDEFINED = 0;    //0b0000000000000000 
+	
+	// the alphabet 
+	uint(size=3) A = 0; 
+	uint(size=3) C = 1; 
+	uint(size=3) G = 2; 
+	uint(size=3) T = 3;
+	uint(size=3) N = 4;
+	uint(size=3) EOS = 5; 
+	
+	// the encoding 
+	int(size=16) INDEL = -1;
+	int(size=16) EOE = -2;
+
+end
