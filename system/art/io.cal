@@ -6,6 +6,8 @@ namespace system.io:
 
     external procedure print_d(double value) end
 
+    external procedure print_c(int value) end
+    
     external procedure print_s(String value) end
 
     external procedure println() end

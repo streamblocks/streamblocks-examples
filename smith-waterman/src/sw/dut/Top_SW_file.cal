@@ -1,0 +1,25 @@
+namespace sw.dut:
+
+    import entity sw.dut.ArrayStreamer;
+    import entity sw.systolic.SW;
+    import entity sw.io.Display;
+    import entity ART.Genomic.art_Fasta;
+
+    network Top_SW_file()
+        ==> :
+
+        entities
+            ref = art_Fasta(fileName="ref.fasta");
+            read = art_Fasta(fileName="read.fasta");
+            sw = SW();
+            display = Display();
+        structure
+            ref.SEQ --> sw.REF;
+            read.SEQ --> sw.READ;
+
+            sw.AL_REF   --> display.AL_REF;
+            sw.AL_READ  --> display.AL_READ;
+            sw.SCORE    --> display.SCORE;
+    end
+
+end

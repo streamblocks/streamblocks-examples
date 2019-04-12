@@ -1,0 +1,15 @@
+namespace ART.Genomic:
+
+    // DNA alphabet 
+	uint(size=3) A = 1; 
+	uint(size=3) C = 2; 
+	uint(size=3) G = 3; 
+	uint(size=3) T = 4;
+	uint(size=3) N = 5;
+	uint(size=3) EOS = 6; 
+
+    // -- Fasta Reader
+    external actor art_Fasta(String fileName) ==> int(size=8) SEQ;
+
+
+end

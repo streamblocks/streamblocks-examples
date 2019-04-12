@@ -23,8 +23,8 @@ namespace sw.systolic:
             begin
             var
                 int(size=16) left,
-                uint(size=3)  a,
-                uint(size=3)  b,
+                uint(size=3) a,
+                uint(size=3) b,
                 int(size=16) v,
                 int(size=16) v1,
                 int(size=16) v2,
@@ -35,7 +35,7 @@ namespace sw.systolic:
                 READ    --> b;
                 
                 if (b = EOS) then
-                    v := 0 | UNDEFINED;
+                    V <-- 0 | UNDEFINED;
                     diagonal := 0;
                     up := 0;
                 else
@@ -50,20 +50,15 @@ namespace sw.systolic:
 
                     // compute direction
                     if (v = v1) then
-                        v := v | DIAGONAL;
+                        V <-- v | DIAGONAL;
+                    elsif (v = v2) then
+                        V <-- v | LEFT;
+                    elsif (v = v3) then
+                        V <-- v | UP;
                     else
-                        if (v = v2) then
-                            v := v | LEFT;
-                        else
-                            if (v = v3) then
-                                v := v | UP;
-                            else
-                                v := v | UNDEFINED;
-                            end
-                        end
+                        V <-- v | UNDEFINED;
                     end
                 end
-                V <-- v;
             end
         end
     end

@@ -26,12 +26,12 @@ namespace sw.configuration:
 	uint(size=16) UNDEFINED = 0;    //0b0000000000000000 
 	
 	// the alphabet 
-	uint(size=3) A = 0; 
-	uint(size=3) C = 1; 
-	uint(size=3) G = 2; 
-	uint(size=3) T = 3;
-	uint(size=3) N = 4;
-	uint(size=3) EOS = 5; 
+	uint(size=3) A = 1; 
+	uint(size=3) C = 2; 
+	uint(size=3) G = 3; 
+	uint(size=3) T = 4;
+	uint(size=3) N = 5;
+	uint(size=3) EOS = 6; 
 	
 	// the encoding 
 	int(size=16) INDEL = -1;

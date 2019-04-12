@@ -1,0 +1,26 @@
+namespace simple.genomic:
+
+    import entity ART.Genomic.art_Fasta;
+    import var system.io.print_i;
+
+     actor Display()
+        int(size=8) IN ==> :
+    
+        action IN:[token] ==>
+        do 
+            print_i(token);
+        end
+    end
+
+
+    network FastaReader() ==> :
+    entities
+        fasta = art_Fasta(fileName = "seq.fasta");
+        sink  = Display();
+    structure
+        fasta.SEQ --> sink.IN;
+    end
+
+
+
+end
