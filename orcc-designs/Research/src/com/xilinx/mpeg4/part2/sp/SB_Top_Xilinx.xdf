@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="SB_Top_Xilinx">
+    <Instance id="decoder">
+        <Class name="com.xilinx.mpeg4.part2.sp.Decoder"/>
+    </Instance>
+    <Instance id="source">
+        <Class name="ART.art_Source_byte"/>
+        <Parameter name="fileName">
+            <Expr kind="Literal" literal-kind="String" value="./foreman_qcif_30.bit"/>
+        </Parameter>
+        <Parameter name="loops">
+            <Expr kind="Literal" literal-kind="Integer" value="10"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+        <Class name="ART.art_Display_yuv_width_height"/>
+        <Parameter name="title">
+            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="1920"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="1080"/>
+        </Parameter>
+    </Instance>
+    <Instance id="ddr">
+        <Class name="com.xilinx.mpeg4.part2.sp.DDRModel"/>
+    </Instance>
+    <Instance id="Merger">
+        <Class name="com.xilinx.mpeg4.part2.sp.SB_Mgnt_Merger"/>
+    </Instance>
+    <Connection dst="decoder" dst-port="bits" src="source" src-port="Out"/>
+    <Connection dst="decoder" dst-port="MCD" src="ddr" src-port="RD"/>
+    <Connection dst="ddr" dst-port="WD" src="decoder" src-port="MBD"/>
+    <Connection dst="ddr" dst-port="WA" src="decoder" src-port="MBA"/>
+    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA"/>
+    <Connection dst="Merger" dst-port="YUV_i" src="decoder" src-port="VIDEO"/>
+    <Connection dst="display" dst-port="In" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
+    <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
+</XDF>

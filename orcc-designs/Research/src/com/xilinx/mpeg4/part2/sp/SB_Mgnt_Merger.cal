@@ -1,0 +1,59 @@
+// Mgnt_Merger420
+//
+// Author Endri Bezati
+package com.xilinx.mpeg4.part2.sp;
+import org.sc29.wg11.mpeg4.part2.Constants.*;
+
+actor SB_Mgnt_Merger() int(size=9) YUV_i ==> int(size=32) YUV :
+
+int(size=PIX_SZ) out56[56];
+
+	int Counter := 0;
+
+	Read_Y: action YUV_i:[y] ==> YUV:[y]
+	do
+		Counter := Counter + 1;
+	end
+
+	stop256 : action ==>
+	guard
+		Counter = 256
+	do
+		Counter := 0;
+	end
+
+	stop64 : action ==>
+	guard
+		Counter = 64
+	do
+		Counter := 0;
+	end
+
+	// Select the U blocks
+	Read_U: action YUV_i:[ u ] ==> YUV:[ u ]
+	do
+		Counter := Counter + 1;
+	end
+
+	// Select the V blocks
+	Read_V: action YUV_i:[ v ]==> YUV:[ v ]
+	do
+		Counter := Counter + 1;
+	end
+
+	schedule fsm Y :
+		Y ( Read_Y ) --> Y;
+		Y ( stop256 ) --> U;
+		U ( Read_U ) --> U;
+		U ( stop64 ) --> V;
+		V ( Read_V ) --> V;
+		V ( stop64 ) --> Y;
+	end
+
+	priority
+		stop256 > Read_Y;
+		stop64 > Read_U;
+		stop64 > Read_V;
+	end
+
+end
