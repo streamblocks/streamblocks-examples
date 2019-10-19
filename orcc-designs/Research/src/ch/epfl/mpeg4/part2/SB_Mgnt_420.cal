@@ -1,0 +1,15 @@
+package ch.epfl.mpeg4.part2;
+
+actor SB_Mgnt_420()
+    uint(size=8) IN ==> int(size=32) OUT:
+
+    action IN:[token] repeat 384 ==> OUT:[token] repeat 384
+	var
+		int(size=32) out[384]
+	do
+		foreach int i in 0 .. 383 do
+			out[i] := token[i];
+		end
+    end
+
+end 
