@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="SB_Top_Serial">
+<XDF name="Top_Parallel">
     <Instance id="decoder">
-        <Class name="ch.epfl.mpeg4.part2.Decoder"/>
+        <Class name="ch.epfl.mpeg4.part2.SB_Decoder_Parallel"/>
     </Instance>
     <Instance id="source">
         <Class name="ART.art_Source_bin"/>
@@ -9,7 +9,7 @@
             <Expr kind="Literal" literal-kind="String" value="./foreman_qcif_30.bit"/>
         </Parameter>
          <Parameter name="loops">
-            <Expr kind="Literal" literal-kind="Integer" value="0"/>
+            <Expr kind="Literal" literal-kind="Integer" value="50"/>
         </Parameter>
     </Instance>
     <Instance id="display">
@@ -24,17 +24,12 @@
             <Expr kind="Literal" literal-kind="Integer" value="1080"/>
         </Parameter>
     </Instance>
-     <Instance id="sizesplitter">
+         <Instance id="sizesplitter">
          <Class name="ch.epfl.mpeg4.part2.SizeSplitter"/>
     </Instance>
-     <Instance id="outmgnt">
-         <Class name="ch.epfl.mpeg4.part2.SB_Mgnt_420"/>
-    </Instance>
-    <Connection dst="display" dst-port="In" src="outmgnt" src-port="OUT"/>
-    <Connection dst="outmgnt" dst-port="IN" src="decoder" src-port="VID"/>
+    <Connection dst="display" dst-port="In" src="decoder" src-port="VID"/>
     <Connection dst="decoder" dst-port="bits" src="source" src-port="Out"/>
     <Connection dst="sizesplitter" dst-port="IN" src="decoder" src-port="SIZE"/>
     <Connection dst="display" dst-port="WIDTH" src="sizesplitter" src-port="WIDTH"/>
     <Connection dst="display" dst-port="HEIGHT" src="sizesplitter" src-port="HEIGHT"/>
 </XDF>
-
