@@ -1,0 +1,67 @@
+namespace sw.systolic:
+
+    import all sw.configuration;
+    import all sw.utils;
+
+    actor SwCellProcess()
+        int(size=16) IN_LEFT,
+        uint(size=3) REF,
+        uint(size=3) READ 
+        ==>
+        int(size=16) V:
+
+        // the SW algorithm parameters
+        int(size=16) GAP = -3;
+        int(size=16) MATCH = 5;
+        int(size=16) MISMATCH = -3;
+
+        // state variables
+        int(size=16) diagonal := 0;
+        int(size=16) up := 0;
+
+        repeat
+            begin
+            var
+                int(size=16) left,
+                uint(size=3) a,
+                uint(size=3) b,
+                int(size=16) v,
+                int(size=16) v1,
+                int(size=16) v2,
+                int(size=16) v3
+            do
+                IN_LEFT --> left;
+                REF     --> a;
+                READ    --> b;
+                
+                if (b = EOS) then
+                    V <-- 0 | UNDEFINED;
+                    diagonal := 0;
+                    up := 0;
+                else
+                    left := left & MASK_VALUE;
+                    v1 := (if a = b then MATCH else MISMATCH end) + diagonal;
+                    v2 := left + GAP;
+                    v3 := up + GAP;
+                    v := max4(0, v2, v3, v1);
+
+                    diagonal := left;
+                    up := v;
+
+                    // compute direction
+                    if (v = v1) then
+                        V <-- v | DIAGONAL;
+                    elsif (v = v2) then
+                        V <-- v | LEFT;
+                    elsif (v = v3) then
+                        V <-- v | UP;
+                    else
+                        V <-- v | UNDEFINED;
+                    end
+                end
+            end
+        end
+    end
+
+
+end

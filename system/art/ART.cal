@@ -10,7 +10,7 @@ namespace ART :
   external actor art_Display_yuv_width_height (String title, int width, int height) int In, int WIDTH, int HEIGHT ==> ;
 
   // -- Sources
-  external actor art_Source_bin(String fileName) ==> uint(size=8) Out;
+  external actor art_Source_bin(String fileName, int loops) ==> uint(size=8) Out;
   external actor art_Source_real(String fileName) ==> float Out;
   external actor art_Source_txt(String fileName) ==> uint(size=8) Out;
   external actor art_Source_byte(String fileName, int loops) ==> uint(size=8) Out;

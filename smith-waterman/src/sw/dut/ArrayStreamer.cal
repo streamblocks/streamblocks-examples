@@ -5,7 +5,7 @@ namespace sw.dut:
     actor ArrayStreamer () ==> uint(size=3) REF, uint(size=3) READ :
 
         // max number of alignements
-        int MAX_ALIGNEMENTS = 2;
+        int MAX_ALIGNEMENTS = 10;
         
         // here there are 10 sequences stored (10 refs and 10 reads)
         int REF_ARRAY_SIZE = 1610;
@@ -22,7 +22,7 @@ namespace sw.dut:
         int read_idx := 0;
         
         sendRefs: action ==> REF:[value]
-        guard refs < MAX_ALIGNEMENTS and ref_idx < READ_ARRAY_SIZE
+        guard refs < MAX_ALIGNEMENTS and ref_idx < REF_ARRAY_SIZE
         var 
             uint(size=3) value
         do
