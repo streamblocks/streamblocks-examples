@@ -1,0 +1,4 @@
+[submodule "orcc-designs/orc-apps"]
+	path = orcc-designs/orc-apps
+	url = https://github.com/orcc/orc-apps.git
+	branch = master
