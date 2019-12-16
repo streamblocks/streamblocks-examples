@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="SB_Top_Serial_SDx">
+    <Instance id="decoder">
+        <Class name="ch.epfl.mpeg4.part2.SB_Decoder_Sdx"/>
+    </Instance>
+    <Instance id="convert">
+        <Class name="ch.epfl.mpeg4.part2.Convert8to32"/>
+    </Instance>
+    <Instance id="source">
+        <Class name="ART.art_Source_bin"/>
+        <Parameter name="fileName">
+            <Expr kind="Literal" literal-kind="String" value="./foreman_qcif_30.bit"/>
+        </Parameter>
+         <Parameter name="loops">
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+         <Class name="ART.art_Display_yuv"/>
+        <Parameter name="title">
+            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+    </Instance>
+    
+    <Connection dst="display" dst-port="In" src="decoder" src-port="YCbCr"/>
+
+    <Connection dst="decoder" dst-port="BYTE" src="convert" src-port="OUT"/>
+    <Connection dst="convert" dst-port="IN" src="source" src-port="Out"/>
+   
+</XDF>
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="XilinxSDx">
+    <Port kind="Input" name="BYTE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="YCbCr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Instance id="decoder">
+        <Class name="com.xilinx.mpeg4.part2.sp.Decoder"/>
+    </Instance>
+    <Instance id="ddr">
+        <Class name="com.xilinx.mpeg4.part2.sp.DDRModel"/>
+    </Instance>
+
+    <Instance id="Convert32to8">
+        <Class name="com.xilinx.mpeg4.part2.sp.Convert32to8"/>
+    </Instance>
+    <Instance id="Convert9to32">
+        <Class name="com.xilinx.mpeg4.part2.sp.Convert9to32"/>
+    </Instance>
+    <Instance id="ConsumesWH">
+        <Class name="com.xilinx.mpeg4.part2.sp.ConsumeWH"/>
+    </Instance>
+    <Connection dst="decoder" dst-port="MCD" src="ddr" src-port="RD"/>
+    <Connection dst="ddr" dst-port="WD" src="decoder" src-port="MBD"/>
+    <Connection dst="ddr" dst-port="WA" src="decoder" src-port="MBA"/>
+    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA"/>
+    <Connection dst="decoder" dst-port="bits" src="Convert32to8" src-port="OUT"/>
+    <Connection dst="Convert9to32" dst-port="IN" src="decoder" src-port="VIDEO"/>
+    <Connection dst="Convert32to8" dst-port="IN" src="" src-port="BYTE"/>
+    <Connection dst="" dst-port="YCbCr" src="Convert9to32" src-port="OUT"/>
+    <Connection dst="ConsumesWH" dst-port="W" src="decoder" src-port="WIDTH"/>
+    <Connection dst="ConsumesWH" dst-port="H" src="decoder" src-port="HEIGHT"/>
+</XDF>

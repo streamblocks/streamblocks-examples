@@ -1,0 +1,17 @@
+package com.xilinx.mpeg4.part2.sp;
+
+actor Convert32to8()
+	uint(size=32) IN ==> uint(size=8) OUT:
+	
+	
+	action IN:[token] ==> OUT:[out] repeat 4 
+	var
+		uint(size=32) out[4]
+	do
+		out[0] := token;
+		out[1] := token >> 8;
+		out[2] := token >> 16;
+		out[3] := token >> 24;
+	end
+	
+end

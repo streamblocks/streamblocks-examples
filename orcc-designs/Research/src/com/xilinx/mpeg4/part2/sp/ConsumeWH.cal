@@ -1,0 +1,10 @@
+package com.xilinx.mpeg4.part2.sp;
+
+actor ConsumeWH()
+	int(size=16) W,
+	int(size=16) H ==>:
+	
+	action W:[w],H:[h] ==>
+	end
+	
+end

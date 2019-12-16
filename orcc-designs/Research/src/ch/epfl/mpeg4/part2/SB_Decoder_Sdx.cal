@@ -1,0 +1,9 @@
+package ch.epfl.mpeg4.part2;
+
+actor SB_Decoder_Sdx()
+    uint(size=32) BYTE ==> uint(size=32) YCbCr:
+
+    action BYTE:[token] ==> YCbCr:[token]
+    end
+
+end 
