@@ -1,4 +1,4 @@
 [submodule "orcc-designs/orc-apps"]
 	path = orcc-designs/orc-apps
 	url = https://github.com/orcc/orc-apps.git
-	branch = master
+	branch = a25c81b2032fd5b5de286e53d65b9849e6792a5b
