@@ -1,0 +1,41 @@
+namespace hetero.simple.sink:
+
+  /*
+    * Sink actor
+    * Consumes identfinetly tokens from the input port IN, 
+    * and prints the tokens to the standart output.
+    */
+  actor Sink64()
+      uint(size=64) IN ==> :
+  
+      action IN:[token] ==>
+      end
+  end
+
+  actor Sink32()
+      uint(size=32) IN ==> :
+  
+      action IN:[token] ==>
+      end
+  end
+
+  actor Sink16()
+      uint(size=16) IN ==> :
+  
+      action IN:[token] ==>
+      end
+  end
+
+  actor Sink8()
+      uint(size=8) IN ==> :
+  
+      action IN:[token] ==>
+      end
+  end
+
+
+
+
+
+
+end

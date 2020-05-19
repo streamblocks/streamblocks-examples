@@ -1,0 +1,43 @@
+#!/bin/bash
+
+SB_HOME="/home/mayy/streamblocks"
+
+SB_SRC_PATH="$SB_HOME/streamblocks-examples/hetero/simple"
+
+TGT_PATH="$1"
+HW_PATH="$TGT_PATH/HW"
+SW_PATH="$TGT_PATH/SW"
+RET_DIR=$PWD
+SB="$SB_HOME/streamblocks-platforms/streamblocks"
+
+
+PARTITIONING="--set partitioning=on"
+# BUFFERSIZE="--set buffer-depth=$((1 << 25))"
+OPTIONS="$PARTIOTION"
+echo "Changing directory to $SB_HOME"
+cd $SB_HOME
+bold=$(tput bold)
+normal=$(tput sgr0)
+set -e
+for sz in 8 16 32 64
+do
+  for fo in 1 2 
+  do
+    echo "${bold}Running HW compilation${normal}"
+    echo "----------------Loopback${sz}x${fo}---------------------"
+    OUTPUT_PATH="$TGT_PATH/${sz}x${fo}"
+    HW_PATH="$OUTPUT_PATH/HW"
+    SW_PATH="$OUTPUT_PATH/SW"
+    ENTITY="hetero.simple.loopback.Loopback${sz}x${fo}"
+    $SB vivado-hls $PARTITIONING --source-path $SB_SRC_PATH --target-path $HW_PATH $ENTITY
+    
+    echo "======================================="
+    echo "Runninn SW compilation"
+    echo "----------------Loopback${sz}x${fo}---------------------"
+    $SB multicore $PARTITIONING --source-path $SB_SRC_PATH --target-path $SW_PATH $ENTITY
+    
+    echo "======================================="
+  done
+done
+
+

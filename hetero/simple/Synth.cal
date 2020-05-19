@@ -1,0 +1,134 @@
+namespace hetero.simple:
+    /*
+     * Sink actor
+     * Consumes identfinetly tokens from the input port IN, 
+     * and prints the tokens to the standart output.
+     */
+    actor Sink()
+        int IN ==> :
+    
+        action IN:[token] ==>
+        end
+    end
+
+    actor Pass()
+      int IN ==> int OUT:
+
+      action IN:[token] ==> OUT:[token]
+      end
+    end
+
+
+    /*
+     * SourceSink network
+     * Instatiates Source and Sink actors and interconnects them.
+     */
+    network Loopback() 
+        ==> :
+
+        entities
+            source = Source(max = 1 << 20) {partition = "sw";};
+            pass = Pass() {partition = "hw";};
+            sink = Sink() {partition = "sw";};
+        structure
+            source.OUT --> pass.IN;
+            pass.OUT --> sink.IN;
+    end
+
+    network SWFanout() 
+        ==> :
+
+        entities
+            source = Source() {partition = "sw";};
+            pass1 = Pass() {partition = "hw";};
+            pass2 = Pass() {partition = "hw";};
+            sink1 = Sink() {partition = "sw";};
+            sink2 = Sink() {partition = "sw";};
+        structure
+            source.OUT --> pass1.IN;
+            source.OUT --> pass2.IN;
+            pass1.OUT --> sink1.IN;
+            pass2.OUT --> sink2.IN;
+    end
+
+    network HWSource() 
+        ==> :
+        entities
+            source = Source() { partition = "hw"; };
+            sink1 = Sink();
+            sink2 = Sink();
+
+        structure
+            source.OUT --> sink1.IN;
+            source.OUT --> sink2.IN;
+    end
+
+
+    network HWSink()
+        ==> :
+        entities
+            source = Source();
+            sink1 = Sink() { partition = "hw"; };
+            sink2 = Sink() { partition = "hw"; };
+        structure
+            source.OUT --> sink1.IN;
+            source.OUT --> sink2.IN;
+    end
+    network HWFanout()
+        ==> :
+        entities
+            source = Source() {partition = "sw";};
+            pass = Pass() {partition = "hw";};
+            sink1 = Sink() {partition = "sw";};
+            sink2 = Sink() {partition = "sw";};
+        structure
+            source.OUT --> pass.IN;
+            pass.OUT --> sink2.IN;
+            pass.OUT --> sink2.IN;
+    end
+
+    network Fanout()
+        ==> :
+        entities
+
+            swSource = Source() {partition = "sw";};
+            hwPass1 = Pass() {partition = "hw";};
+            hwPass2 = Pass() {partition = "hw";};
+            swSink1 = Sink() {partition = "sw";};
+            swSink2 = Sink() {partition = "sw";};
+
+            
+            hwSource = Source() {partition = "hw";};
+            swPass1 = Pass() {partition = "sw";};
+            swPass2 = Pass() {partition = "sw";};
+            hwSink1 = Sink() {partition = "hw";};
+            hwSink2 = Sink() {partition = "hw";};
+
+        structure
+
+            swSource.OUT --> hwPass1.IN;
+            swSource.OUT --> hwPass2.IN;
+            hwPass1.OUT --> swSink1.IN;
+            hwPass2.OUT --> swSink2.IN;
+
+            hwSource.OUT --> swPass1.IN;
+            hwSource.OUT --> swPass2.IN;
+            swPass1.OUT --> hwSink1.IN;
+            swPass2.OUT --> hwSink2.IN;
+    end
+
+    network HWPass()
+        int source_OUT ==> int sink1_IN, int sink2_IN:
+
+        entities
+        
+            hwPass1 = Pass();
+            hwPass2 = Pass();
+        
+        structure
+            source_OUT --> hwPass1.IN;
+            source_OUT --> hwPass2.IN;
+            hwPass2.OUT --> sink1_IN;
+            hwPass2.OUT --> sink2_IN;
+    end
+end

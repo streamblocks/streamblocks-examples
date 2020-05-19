@@ -1,0 +1,141 @@
+namespace hetero.simple.loopback:
+
+  import entity hetero.simple.source.Source64;
+  import entity hetero.simple.source.Source32;
+  import entity hetero.simple.source.Source16;
+  import entity hetero.simple.source.Source8;
+
+  import entity hetero.simple.sink.Sink64;
+  import entity hetero.simple.sink.Sink32;
+  import entity hetero.simple.sink.Sink16;
+  import entity hetero.simple.sink.Sink8;
+
+  import entity hetero.simple.pass.Pass64;
+  import entity hetero.simple.pass.Pass32;
+  import entity hetero.simple.pass.Pass16;
+  import entity hetero.simple.pass.Pass8;
+  
+  uint(size=64) txSize = 1 << 16;
+  uint(size=64) depth = 1 << 16;
+  /*
+    * SourceSink network
+    * Instatiates Source and Sink actors and interconnects them.
+    */
+  network Loopback64x1() 
+      ==> :
+
+      entities
+          source = Source64(max = txSize);
+          pass = Pass64() {partition = "hw";};
+          sink = Sink64();
+      structure
+          source.OUT --> pass.IN {buffersize = depth;};
+          pass.OUT --> sink.IN {buffersize = depth;};
+  end
+
+  network Loopback32x1() 
+      ==> :
+
+      entities
+          source = Source32(max = txSize);
+          pass = Pass32() {partition = "hw";};
+          sink = Sink32();
+      structure
+          source.OUT --> pass.IN {buffersize = depth;};
+          pass.OUT --> sink.IN {buffersize = depth;};
+  end
+
+  network Loopback16x1() 
+      ==> :
+
+      entities
+          source = Source16(max = txSize);
+          pass = Pass16() {partition = "hw";};
+          sink = Sink16();
+      structure
+          source.OUT --> pass.IN {buffersize = depth;};
+          pass.OUT --> sink.IN {buffersize = depth;};
+  end
+
+  network Loopback8x1() 
+      ==> :
+
+      entities
+          source = Source8(max = txSize);
+          pass = Pass8() {partition = "hw";};
+          sink = Sink8();
+      structure
+          source.OUT --> pass.IN {buffersize = depth;};
+          pass.OUT --> sink.IN {buffersize = depth;};
+  end
+
+  network Loopback64x2()
+    ==>:
+
+    entities
+      source1 = Source64(max = txSize);
+      source2 = Source64(max = txSize);
+      pass1 = Pass64() { partition = "hw"; };
+      pass2 = Pass64() { partition = "hw"; };
+      sink1 = Sink64();
+      sink2 = Sink64();
+    structure
+      source1.OUT --> pass1.IN { buffersize = depth;};
+      source2.OUT --> pass2.IN { buffersize = depth;};
+      pass1.OUT --> sink1.IN { buffersize = depth;};
+      pass2.OUT --> sink2.IN { buffersize = depth;};
+  end
+
+  network Loopback32x2()
+    ==>:
+    entities
+      source1 = Source32(max = txSize);
+      source2 = Source32(max = txSize);
+      pass1 = Pass32() { partition = "hw"; };
+      pass2 = Pass32() { partition = "hw"; };
+      sink1 = Sink32();
+      sink2 = Sink32();
+    structure
+      source1.OUT --> pass1.IN { buffersize = depth;};
+      source2.OUT --> pass2.IN { buffersize = depth;};
+      pass1.OUT --> sink1.IN { buffersize = depth;};
+      pass2.OUT --> sink2.IN { buffersize = depth;};
+  end
+
+
+
+  network Loopback16x2()
+    ==>:
+    entities
+      source1 = Source16(max = txSize);
+      source2 = Source16(max = txSize);
+      pass1 = Pass16() { partition = "hw"; };
+      pass2 = Pass16() { partition = "hw"; };
+      sink1 = Sink16();
+      sink2 = Sink16();
+    structure
+      source1.OUT --> pass1.IN { buffersize = depth;};
+      source2.OUT --> pass2.IN { buffersize = depth;};
+      pass1.OUT --> sink1.IN { buffersize = depth;};
+      pass2.OUT --> sink2.IN { buffersize = depth;};
+  end
+
+  network Loopback8x2()
+    ==>:
+    entities
+      source1 = Source8(max = txSize);
+      source2 = Source8(max = txSize);
+      pass1 = Pass8() { partition = "hw"; };
+      pass2 = Pass8() { partition = "hw"; };
+      sink1 = Sink8();
+      sink2 = Sink8();
+    structure
+      source1.OUT --> pass1.IN { buffersize = depth;};
+      source2.OUT --> pass2.IN { buffersize = depth;};
+      pass1.OUT --> sink1.IN { buffersize = depth;};
+      pass2.OUT --> sink2.IN { buffersize = depth;};
+  end
+
+
+
+end

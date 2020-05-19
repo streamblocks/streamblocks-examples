@@ -1,0 +1,31 @@
+#!/bin/bash
+
+SB_HOME="/home/mayy/streamblocks"
+
+SB_SRC_PATH="$SB_HOME/streamblocks-examples/system"
+SB_ORCC_PATH="$SB_HOME/streamblocks-examples/orc-apps/Research/src"
+SB_ORCC_PATH="$SB_ORCC_PATH:$SB_HOME/streamblocks-examples/orc-apps/RVC/src"
+SB_ORCC_PATH="$SB_ORCC_PATH:$SB_HOME/streamblocks-examples/orc-apps/System/src"
+SB_ORCC_PATH="$SB_ORCC_PATH:$SB_HOME/streamblocks-examples/orc-apps/StreamBlocks/src"
+SB_ORCC_PATH="$SB_ORCC_PATH:$SB_HOME/streamblocks-examples/orcc-designs/Research/src"
+SB_XDF_PATH="$SB_HOME/streamblocks-examples"
+SB_XDF_PATH="$SB_XDF_PATH:$SB_HOME/streamblocks-examples/orcc-designs/Research/src"
+SB_XDF_PATH="$SB_XDF_PATH:$SB_HOME/streamblocks-examples/orc-apps/Research/src"
+SB_XDF_PATH="$SB_XDF_PATH:$SB_HOME/streamblocks-examples/orc-apps/StreamBlocks/src"
+set -x
+TGT_PATH="/home/mayy/icc126/_build/mpeg"
+HW_PATH="$TGT_PATH/HW"
+SW_PATH="$TGT_PATH/SW"
+RET_DIR=$PWD
+SB="$SB_HOME/streamblocks-platforms/streamblocks"
+PARTITIONING="--set partitioning=on"
+echo "Going to $SB_HOME"
+cd $SB_HOME
+echo "Running HW compilation"
+$SB vivado-hls $PARTITIONING --source-path $SB_SRC_PATH --orcc-source-path $SB_ORCC_PATH --xdf-source-path $SB_XDF_PATH --target-path $HW_PATH "hetero.mpeg.MPEG"
+echo "Runninn SW compilation"
+$SB multicore $PARTITIONING --source-path $SB_SRC_PATH --orcc-source-path $SB_ORCC_PATH --xdf-source-path $SB_XDF_PATH --target-path $SW_PATH "hetero.mpeg.MPEG"
+
+# cd $RET_DIR
+
+

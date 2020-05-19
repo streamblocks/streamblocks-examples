@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="MPEG">
+    <Instance id="decoder">
+        <Class name="com.xilinx.mpeg4.part2.sp.XilinxSDx"/>
+         <Attribute kind="Value" name="partition">
+            <Expr kind="Literal" literal-kind="String" value='"hw"'/>
+        </Attribute>
+    </Instance>
+    <Instance id="source">
+        <Class name="ART.art_Source_byte"/>
+        <Parameter name="fileName">
+            <Expr kind="Literal" literal-kind="String" value="./foreman_qcif_30.bit"/>
+        </Parameter>
+        <Parameter name="loops">
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+        <Class name="ART.art_Display_yuv"/>
+        <Parameter name="title">
+            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+        
+    </Instance>
+    
+    <Instance id="Convert8to32">
+        <Class name="com.xilinx.mpeg4.part2.sp.Convert8to32"/>
+    </Instance>
+    <Instance id="Convert32to32">
+        <Class name="com.xilinx.mpeg4.part2.sp.Convert32to32"/>
+    </Instance>
+    <Instance id="sink_BYTE">
+        <Class name="ART.art_Sink_txt"/>
+        <Parameter name="fileName">
+            <Expr kind="Literal" literal-kind="String" value="./BYTE.txt"/>
+        </Parameter>
+    </Instance>
+    <Instance id="sink_YCbCr">
+        <Class name="ART.art_Sink_txt"/>
+        <Parameter name="fileName">
+            <Expr kind="Literal" literal-kind="String" value="./YCbCr.txt"/>
+        </Parameter>
+    </Instance>
+    <Connection dst="Convert8to32" dst-port="IN" src="source" src-port="Out"/>
+    <Connection dst="sink_BYTE" dst-port="In" src="Convert8to32" src-port="OUT"/>
+    <Connection dst="decoder" dst-port="BYTE" src="Convert8to32" src-port="OUT"/>
+    <Connection dst="Convert32to32" dst-port="IN" src="decoder" src-port="YCbCr"/>
+    <Connection dst="sink_YCbCr" dst-port="In" src="decoder" src-port="YCbCr"/>
+    <Connection dst="display" dst-port="In" src="Convert32to32" src-port="OUT"/>
+</XDF>

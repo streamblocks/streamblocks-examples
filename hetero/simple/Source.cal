@@ -1,0 +1,71 @@
+namespace hetero.simple.source:
+    
+  /*
+    * Source actor 
+    * Produces 16 token from 0 to 15, and send them to output OUT.
+  */
+  actor Source64(uint(size=64) max)
+      ==> uint(size=64) OUT:
+
+      uint(size=64) Counter := 0;
+
+      action ==> OUT:[token]
+      guard
+          Counter < max
+      var
+          uint(size=64) token = Counter
+      do
+          Counter := Counter + 1;
+      end
+
+  end
+
+  actor Source32(uint(size=64) max)
+      ==> uint(size=32) OUT:
+
+      uint(size=64) Counter := 0;
+
+      action ==> OUT:[token]
+      guard
+          Counter < max
+      var
+          uint(size=32) token = Counter
+      do
+          Counter := Counter + 1;
+      end
+
+  end
+  
+  actor Source16(uint(size=64) max)
+    ==> uint(size=16) OUT:
+
+    uint(size=64) Counter := 0;
+
+    action ==> OUT:[token]
+    guard
+        Counter < max
+    var
+        uint(size=16) token = Counter
+    do
+        Counter := Counter + 1;
+    end
+
+  end
+
+  actor Source8(uint(size=64) max)
+    ==> uint(size=8) OUT:
+
+    uint(size=64) Counter := 0;
+
+    action ==> OUT:[token]
+    guard
+        Counter < max
+    var
+        uint(size=8) token = Counter
+    do
+        Counter := Counter + 1;
+    end
+
+  end
+
+end

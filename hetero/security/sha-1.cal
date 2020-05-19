@@ -1,0 +1,296 @@
+namespace hetero.security.sha:
+
+  import var system.io.print_s;
+  import var system.io.print_i;
+  import var system.io.println_s_i;
+
+  type ScheduleInfo : (uint(size = 32) num_chunks, bool started) end
+
+
+  actor SHA1Padding()
+    uint(size = 8) messageStream ==> uint(size = 32) paddedStream:
+
+  
+    function bytesToWord(
+      List(type:uint(size = 8), size = 4) bytes) --> uint(size = 32):
+        ((bytes[0]::uint(size = 32))  << 24) | 
+        ((bytes[1]::uint(size = 32))  << 16) | 
+        ((bytes[2]::uint(size = 32))  <<  8) | 
+        ((bytes[3]::uint(size = 32))       )     
+    end
+    repeat
+      begin
+      var 
+          // uint(size = 8)  bytes_stream[4],
+          uint(size = 8) b0,
+          uint(size = 8) b1,
+          uint(size = 8) b2,
+          uint(size = 8) b3,
+          List(type: uint(size = 8), size = 4) bytes,
+          uint(size = 32) message_length := 0,
+          uint(size = 32) padded_length := 0,
+          uint(size = 64) bits_length := 0,
+          uint(size = 32) remainder := 0,
+          uint(size = 32) loop_counter := 0,
+          uint(size = 8)  token := 0,
+          uint(size = 32) zeros := 0
+      do
+
+        messageStream --> token;
+        bytes[0] := token;
+        messageStream --> token;
+        bytes[1] := token;
+        messageStream --> token;
+        bytes[2] := token;
+        messageStream --> token;
+        bytes[3] := token;
+        message_length := bytesToWord(bytes);
+        bits_length := ((message_length :: uint(size=64)) * 8);
+
+        remainder := (message_length + 1) mod 64;
+        zeros := if remainder < 56 then 56 - remainder else 64 - remainder + 56 + 1 end;
+
+        padded_length := message_length + 1 + zeros + 8; 
+        
+        // stream the padded size
+        paddedStream <-- padded_length;
+        
+        loop_counter := 0;
+        while loop_counter < padded_length - 8
+        var 
+            uint byte_index := 0
+      
+        do
+          if (loop_counter < message_length) then
+            messageStream --> token;
+            bytes[byte_index] := token;
+          elsif loop_counter = message_length then
+            bytes[byte_index] := 0x80;
+          else  
+            bytes[byte_index] := 0x00;
+          end
+
+          if byte_index = 3 then
+            paddedStream <-- bytesToWord(bytes);
+            byte_index := 0;
+          else 
+            byte_index := byte_index + 1;
+          end
+          loop_counter := loop_counter + 1;
+
+        end
+
+        paddedStream <-- ((bits_length >> 32) ::uint(size = 32));
+        paddedStream <-- ( bits_length        ::uint(size = 32));
+      end
+    end
+  end
+
+
+  // Each chunk is 64-btye long that is processed as 16, 32-bit words
+  actor SHA1ComputeHash() 
+    uint(size = 32) wordStream ==> uint(size = 32) hashStream:
+
+    uint(size = 32) a;
+    uint(size = 32) b;
+    uint(size = 32) c;
+    uint(size = 32) d;
+    uint(size = 32) e;
+    uint(size = 32) f;
+
+
+    List(type:uint(size = 32), size=5) initHashes = 
+      [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
+    List(type:uint(size = 32), size = 5) hashes;
+    
+    List(type:uint(size = 32), size=80) words;
+
+    
+
+    ScheduleInfo sch_info := ScheduleInfo(0, false);
+
+    function leftRotate(uint(size = 32) w, uint n) --> uint(size = 32):
+      (w << n) | (w >> (32 - n))
+    end
+
+    procedure computeTemp(uint(size = 32) k, uint i) 
+    var uint(size = 32) tmp = leftRotate(a, 5) + f + e + k + words[i]
+    begin
+      e := d;
+      d := c;
+      c := leftRotate(b, 30);
+      b := a;
+      a := tmp;
+    end
+
+    // Reads the first word which is the stream size
+    initHashes: action wordStream:[w] ==>
+    guard sch_info.num_chunks = 0 and sch_info.started = false
+    do
+      hashes[0] := initHashes[0];
+      hashes[1] := initHashes[1];
+      hashes[2] := initHashes[2];
+      hashes[3] := initHashes[3];
+      hashes[4] := initHashes[4];
+      sch_info  := ScheduleInfo(w / 64, true); // each chunk has 64 bytes 
+      
+    end
+
+    processChunk: action wordStream:[ws] repeat 16 ==>
+    guard sch_info.num_chunks > 0 and sch_info.started = true
+    var uint iter := 0,
+        uint(size = 32) num_chunks := sch_info.num_chunks
+    do
+      foreach uint i in 0 .. 16 do
+        words[i] := ws[i];
+      end
+
+      iter := 16;
+      while iter < 80
+      do
+        words[iter] := leftRotate( 
+          words[iter -  3] ^ words[iter -  8] ^ 
+          words[iter - 14] ^ words[iter - 16],
+          1);
+        iter := iter + 1;
+      end
+      a := hashes[0];
+      b := hashes[1];
+      c := hashes[2];
+      d := hashes[3];
+      e := hashes[4];
+
+      iter := 0;
+      while iter < 20
+      do
+        f := (b & c) | ((~b) & d);
+        computeTemp(0x5A827999, iter);
+        iter := iter + 1;
+      end
+      
+      while iter < 40
+      do
+        f := b ^ c ^ d;
+        computeTemp(0x6ED9EBA1, iter);
+        iter := iter + 1;
+      end
+      
+      while iter < 60
+      do
+        f := (b & c) | (b & d) | (c & d);
+        computeTemp(0x8F1BBCDC, iter);
+        iter := iter + 1;
+      end
+
+      while iter < 80
+      do
+        f := b ^ c ^ d;
+        computeTemp(0xCA62C1D6, iter);
+        iter := iter + 1;
+      end
+
+      hashes[0] := hashes[0] + a;
+      hashes[1] := hashes[1] + b;
+      hashes[2] := hashes[2] + c;
+      hashes[3] := hashes[3] + d;
+      hashes[4] := hashes[4] + e;
+
+
+      sch_info := ScheduleInfo(num_chunks - 1, true);
+    end
+
+    streamHashes: action ==> hashStream:[h0, h1, h2, h3, h4]
+    guard sch_info.num_chunks = 0 and sch_info.started = true
+    var 
+      uint(size = 32) h0 = hashes[0],
+      uint(size = 32) h1 = hashes[1],
+      uint(size = 32) h2 = hashes[2],
+      uint(size = 32) h3 = hashes[3],
+      uint(size = 32) h4 = hashes[4]
+    do
+      sch_info := ScheduleInfo(0, false);
+    end
+
+    schedule fsm init:
+
+      init(initHashes) --> chunks;
+      chunks(processChunk) --> chunks;
+      chunks(streamHashes) --> init;
+
+    end
+    
+  end
+
+  
+  network SHA1() uint(size = 8) text ==> uint(size = 32) hash:
+
+    entities
+      padding = SHA1Padding();
+      compute = SHA1ComputeHash();
+
+    structure
+      text --> padding.messageStream;
+      padding.paddedStream --> compute.wordStream;
+      compute.hashStream --> hash;
+  end
+
+
+  actor SHA1Input() ==> uint(size = 8) messageStream:
+
+    List(type:uint(size = 8), size=5) msg = [65, 66, 67, 68, 69];
+    
+    do
+      begin
+      var loop_counter := 0
+      do
+        messageStream <-- 0x00;
+        messageStream <-- 0x00;
+        messageStream <-- 0x00;
+        messageStream <-- 0x05;
+
+        while loop_counter < 5 do
+          messageStream <-- msg[loop_counter];
+          loop_counter := loop_counter + 1;
+        end
+      end
+    end
+  end
+
+  actor SHA1Compare() uint(size = 32) in1, uint(size = 32) in2 ==> :
+
+    uint(size = 64) errors := 0;
+    uint(size = 64) count  := 0; 
+    action in1:[t1], in2:[t2] ==> 
+    guard t1 = t2
+    do
+      count := count + 1;
+    end
+    action in1:[t1], in2:[t2] ==> 
+    guard t1 != t2
+    do
+      count  := count + 1;
+      errors := errors + 1;
+      println_s_i("Errors: ", errors);
+    end
+  end
+  network SHA1Test() ==> :
+
+    entities
+      
+      sha1HW = SHA1() { partition="hw"; };
+      sha1SW = SHA1() { partition="sw"; };
+      input = SHA1Input();
+      cmp = SHA1Compare();
+    structure
+      input.messageStream --> sha1HW.text;
+      input.messageStream --> sha1SW.text;
+
+      sha1HW.hash --> cmp.in1;
+      sha1SW.hash --> cmp.in2;
+
+  end
+end
+
+
+  
+  
