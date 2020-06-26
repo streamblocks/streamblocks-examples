@@ -1,0 +1,13 @@
+namespace simple.dwf:
+
+   
+    actor Adder()
+        int A ==> int B:
+        
+        action A:[a] ==> B:[0]
+        end
+    end
+
+    
+end
+ 

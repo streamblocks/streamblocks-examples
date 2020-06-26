@@ -1,0 +1,25 @@
+namespace System.math:
+
+
+	
+	    external function round(float f) --> int end
+	    
+	    external function fabs(float f) --> float end
+		
+		external function floor(float f) --> int end
+		
+		external function sin(float f) --> float end
+		
+		external function cos(float f) --> float end
+
+        external function sqrt(float f) --> float end
+        		
+		external function exp(float f) --> float end
+		
+		external function log(float f) --> float end
+		
+		float PI=3.14159265358979323846; 
+
+	
+	
+end

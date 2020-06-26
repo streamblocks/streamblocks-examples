@@ -21,5 +21,28 @@ namespace system.io:
     external procedure println_s(String value) end
 
     external procedure println_s_i(String id, int value) end
+ 
+  	external procedure printInt(int i) end
+  	
+  	external procedure printStr(String s)end
+	
+	external procedure dprint(String s)end
+    
+    external procedure dprint1(String s, int i) end
+    
+    external procedure dprint2(String s, int i1, int i2)end
+
+    external procedure dprint3(String s, int i1, int i2, int i3)end
+    
+    external procedure dprintc(int i1, int i2, String s)end
+    
+    external procedure dprint_trace(String s1, String s2)end
+    
+    external procedure dprint_trace1(String s1, String s2, int i)end 
+    
+    external procedure dprint_trace2(String s1, String s2, int i1, int i2)end
+    
+    external procedure dprint_trace3(String s1, String s2, int i1, int i2, int i3)end
+  
 
 end
