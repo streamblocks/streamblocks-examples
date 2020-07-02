@@ -1,0 +1,37 @@
+namespace hetero.decoder.jpeg:
+
+	import entity ART.art_Display_yuv;
+	import entity ART.art_Sink_txt;
+	import entity ART.art_Source_byte;
+
+  import entity jpeg.decoder.JpegDecoder;
+
+	import entity hetero.utils.Comparator;
+
+	uint fifo_size = 131072;
+	network JpegDecoderNetwork() ==> :
+	entities
+		source = art_Source_byte(fileName="./foreman_qcif.mjpg", loops=0);
+		display = art_Display_yuv(title="Foreman QCIF", width=176, height=144);
+		ixSink = art_Sink_txt(fileName="./ix.txt");
+		hwSink = art_Sink_txt(fileName="./hw.txt");
+		swSink = art_Sink_txt(fileName="./sw.txt");
+		decoderHW = JpegDecoder() {partition = "hw"; };
+		decoderSW = JpegDecoder();
+		compare = Comparator();
+	structure
+		source.Out --> decoderSW.BYTE { buffersize = fifo_size; };
+		source.Out --> decoderHW.BYTE { buffersize = fifo_size; };
+
+		decoderHW.YCbCr --> compare.In1 { buffersize = fifo_size; };
+		decoderSW.YCbCr --> compare.In2 { buffersize = fifo_size; };
+
+		compare.ErrIx --> ixSink.In;
+		compare.V1 --> hwSink.In;
+		compare.V2 --> swSink.In;
+
+		decoderHW.YCbCr --> display.In { buffersize = fifo_size; };
+	end
+
+
+end

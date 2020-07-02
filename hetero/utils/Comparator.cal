@@ -1,0 +1,32 @@
+namespace hetero.utils:
+
+
+	actor Comparator() uint In1, uint In2 ==> uint ErrIx, uint V1, uint V2:
+
+		uint ix := 0;
+		uint v1 := 0;
+		uint v2 := 0;
+		bool error_found := false;
+		compare: action In1:[t1], In2:[t2] ==> 
+		do
+			if t1 = t2 then
+				error_found := false;
+			else 
+				error_found := true;
+			end
+			ix := ix + 1;
+			v1 := t1;
+			v2 := t2;
+		end
+
+		emitError: action ==> ErrIx:[ix], V1:[v1], V2:[v2]
+		guard error_found
+		do
+			error_found := false;
+		end
+
+		priority 
+			emitError > compare;
+		end
+	end
+end

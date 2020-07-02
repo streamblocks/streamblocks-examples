@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="MPEG">
+<XDF name="SerialNetwork">
     <Instance id="decoder">
         <Class name="com.xilinx.mpeg4.part2.sp.XilinxSDx"/>
          <Attribute kind="Value" name="partition">

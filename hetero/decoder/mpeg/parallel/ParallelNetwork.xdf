@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="ParallelNetwork">
+    <Instance id="decoder">
+        <Class name="ch.epfl.mpeg4.part2.SB_Decoder_Parallel"/>
+        <Attribute kind="Value" name="partition">
+            <Expr kind="Literal" literal-kind="String" value='"hw"' />
+        </Attribute>
+    </Instance>
+    <Instance id="source">
+        <Class name="ART.art_Source_bin"/>
+        <Parameter name="fileName">
+            <Expr kind="Literal" literal-kind="String" value="./foreman_qcif_30.bit"/>
+        </Parameter>
+         <Parameter name="loops">
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+         <Class name="ART.art_Display_yuv_width_height"/>
+        <Parameter name="title">
+            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+    </Instance>
+         <Instance id="sizesplitter">
+         <Class name="ch.epfl.mpeg4.part2.SizeSplitter"/>
+    </Instance>
+    <Connection dst="display" dst-port="In" src="decoder" src-port="VID"/>
+    <Connection dst="decoder" dst-port="bits" src="source" src-port="Out"/>
+    <Connection dst="sizesplitter" dst-port="IN" src="decoder" src-port="SIZE"/>
+    <Connection dst="display" dst-port="WIDTH" src="sizesplitter" src-port="WIDTH"/>
+    <Connection dst="display" dst-port="HEIGHT" src="sizesplitter" src-port="HEIGHT"/>
+</XDF>
