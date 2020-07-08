@@ -1,15 +1,15 @@
 namespace sort:
 
-	bool ASCENDING = true;
-	bool DESCENDING = false;
-
-	actor Compare(bool dir) int I_0, int I_1 ==> int O_0, int O_1:
+	actor Compare() int I_0, int I_1 ==> int O_0, int O_1:
+		
 		action I_0:[a], 
 			   I_1:[b] 
 			   ==> 
-			   O_0:[if dir and a > b then a else b end], 
-			   O_1:[if dir and a > b then b else a end]
+			   O_0:[if a > b then b else a end], 
+			   O_1:[if a > b then a else b end]
 		end
+		
+		
 	end
 	
 	network BitonicMerge4() 
@@ -21,14 +21,13 @@ namespace sort:
 		int O_0, 
 		int O_1,
 		int O_2,
-		int O_3
-		:
+		int O_3:
 	
 		entities
-			compare03 = Compare(dir=ASCENDING);
-			compare12 = Compare(dir=ASCENDING);
-			compare01 = Compare(dir=DESCENDING);
-			compare23 = Compare(dir=DESCENDING);	
+			compare03 = Compare();
+			compare12 = Compare();
+			compare01 = Compare();
+			compare23 = Compare();	
 		structure
 			I_0 --> compare03.I_0;
 			I_3 --> compare03.I_1;
@@ -66,30 +65,29 @@ namespace sort:
 		int O_4,
 		int O_5,
 		int O_6,
-		int O_7
-		:
+		int O_7:
 		
 		entities
-			compare07 = Compare(dir=ASCENDING);
-			compare16 = Compare(dir=ASCENDING);
-			compare25 = Compare(dir=ASCENDING);
-			compare34 = Compare(dir=ASCENDING);
+			compare07 = Compare();
+			compare16 = Compare();
+			compare25 = Compare();
+			compare34 = Compare();
 			
-			compare02 = Compare(dir=ASCENDING);
-			compare13 = Compare(dir=DESCENDING);
-			
-			
-			compare46 = Compare(dir=DESCENDING);
-			compare57 = Compare(dir=DESCENDING);
+			compare02 = Compare();
+			compare13 = Compare();
 			
 			
-			compare01 = Compare(dir=DESCENDING);
+			compare46 = Compare();
+			compare57 = Compare();
 			
-			compare23 = Compare(dir=DESCENDING);
 			
-			compare45 = Compare(dir=DESCENDING);
+			compare01 = Compare();
 			
-			compare67 = Compare(dir=DESCENDING);
+			compare23 = Compare();
+			
+			compare45 = Compare();
+			
+			compare67 = Compare();
 		structure
 			I_0 --> compare07.I_0;
 			I_7 --> compare07.I_1;
@@ -107,7 +105,7 @@ namespace sort:
 			compare25.O_0 --> compare02.I_1;
 			
 			compare16.O_0 --> compare13.I_0;
-			compare34.O_0 --> compare13.I_0;
+			compare34.O_0 --> compare13.I_1;
 			
 			compare34.O_1 --> compare46.I_0;
 			compare16.O_1 --> compare46.I_1;
@@ -159,14 +157,13 @@ namespace sort:
 		int O_4,
 		int O_5,
 		int O_6,
-		int O_7
-		:
+		int O_7:
 		
 		entities
-			compare01 = Compare(dir=ASCENDING);
-			compare23 = Compare(dir=ASCENDING);
-			compare45 = Compare(dir=ASCENDING);
-			compare67 = Compare(dir=ASCENDING);
+			compare01 = Compare();
+			compare23 = Compare();
+			compare45 = Compare();
+			compare67 = Compare();
 			
 			merge03 = BitonicMerge4();
 			merge47 = BitonicMerge4();
@@ -201,6 +198,7 @@ namespace sort:
 			merge03.O_1 --> merge07.I_1;
 			merge03.O_2 --> merge07.I_2;
 			merge03.O_3 --> merge07.I_3;
+			
 			merge47.O_0 --> merge07.I_4;
 			merge47.O_1 --> merge07.I_5;
 			merge47.O_2 --> merge07.I_6;
