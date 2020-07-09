@@ -94,7 +94,7 @@ namespace sort:
 	network Test_BitonicSort() ==> :
 	entities
 		send = Send();
-		sort = BitonicSort8();
+		sort = BitonicSort8(DIRECTION=DESCENDING);
 		print = Print();
 	structure
 		send.O_0 --> sort.I_0;
