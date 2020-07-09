@@ -77,7 +77,6 @@ import System.bitops.bitor;
 import System.bitops.lshift;
 import System.bitops.bitxor;
 import System.bitops.rshift;
-import System.util.Integers;
 
 actor MPEG4_algo_DCRinvpred_chroma_8x8 (
  int DCVAL,
@@ -109,13 +108,13 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   int ptr := 1;                      // Pointer to current 8x8 block on current row                          
                                      // using circular buffer addressing. Start at 4, since 0-3 are reserved.
   // Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
-  List( type:int(size=SAMPLE_SZ), size=BUF_SIZE ) dc_buf := [ DCVAL : for int k in Integers(1,BUF_SIZE) ];
+  List( type:int(size=SAMPLE_SZ), size=BUF_SIZE ) dc_buf := [ DCVAL : for int k in 0 .. BUF_SIZE-1 ];
   int(size=SAMPLE_SZ) dc_pred;       // Decoded DC prediction value          
   int(size=SCALER_SZ) scaler;        // Decoded 'dc_scalar'                  
   bool is_signed;                    // Flag to indicate INTER or INTRA block
   int(size=SAMPLE_SZ) dc_val;        // Reconstructed DC coefficient  
 
-  List( type:int(size=QUANT_SZ), size=BUF_SIZE ) buf_qp := [ 0 : for int k in Integers(1, BUF_SIZE)  ];
+  List( type:int(size=QUANT_SZ), size=BUF_SIZE ) buf_qp := [ 0 : for int k in 0 .. BUF_SIZE - 1  ];
   int(size=MB_COORD_SZ) mbwidth   := 0;           // Macroblock width of current vop
   int cnt := 0;                         // Pointer to current 8x8 block
 

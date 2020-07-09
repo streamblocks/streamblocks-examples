@@ -17,7 +17,6 @@
 
 namespace RVC:
 
-import System.util.Integers;
 
  actor Clip ( int isz, int osz ) int(size=isz) I, bool SIGNED ==> int(size=osz) O :
 
@@ -42,7 +41,7 @@ import System.util.Integers;
             x[i]
           end
         end
-      end : for int i in Integers(0, 63) ] ] repeat 64
+      end : for int i in 0 .. 63 ] ] repeat 64
   end     
 
   schedule fsm set_sign:

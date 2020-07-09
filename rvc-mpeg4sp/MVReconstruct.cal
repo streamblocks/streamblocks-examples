@@ -18,7 +18,6 @@ import System.bitops.bitnot;
 import System.bitops.bitor;
 import System.bitops.lshift;
 import System.bitops.rshift;
-import System.util.Integers;
 
  actor MVReconstruct (
   // Maximum image width (in units of macroblocks) that the decoder can handle.
@@ -49,7 +48,7 @@ import System.util.Integers;
   int BUF_SIZE = MAXW_IN_MB * 8;
   int(size=4) Y_SELECT = 4;
   int(size=MB_COORD_SZ+3) ptr;
-  List( type:int(size=MV_SZ), size=BUF_SIZE ) buf := [ 0 : for int i in Integers( 1, BUF_SIZE) ];
+  List( type:int(size=MV_SZ), size=BUF_SIZE ) buf := [ 0 : for int i in 0 .. BUF_SIZE- 1 ];
 
   int(size=MV_SZ) mv_rsize;
   int(size=MV_SZ) mv_range;

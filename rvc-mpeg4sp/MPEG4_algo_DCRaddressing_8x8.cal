@@ -52,7 +52,6 @@ namespace RVC:
 import System.bitops.bitand;
 import System.bitops.bitor;
 import System.bitops.lshift;
-import System.util.Integers;
 
 actor MPEG4_algo_DCRaddressing_8x8 (int MAXW_IN_MB,
                                     int MB_COORD_SZ,
@@ -75,7 +74,7 @@ actor MPEG4_algo_DCRaddressing_8x8 (int MAXW_IN_MB,
   bool                  left_edge;                // Left edge macroblock flag
   int(size=MB_COORD_SZ) mbwidth   := 0;           // Macroblock width of current vop
   int BUF_SIZE                              = (MAXW_IN_MB+2);
-  List( type:bool, size=BUF_SIZE ) coded := [ false : for int i in Integers(1,BUF_SIZE) ];  
+  List( type:bool, size=BUF_SIZE ) coded := [ false : for int i in  0  .. BUF_SIZE -1 ];  
   int(size=MB_COORD_SZ) ptr;                      // Pointer to current macroblock                   
   int(size=MB_COORD_SZ) ptr_left;                 // Pointer to left neighbour macroblock ('A')      
   int(size=MB_COORD_SZ) ptr_above;                // Pointer to above neighbour macroblock ('C')     

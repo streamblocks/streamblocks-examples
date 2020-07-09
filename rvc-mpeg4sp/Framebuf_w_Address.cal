@@ -21,7 +21,6 @@ namespace RVC:
 import System.bitops.bitand;
 import System.bitops.rshift;
 import System.bitops.lshift;
-import System.util.Integers;
 
  actor Framebuf_w_Address (
     int SEARCHWIN_IN_MB,      // search window size (in macroblocks)
@@ -227,7 +226,7 @@ import System.util.Integers;
   read_fb: action ==> RD:[rd] repeat 81
   guard outstanding_writes < max_outstanding_writes
   var
-    List(type:int(size=PIX_SZ), size=81) rd := [0: for int k in Integers(1,81)],
+    List(type:int(size=PIX_SZ), size=81) rd := [0: for int k in 0 .. 80],
     int x = mbx_read*SAMPLES_PER_MB + 8*bitand(comp_read,1) + mvx,
     int y := mby_read*SAMPLES_PER_MB + 8*rshift(comp_read,1) + mvy,
     int clip_left := 0,

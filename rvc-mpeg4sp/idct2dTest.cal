@@ -63,7 +63,7 @@ namespace RVC :
 
 		i2b = int2bool();
 
-        idct2d = idct2d_23002(
+        idct2d = idt(
         	OUT_SZ = OUT_SIZE,
 			SIN_SZ = SAMPLE_SZ,
 			PIX_SZ = PIX_SZ

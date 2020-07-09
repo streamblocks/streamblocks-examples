@@ -35,7 +35,6 @@
  */
 
 namespace RVC:
-import System.util.Integers;
 
 actor Transpose () int In ==> int Out :
 
@@ -46,8 +45,8 @@ actor Transpose () int In ==> int Out :
   var 
   	List(type: int, size=64) y
   do		
-    foreach int r in Integers(0,7) do
-      foreach int c in Integers(0,7) do
+    foreach int r in 0 .. 7 do
+      foreach int c in 0 .. 7 do
     	y[r + c*8] := x[8*r + c];
       end    
     end

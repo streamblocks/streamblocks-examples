@@ -16,7 +16,6 @@
 namespace RVC:
 
 import System.bitops.bitand;
-import System.util.Integers;
 
 actor MPEG4_algo_Add (int PIX_SZ, int MB_COORD_SZ, int BTYPE_SZ, int NEWVOP, int INTRA, int ACCODED)
                       
@@ -57,7 +56,7 @@ actor MPEG4_algo_Add (int PIX_SZ, int MB_COORD_SZ, int BTYPE_SZ, int NEWVOP, int
   			 then 255 
   			 else tex[i] + mot[i] 
   			 end 
-  		end : for int i in Integers(0,63)]] repeat 64
+  		end : for int i in 0 .. 63]] repeat 64
   end
 
   schedule fsm cmd:

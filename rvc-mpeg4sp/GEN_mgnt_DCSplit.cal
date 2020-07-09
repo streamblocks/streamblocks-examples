@@ -14,7 +14,6 @@
 // Rewrote the actor at block-level
 
 namespace RVC:
-import System.util.Integers;
 
  actor GEN_mgnt_DCSplit ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
 

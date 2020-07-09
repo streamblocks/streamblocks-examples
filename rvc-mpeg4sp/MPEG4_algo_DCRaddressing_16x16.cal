@@ -52,7 +52,6 @@ namespace RVC:
 import System.bitops.bitand;
 import System.bitops.bitor;
 import System.bitops.lshift;
-import System.util.Integers;
 
 actor MPEG4_algo_DCRaddressing_16x16 (
 int MAXW_IN_MB, 
@@ -84,7 +83,7 @@ int INTRA
   int(size=4)           comp      := 0;           // 8x8 block component in macroblock index // JWJ: increased size
   int(size=MB_COORD_SZ) mbwidth   := 0;           // Macroblock width of current vop
   int BUF_SIZE                              = (MAXW_IN_MB+2);
-  List( type:bool, size=BUF_SIZE*4 ) coded := [ false : for int i in Integers(1,BUF_SIZE*4) ];  // Buffer to record if 8x8 block is coded or not (i.e. are there DCT coeffs in the bitstream for this block?
+  List( type:bool, size=BUF_SIZE*4 ) coded := [ false : for int i in 0 .. BUF_SIZE*4-1 ];  // Buffer to record if 8x8 block is coded or not (i.e. are there DCT coeffs in the bitstream for this block?
   int(size=MB_COORD_SZ) ptr;                      // Pointer to current macroblock
   int(size=MB_COORD_SZ) ptr_left;                 // Pointer to left neighbour macroblock ('A')
   int(size=MB_COORD_SZ) ptr_above;                // Pointer to above neighbour macroblock ('C')

@@ -19,7 +19,6 @@ import System.bitops.bitxor;
 import System.bitops.bitor;
 import System.bitops.lshift;
 import System.bitops.rshift;
-import System.util.Integers;
 
 actor MPEG4_algo_Inversequant ( int QUANT_SZ, int SAMPLE_SZ ) int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
@@ -48,8 +47,8 @@ actor MPEG4_algo_Inversequant ( int QUANT_SZ, int SAMPLE_SZ ) int(size=SAMPLE_SZ
 
   ac: action AC:[i] repeat 63 ==> OUT:[o] repeat 63
   var
-    List(type:int(size=SAMPLE_SZ),size=63) v = [( quant * ( lshift( abs(i[j]), 1) + 1) ) - round  : for int j in Integers(0,62)],
-    List(type:int(size=SAMPLE_SZ),size=63) o = [ if i[k] = 0 then 0 else if i[k] < 0 then saturate(-v[k]) else saturate(v[k]) end end : for int k in Integers(0,62)]
+    List(type:int(size=SAMPLE_SZ),size=63) v = [( quant * ( lshift( abs(i[j]), 1) + 1) ) - round  : for int j in 0 .. 62 ],
+    List(type:int(size=SAMPLE_SZ),size=63) o = [ if i[k] = 0 then 0 else if i[k] < 0 then saturate(-v[k]) else saturate(v[k]) end end : for int k in 0 .. 62 ]
   end
 
   schedule fsm start :

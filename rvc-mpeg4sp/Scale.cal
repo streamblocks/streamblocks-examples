@@ -37,7 +37,6 @@
 namespace RVC:
 
 import System.bitops.lshift;
-import System.util.Integers;
 
 actor Scale (int SIN_SZ, int SOUT_SZ) int (size=SIN_SZ) SIn ==> int (size=SOUT_SZ) SOut :
 
@@ -67,7 +66,7 @@ B, E, F, G, B, G, F, E
   action SIn: [x] repeat 64 ==> SOut: [y] repeat 64
     var List (type: int (size=32), size=64) y := [0 : for int i in 1 .. 64]
       do
-        y := [x[i] * scale[i]: for int i in Integers(0, 63)];
+        y := [x[i] * scale[i]: for int i in 0 .. 63];
         y[0] := y[0] + lshift( 1, 12 );
       end
   end
