@@ -1,0 +1,86 @@
+namespace hetero.decoder.mpeg.xilinx:
+
+    import entity ART.art_Source_byte;
+    import entity ART.art_Display_yuv_width_height;
+
+    import entity com.xilinx.mpeg4.part2.sp.Decoder;
+    import entity com.xilinx.mpeg4.part2.sp.DDRModel;
+
+    actor Merger() int(size=9) YUV_i ==> int(size=32) YUV :
+
+        int Counter := 0;
+
+        Read_Y: action YUV_i:[y] ==> YUV:[y]
+        do
+            Counter := Counter + 1;
+        end
+
+        stop256 : action ==>
+        guard
+            Counter = 256
+        do
+            Counter := 0;
+        end
+
+        stop64 : action ==>
+        guard
+            Counter = 64
+        do
+            Counter := 0;
+        end
+
+        // Select the U blocks
+        Read_U: action YUV_i:[ u ] ==> YUV:[ u ]
+        do
+            Counter := Counter + 1;
+        end
+
+        // Select the V blocks
+        Read_V: action YUV_i:[ v ]==> YUV:[ v ]
+        do
+            Counter := Counter + 1;
+        end
+
+        schedule fsm Y :
+            Y ( Read_Y ) --> Y;
+            Y ( stop256 ) --> U;
+            U ( Read_U ) --> U;
+            U ( stop64 ) --> V;
+            V ( Read_V ) --> V;
+            V ( stop64 ) --> Y;
+        end
+
+        priority
+            stop256 > Read_Y;
+            stop64 > Read_U;
+            stop64 > Read_V;
+        end
+    end
+
+    network XilinxNetwork() ==> :
+    entities
+        source  = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=10); 
+        display = art_Display_yuv_width_height(title="StreamBlocks Multicore", width=176, height=144);
+        
+        decoder = Decoder() {partition="hw";};
+
+        ddr = DDRModel() {partition="hw";};
+
+        merger = Merger() {partition="hw";};
+
+    structure
+        source.Out --> decoder.bits;
+        ddr.RD --> decoder.MCD;
+
+        decoder.MBD --> ddr.WD;
+        decoder.MBA --> ddr.WA;
+        decoder.MCA --> ddr.RA;
+        decoder.VIDEO --> merger.YUV_i;
+        decoder.WIDTH --> display.WIDTH;
+        decoder.HEIGHT --> display.HEIGHT;
+
+        merger.YUV --> display.In;
+    end
+
+
+end
