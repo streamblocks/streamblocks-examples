@@ -3,7 +3,7 @@
 SB_HOME ?= $(STREAMBLOCKS_HOME)
 CMAKE ?= cmake
 
-TARGET_PATH ?= ./generated
+TARGET_PATH ?= $(shell pwd)/generated
 
 NUM_CORES ?= 2
 
@@ -34,13 +34,11 @@ XDF_SOURCE_PATH := $(XDF_SOURCE_PATH):$(SB_EXAMPLES_PATH)/
 SOURCE_ART_PATH := $(SB_EXAMPLES_PATH)/system/art
 
 
-COMMON_SETTIGNS := --set partitioning=on --set enable-systemc=on
+COMMON_SETTIGNS := --set partitioning=on
 
 MULTICORE_SETTIGS := $(COMMON_SETTIGNS)
 
-HLS_SETTINGS := $(COMMON_SETTIGNS)
-
-HLS_SETTINGS := $(COMMON_SETTIGNS) --set enable-action-profile=off --set max-bram=128MiB
+HLS_SETTINGS := $(COMMON_SETTIGNS) --set enable-action-profile=off 
 
 
 PATH_SETTINGS := --source-path $(SOURCE_ART_PATH) --orcc-source-path $(ORCC_SOURCE_PATH) --xdf-source-path $(XDF_SOURCE_PATH) --target-path $(TARGET_PATH)
