@@ -32,13 +32,17 @@ XDF_SOURCE_PATH := $(XDF_SOURCE_PATH):$(SB_EXAMPLES_PATH)/
 
 
 SOURCE_ART_PATH := $(SB_EXAMPLES_PATH)/system/art
+UTILS_PATH := $(SB_EXAMPLES_PATH)/hetero/utils
+SOURCE_PATH := $(SOURCE_ART_PATH):$(UTILS_PATH)
 
+SYSTEMC_SETTIGNS := --set enable-systemc=on --set max-bram=128MiB
 
-COMMON_SETTIGNS := --set partitioning=on
+COMMON_SETTIGNS := --set partitioning=on $(SYSTEMC_SETTIGNS)
+
 
 MULTICORE_SETTIGS := $(COMMON_SETTIGNS)
 
 HLS_SETTINGS := $(COMMON_SETTIGNS) --set enable-action-profile=off 
 
 
-PATH_SETTINGS := --source-path $(SOURCE_ART_PATH) --orcc-source-path $(ORCC_SOURCE_PATH) --xdf-source-path $(XDF_SOURCE_PATH) --target-path $(TARGET_PATH)
+PATH_SETTINGS := --source-path $(SOURCE_PATH) --orcc-source-path $(ORCC_SOURCE_PATH) --xdf-source-path $(XDF_SOURCE_PATH) --target-path $(TARGET_PATH)
