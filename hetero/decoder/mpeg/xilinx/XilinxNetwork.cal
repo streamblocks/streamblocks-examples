@@ -62,7 +62,7 @@ namespace hetero.decoder.mpeg.xilinx:
     end
 
 
-    network XilinxDecoder() uint(size=8) bits ==> 
+    network XilinxDecoder() uint(size=1) bits ==> 
         uint(size=16) WIDTH, uint(size=16) HEIGHT, int(size=32) YUV:
         entities
 
