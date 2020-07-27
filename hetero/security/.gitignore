@@ -1,0 +1,4 @@
+generated
+.vscode
+scripts/*.txt
+data

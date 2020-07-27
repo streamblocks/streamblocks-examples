@@ -3,21 +3,19 @@ namespace hetero.security.sha:
   import var system.io.print_s;
   import var system.io.print_i;
   import var system.io.println_s_i;
-
-  type ScheduleInfo : (uint(size = 32) num_chunks, bool started) end
-
-
-  actor SHA1Padding()
-    uint(size = 8) messageStream ==> uint(size = 32) paddedStream:
-
-  
-    function bytesToWord(
+  import entity ART.art_Sink_txt;
+  import entity ART.art_Source_txt;
+  // type ScheduleInfo : (uint(size = 32) num_chunks, bool started) end
+  function bytesToWord(
       List(type:uint(size = 8), size = 4) bytes) --> uint(size = 32):
         ((bytes[0]::uint(size = 32))  << 24) | 
         ((bytes[1]::uint(size = 32))  << 16) | 
         ((bytes[2]::uint(size = 32))  <<  8) | 
         ((bytes[3]::uint(size = 32))       )     
-    end
+  end
+
+  actor SHA1Padding()
+    uint(size = 8) messageStream ==> uint(size = 32) paddedStream:
     repeat
       begin
       var 
@@ -48,7 +46,7 @@ namespace hetero.security.sha:
         bits_length := ((message_length :: uint(size=64)) * 8);
 
         remainder := (message_length + 1) mod 64;
-        zeros := if remainder < 56 then 56 - remainder else 64 - remainder + 56 + 1 end;
+        zeros := if remainder < 56 then 56 - remainder elsif remainder = 56 then 0 else 64 - remainder + 56 end;
 
         padded_length := message_length + 1 + zeros + 8; 
         
@@ -59,7 +57,6 @@ namespace hetero.security.sha:
         while loop_counter < padded_length - 8
         var 
             uint byte_index := 0
-      
         do
           if (loop_counter < message_length) then
             messageStream --> token;
@@ -107,7 +104,9 @@ namespace hetero.security.sha:
 
     
 
-    ScheduleInfo sch_info := ScheduleInfo(0, false);
+    // ScheduleInfo sch_info := ScheduleInfo(0, false);
+    uint(size=32) sch_info_num_chunks := 0;
+    bool sch_info_started := false;
 
     function leftRotate(uint(size = 32) w, uint n) --> uint(size = 32):
       (w << n) | (w >> (32 - n))
@@ -124,22 +123,24 @@ namespace hetero.security.sha:
     end
 
     // Reads the first word which is the stream size
-    initHashes: action wordStream:[w] ==>
-    guard sch_info.num_chunks = 0 and sch_info.started = false
+    startProcess: action wordStream:[w] ==>
+    guard sch_info_num_chunks = 0 and sch_info_started = false
     do
       hashes[0] := initHashes[0];
       hashes[1] := initHashes[1];
       hashes[2] := initHashes[2];
       hashes[3] := initHashes[3];
       hashes[4] := initHashes[4];
-      sch_info  := ScheduleInfo(w / 64, true); // each chunk has 64 bytes 
+      sch_info_num_chunks := w / 64;
+      sch_info_started := true;
+      // sch_info  := ScheduleInfo(w / 64, true); // each chunk has 64 bytes 
       
     end
 
     processChunk: action wordStream:[ws] repeat 16 ==>
-    guard sch_info.num_chunks > 0 and sch_info.started = true
+    guard sch_info_num_chunks > 0 and sch_info_started = true
     var uint iter := 0,
-        uint(size = 32) num_chunks := sch_info.num_chunks
+        uint(size = 32) num_chunks := sch_info_num_chunks
     do
       foreach uint i in 0 .. 16 do
         words[i] := ws[i];
@@ -195,12 +196,13 @@ namespace hetero.security.sha:
       hashes[3] := hashes[3] + d;
       hashes[4] := hashes[4] + e;
 
-
-      sch_info := ScheduleInfo(num_chunks - 1, true);
+      sch_info_num_chunks := num_chunks - 1;
+      sch_info_started := true;
+      // sch_info := ScheduleInfo(num_chunks - 1, true);
     end
 
     streamHashes: action ==> hashStream:[h0, h1, h2, h3, h4]
-    guard sch_info.num_chunks = 0 and sch_info.started = true
+    guard sch_info_num_chunks = 0 and sch_info_started = true
     var 
       uint(size = 32) h0 = hashes[0],
       uint(size = 32) h1 = hashes[1],
@@ -208,12 +210,14 @@ namespace hetero.security.sha:
       uint(size = 32) h3 = hashes[3],
       uint(size = 32) h4 = hashes[4]
     do
-      sch_info := ScheduleInfo(0, false);
+      sch_info_num_chunks := 0;
+      sch_info_started := false;
+      // sch_info := ScheduleInfo(0, false);
     end
 
     schedule fsm init:
 
-      init(initHashes) --> chunks;
+      init(startProcess) --> chunks;
       chunks(processChunk) --> chunks;
       chunks(streamHashes) --> init;
 
@@ -252,6 +256,18 @@ namespace hetero.security.sha:
           messageStream <-- msg[loop_counter];
           loop_counter := loop_counter + 1;
         end
+
+        loop_counter := 0;
+        
+        messageStream <-- 0x00;
+        messageStream <-- 0x00;
+        messageStream <-- 0x00;
+        messageStream <-- 0x05;
+
+        while loop_counter < 5 do
+          messageStream <-- msg[loop_counter];
+          loop_counter := loop_counter + 1;
+        end
       end
     end
   end
@@ -263,6 +279,7 @@ namespace hetero.security.sha:
     action in1:[t1], in2:[t2] ==> 
     guard t1 = t2
     do
+      println_s_i("Token: ", t1);
       count := count + 1;
     end
     action in1:[t1], in2:[t2] ==> 
@@ -273,6 +290,7 @@ namespace hetero.security.sha:
       println_s_i("Errors: ", errors);
     end
   end
+  
   network SHA1Test() ==> :
 
     entities
@@ -289,6 +307,25 @@ namespace hetero.security.sha:
       sha1SW.hash --> cmp.in2;
 
   end
+  network SHANetwork() ==>:
+
+    entities
+      
+      source = art_Source_txt(fileName="strings.txt");
+
+      // the following actor is generated by the python scripts
+      shaEngines = ParallelSHA() {partition = "hw";}; 
+
+      sink = art_Sink_txt(fileName="hash.txt");
+
+
+    structure
+
+      source.Out --> shaEngines.strings;
+      shaEngines.hashes --> sink.In;
+
+  end
+
 end
 
 
