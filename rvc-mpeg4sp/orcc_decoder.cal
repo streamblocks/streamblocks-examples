@@ -66,9 +66,9 @@ network orcc_decoder(
 	
 		int bits ==> int VID, int WIDTH, int HEIGHT:
 	
-	var
-		int PIX_SZ := 9;
-		int QUANT_SZ := 6;
+	var 
+		int PIX_SZ = 9;
+		int QUANT_SZ = 6;
 		
 	entities
 		serialize = byte2bit();

@@ -53,11 +53,12 @@ import System.bitops.bitand;
 import System.bitops.bitor;
 import System.bitops.lshift;
 
-actor MPEG4_algo_DCRaddressing_8x8 (int MAXW_IN_MB,
+actor MPEG4_algo_DCRaddressing_8x8 (int BTYPE_SZ,
+                                    int INTRA,
+                                    int MAXW_IN_MB,
                                     int MB_COORD_SZ,
-                                    int BTYPE_SZ,
-                                    int NEWVOP,
-                                    int INTRA)                                     
+                                    int NEWVOP
+                                    )                                     
            int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A, int (size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C :
 
   // Generate indices into the stream history to locate

@@ -69,7 +69,7 @@ action In: [xi] repeat 8 ==> Out: [y] repeat 8
       int xa,
       int xb,
       List (type: int , size=8) x := xi,
-      List (type: int , size=8) y := [0,0,0,0,0,0,0,0],
+      List (type: int , size=8) y,
       int temp1, int temp2, int temp3, int temp4
   do
     xa := x[1] + x[7];

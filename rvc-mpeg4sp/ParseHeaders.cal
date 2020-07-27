@@ -47,8 +47,8 @@ import System.bitops.bitnot;
 import System.bitops.bitor;
 import System.bitops.lshift;
 import System.bitops.rshift;
-import system.io.dprint1;
-import system.io.dprint2;
+//import system.io.dprint1;
+//import system.io.dprint2;
 
 actor ParseHeaders (
     // Maximum image width (in units of macroblocks) that the decoder can handle.
@@ -145,7 +145,7 @@ actor ParseHeaders (
   // completion with the boolean done_reading_bits() and get the value
   // with read_result(). Use the done function in a guard to wait for the
   // reading to be complete.
-  int(size=7) bits_to_read_count := -1;
+  int bits_to_read_count := -1;
   int(size=32) read_result_in_progress;
   procedure set_bits_to_read( int count )
   begin
@@ -154,6 +154,8 @@ actor ParseHeaders (
   end
   function done_reading_bits() --> bool : bits_to_read_count < 0 end
   function read_result() --> int : read_result_in_progress end
+  
+  
   action bits:[ b ] ==>
   guard 
     not done_reading_bits()
@@ -161,11 +163,13 @@ actor ParseHeaders (
     read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
     bits_to_read_count := bits_to_read_count - 1;
     bit_count := bit_count + 1;
+    /*
     if(bits_to_read_count<0) then
     	dprint2("Read %i bits 0x%x\\n",bit_count, read_result_in_progress);
-	else
+	  else
     	dprint2("In progress read %i bits 0x%x\\n",bit_count, read_result_in_progress);
     end
+    */
   end
 
   int(size=4) bit_count := 0;

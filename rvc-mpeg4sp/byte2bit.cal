@@ -14,10 +14,10 @@ namespace RVC:
 
 import System.bitops.bitand;
 import System.bitops.lshift;
-import system.io.dprint1;
-import system.io.dprint2;
+//import system.io.dprint1;
+//import system.io.dprint2;
 
- actor byte2bit () int(size=32) in8 ==> bool out :
+ actor byte2bit () uint(size=8) in8 ==> bool out :
 
   int(size=4) count := 0;
   int(size=9) buf;
@@ -28,7 +28,7 @@ import system.io.dprint2;
   do
     buf := i;
     count := 8;
-    dprint1("Read byte 0x%x \\n", buf);
+    //dprint1("Read byte 0x%x \\n", buf);
   end
 
   // Write out bits in msb first order
@@ -38,7 +38,7 @@ import system.io.dprint2;
   var
     bool bit = bitand( buf, 128) != 0
   do
-  	dprint2("Sent %i bit %i\\n",count,if bit then 1 else 0 end);
+  	//dprint2("Sent %i bit %i\\n",count,if bit then 1 else 0 end);
     count := count - 1;
     buf := lshift( buf, 1 );
   end

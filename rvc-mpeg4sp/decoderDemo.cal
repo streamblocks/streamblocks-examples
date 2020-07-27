@@ -36,44 +36,43 @@
 
 namespace RVC:
 
-import entity ART.art_Source_bin;
+import entity ART.art_Source_byte;
 import entity ART.art_Sink_txt;
-import entity ART.art_Display_yuv;
+import entity ART.art_Display_yuv_width_height;
 
- network decoderDemo () ==> :
+  network decoderDemo () ==> :
 
   entities
-	decoder=orcc_decoder(ACCODED=2,
-                         ACPRED=1,
-                         ADDR_SZ=24,
-                         BTYPE_SZ=12,
-                         FCODE_MASK=448,
-                         FCODE_SHIFT=6,
-                         FOURMV=4,
-                         INTER=512,
-                         INTRA=1024,
-                         MAXH_IN_MB=69,
-                         MAXW_IN_MB=121,
-                         MB_COORD_SZ=8,
-                         MOTION=8,
-                         MV_SZ=9,
-                         NEWVOP=2048,
-                         QUANT_MASK=31,
-                         ROUND_TYPE=32,
-                         SAMPLE_COUNT_SZ=8,
-                         SAMPLE_SZ=13);
-                         
+    decoder=orcc_decoder(ACCODED=2,
+                          ACPRED=1,
+                          ADDR_SZ=24,
+                          BTYPE_SZ=12,
+                          FCODE_MASK=448,
+                          FCODE_SHIFT=6,
+                          FOURMV=4,
+                          INTER=512,
+                          INTRA=1024,
+                          MAXH_IN_MB=69,
+                          MAXW_IN_MB=121,
+                          MB_COORD_SZ=8,
+                          MOTION=8,
+                          MV_SZ=9,
+                          NEWVOP=2048,
+                          QUANT_MASK=31,
+                          ROUND_TYPE=32,
+                          SAMPLE_COUNT_SZ=8,
+                          SAMPLE_SZ=13);
+                          
 
-	sourceBits = art_Source_bin(fileName="./foreman_qcif_30.bit", loops=0);
+    sourceBits = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=0);
 
-	display = art_Display_yuv(title="Foreman QCIF", width=176, height=144);
-	sinkWIDTH = art_Sink_txt(fileName = "./WIDTH.txt");
-    sinkHEIGHT = art_Sink_txt(fileName = "./HEIGHT.txt");
+    display = art_Display_yuv_width_height(title="Foreman QCIF", width=176, height=144);
+
 
   structure
-	sourceBits.Out --> decoder.bits;
-	decoder.VID --> display.In;
-	decoder.WIDTH --> sinkWIDTH.In;
-	decoder.HEIGHT --> sinkHEIGHT.In;
- end
+    sourceBits.Out --> decoder.bits;
+    decoder.VID --> display.In;
+    decoder.WIDTH --> display.WIDTH;
+    decoder.HEIGHT --> display.HEIGHT;
+  end
 end
