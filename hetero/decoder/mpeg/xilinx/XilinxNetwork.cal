@@ -88,7 +88,7 @@ namespace hetero.decoder.mpeg.xilinx:
     end
     network XilinxNetwork() ==> :
         entities
-            source  = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=10); 
+            source  = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=1); 
             decoder = XilinxDecoder() { partition = "hw"; };
             
             display = art_Display_yuv_width_height(title="StreamBlocks Multicore", width=176, height=144);
