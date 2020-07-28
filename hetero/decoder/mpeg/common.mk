@@ -28,5 +28,3 @@ SOURCE_PATH := $(ART_SOURCE_PATH):$(UTILS_PATH):$(CAL_SOURCE_PATH)
 
 PATH_SETTINGS := --source-path $(SOURCE_PATH) --orcc-source-path $(ORCC_SOURCE_PATH) --xdf-source-path $(XDF_SOURCE_PATH) --target-path $(TARGET_PATH)
 
-
-include ../../../rules.mk
