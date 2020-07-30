@@ -9,6 +9,23 @@ namespace hetero.decoder.jpeg:
 	import entity hetero.utils.Comparator;
 
 	uint fifo_size = 131072;
+
+
+	network JpegNetwork() ==> :
+
+		entities
+
+			source = art_Source_byte(fileName="./foreman_qcif.mjpg", loops=1);
+			display = art_Display_yuv(title="Forman QCIF", width=176, height=144);
+
+			decoder = JpegDecoder() {partition = "hw";};
+
+		structure
+			source.Out --> decoder.BYTE;
+			decoder.YCbCr --> display.In;
+
+	end
+	
 	network JpegDecoderTester() ==> :
 	entities
 		source = art_Source_byte(fileName="./foreman_qcif.mjpg", loops=0);
