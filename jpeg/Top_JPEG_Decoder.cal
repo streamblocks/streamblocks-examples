@@ -5,7 +5,7 @@ namespace jpeg.decoder:
 
 	network Top_JPEG_Decoder() ==> :
 	entities
-		source = art_Source_byte(fileName="./foreman_qcif.mjpg");
+		source = art_Source_byte(fileName="./foreman_qcif.mjpg", loops=0);
 		display = art_Display_yuv(title="Foreman QCIF", width=176, height=144);
 		decoder = JpegDecoder();
 	structure
