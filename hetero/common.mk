@@ -20,9 +20,9 @@ UTILS_PATH := $(SB_EXAMPLES_PATH)/hetero/utils
 SYSTEMC_SETTIGNS := --set enable-systemc=on --set max-bram=128MiB
 
 
-COMMON_SETTIGNS := --set partitioning=on 
+COMMON_SETTINGS := --set partitioning=on
 
-MULTICORE_SETTIGS := # nothing
+MULTICORE_SETTIGS := #Nothing
 
 
 HLS_SETTINGS := --set enable-action-profile=off 
