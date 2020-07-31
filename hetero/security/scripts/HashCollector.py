@@ -16,7 +16,7 @@ class HashCollector():
 
     for ix in range(0, self.fanin):
       actions +=  """
-      collectStream{index}: actions stream{index}:[h] ==> hashStream:[h]
+      collectStream{index}: action stream{index}:[h] ==> hashStream:[h]
       do
         counter := counter + 1;
       end
@@ -52,7 +52,7 @@ class HashCollector():
     for ix in range(0, self.fanin):
       
       priority += """
-      stop > collectStream{index}   
+      stop > collectStream{index};   
       """.format(index = ix)
     
     priority += """
@@ -92,12 +92,12 @@ class HashCollector():
     {priority}
   end
   """.format(ports = self.getPorts(), 
-            actions = self.getActions, 
+            actions = self.getActions(), 
             fsm = self.getFsm(), 
             priority = self.getPriority())
     return actor
 
 def getHashCollector(n):
-  return HashCollector(n).getActor
+  return HashCollector(n).getActor()
 
 

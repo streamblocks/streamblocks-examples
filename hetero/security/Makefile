@@ -1,43 +1,27 @@
 
-ENTITY_NETWORK = hetero.security.sha.SHANetwork
-SB_HOME ?= $(STREAMBLOCKS_HOME)
-CMAKE ?= cmake
+ENTITY_NETWORK = SHANetwork
+ENTITY_NAMESPACE = hetero.security.sha
+ENTITY = $(ENTITY_NAMESPACE).$(SHANetwork)
 
-TARGET_PATH ?= $(shell pwd)/generated
+CAL_DEPS := sha-1.cal ParallelSHA.cal
 
-NUM_CORES ?= 2
+include ../common.mk
 
+PATH_SETTINGS = --source-path $(shell pwd) --target-path $(TARGET_PATH) 
 
-SB_BIN := $(SB_HOME)/streamblocks-platforms/streamblocks
+NUM_PES ?= 16
+MIN_STRING_SIZE ?= 1024
+MAX_STRING_SIZE ?= 1024
+STRINGS_PER_PE ?= 128
 
-PARTITIONING_BIN ?= $(SB_HOME)/streamblocks-partitioning/partitioning/partition
-
-SB_EXAMPLES_PATH := $(SB_HOME)/streamblocks-examples
-
-
-SOURCE_ART_PATH := $(SB_EXAMPLES_PATH)/system/art
-UTILS_PATH := $(SB_EXAMPLES_PATH)/hetero/utils
-SOURCE_PATH := $(SB_EXAMPLES_PATH)/hetero/security:$(SOURCE_ART_PATH):$(UTILS_PATH)
-
-SYSTEMC_SETTIGNS := --set enable-systemc=on --set max-bram=128MiB
-
-COMMON_SETTIGNS := --set partitioning=on 
-
-MULTICORE_SETTIGS := $(COMMON_SETTIGNS)
-
-HLS_SETTINGS := $(COMMON_SETTIGNS) --set enable-action-profile=off 
+PTYHON_SOURCES = scripts/HashCollector.py scripts/ParallelSHA.py scripts/StreamDispatcher.py scripts/StringGenerator.py
 
 
-PATH_SETTINGS := --source-path $(SOURCE_PATH) --target-path $(TARGET_PATH)
 
+$(ENTITY_NETWORK)_GENERATOR: $(PTYHON_SOURCES)
+	echo "Generating ParallelSHA.cal"
+	cd scripts; \
+	python StringGenerator.py --min-size $(MIN_STRING_SIZE) --max-size $(MAX_STRING_SIZE) --num-pes $(NUM_PES) --strings-per-pe $(STRINGS_PER_PE); \
+	python ParallelSHA.py $(NUM_PES) > ../ParallelSHA.cal ;\
 
-sha_1_software:
-	$(SB_BIN) multicore $(PATH_SETTINGS) $(ENTITY_NETWORK)
-
-sha_1_systemc:
-	$(SB_BIN) vivado-hls $(SYSTEMC_SETTIGNS) $(HLS_SETTINGS) $(PATH_SETTINGS) $(ENTITY_NETWORK)
-	$(SB_BIN) multicore $(SYSTEMC_SETTIGNS) $(MULTICORE_SETTIGS) $(PATH_SETTINGS) $(ENTITY_NETWORK)
-
-sha_1_hetero:
-	$(SB_BIN) vivado-hls $(HLS_SETTINGS) $(PATH_SETTINGS) $(ENTITY_NETWORK)
-	$(SB_BIN) multicore $(MULTICORE_SETTIGS) $(PATH_SETTINGS) $(ENTITY_NETWORK)
+include ../rules.mk

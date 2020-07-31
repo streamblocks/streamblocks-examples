@@ -1,4 +1,5 @@
 generated
 .vscode
 scripts/*.txt
+scripts/*.pyc
 data

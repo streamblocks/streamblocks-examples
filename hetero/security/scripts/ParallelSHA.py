@@ -26,7 +26,7 @@ class ParallelSHA():
 
       connections += """
       dispatcher.stream{index} --> pe{index}.text;
-      pe{index}.hash --> collector.stream{index}
+      pe{index}.hash --> collector.stream{index};
       """.format(index = ix)
     return connections
   
@@ -51,7 +51,6 @@ class ParallelSHA():
       cast.Out -->dispatcher.stringStream;
       {connections}
       collectors.hashStream --> hashes;
-    end
   end
   """.format(peInstances = self.getPEInstances(), 
     connections = self.getConnections())
@@ -80,4 +79,10 @@ end
 
 if __name__ == "__main__":
 
-  print(ParallelSHA(16).getActors())
+  import argparse
+
+  parser = argparse.ArgumentParser(description="Generate a parallel SHA1 network")
+  parser.add_argument('N', type=int, help="number of SHA1 processing elements")
+  
+  args = parser.parse_args()
+  print(ParallelSHA(args.N).getActors())

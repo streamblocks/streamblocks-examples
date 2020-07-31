@@ -64,7 +64,7 @@ class StreamDispatcher():
       emitStream{index} > readSize{indexPlus};
       """.format(index = ix, indexPlus = (ix + 1) % self.fanout)
     
-    priority ="""
+    priority +="""
     end
     """
     return priority
