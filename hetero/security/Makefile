@@ -1,13 +1,13 @@
 
 ENTITY_NETWORK = SHANetwork
 ENTITY_NAMESPACE = hetero.security.sha
-ENTITY = $(ENTITY_NAMESPACE).$(SHANetwork)
+ENTITY = $(ENTITY_NAMESPACE).$(ENTITY_NETWORK)
 
 CAL_DEPS := sha-1.cal ParallelSHA.cal
 
 include ../common.mk
 
-PATH_SETTINGS = --source-path $(shell pwd) --target-path $(TARGET_PATH) 
+PATH_SETTINGS = --source-path $(shell pwd):$(ART_SOURCE_PATH) --target-path $(TARGET_PATH) 
 
 NUM_PES ?= 16
 MIN_STRING_SIZE ?= 1024

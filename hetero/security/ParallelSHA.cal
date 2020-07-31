@@ -1,10 +1,10 @@
 
 namespace hetero.security.sha:
-  import ART.art_Sink_txt;
-  import ART.art_Source_txt;
-
+  import var system.io.println_s_i;
   actor IntToCharCast() uint In ==> uint(size = 8) Out:
     action In:[t] ==> Out:[(t::uint(size = 8))]
+    do 
+      println_s_i("casting: ", t);  
     end
   end
     
@@ -14,35 +14,7 @@ namespace hetero.security.sha:
     
         uint(size = 8) stream0, 
       
-        uint(size = 8) stream1, 
-      
-        uint(size = 8) stream2, 
-      
-        uint(size = 8) stream3, 
-      
-        uint(size = 8) stream4, 
-      
-        uint(size = 8) stream5, 
-      
-        uint(size = 8) stream6, 
-      
-        uint(size = 8) stream7, 
-      
-        uint(size = 8) stream8, 
-      
-        uint(size = 8) stream9, 
-      
-        uint(size = 8) stream10, 
-      
-        uint(size = 8) stream11, 
-      
-        uint(size = 8) stream12, 
-      
-        uint(size = 8) stream13, 
-      
-        uint(size = 8) stream14, 
-      
-        uint(size = 8) stream15
+        uint(size = 8) stream1
       :
 
     uint(size = 32) counter := 0;
@@ -70,160 +42,6 @@ namespace hetero.security.sha:
       counter := counter - 1;
     end
     
-    readSize2: action stringStream:[b] repeat 4 ==> stream2:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream2: action stringStream:[ch] ==> stream2:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize3: action stringStream:[b] repeat 4 ==> stream3:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream3: action stringStream:[ch] ==> stream3:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize4: action stringStream:[b] repeat 4 ==> stream4:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream4: action stringStream:[ch] ==> stream4:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize5: action stringStream:[b] repeat 4 ==> stream5:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream5: action stringStream:[ch] ==> stream5:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize6: action stringStream:[b] repeat 4 ==> stream6:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream6: action stringStream:[ch] ==> stream6:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize7: action stringStream:[b] repeat 4 ==> stream7:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream7: action stringStream:[ch] ==> stream7:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize8: action stringStream:[b] repeat 4 ==> stream8:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream8: action stringStream:[ch] ==> stream8:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize9: action stringStream:[b] repeat 4 ==> stream9:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream9: action stringStream:[ch] ==> stream9:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize10: action stringStream:[b] repeat 4 ==> stream10:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream10: action stringStream:[ch] ==> stream10:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize11: action stringStream:[b] repeat 4 ==> stream11:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream11: action stringStream:[ch] ==> stream11:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize12: action stringStream:[b] repeat 4 ==> stream12:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream12: action stringStream:[ch] ==> stream12:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize13: action stringStream:[b] repeat 4 ==> stream13:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream13: action stringStream:[ch] ==> stream13:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize14: action stringStream:[b] repeat 4 ==> stream14:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream14: action stringStream:[ch] ==> stream14:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
-    readSize15: action stringStream:[b] repeat 4 ==> stream15:[b] repeat 4
-    do
-      counter := bytesToWord(b);
-    end    
-    
-    emitStream15: action stringStream:[ch] ==> stream15:[ch]
-    guard counter > 0
-    do
-      counter := counter - 1;
-    end
-    
 
     
     schedule fsm init:
@@ -233,49 +51,7 @@ namespace hetero.security.sha:
       s0 (readSize1) --> s1;
       
       s1 (emitStream1) --> s1;
-      s1 (readSize2) --> s2;
-      
-      s2 (emitStream2) --> s2;
-      s2 (readSize3) --> s3;
-      
-      s3 (emitStream3) --> s3;
-      s3 (readSize4) --> s4;
-      
-      s4 (emitStream4) --> s4;
-      s4 (readSize5) --> s5;
-      
-      s5 (emitStream5) --> s5;
-      s5 (readSize6) --> s6;
-      
-      s6 (emitStream6) --> s6;
-      s6 (readSize7) --> s7;
-      
-      s7 (emitStream7) --> s7;
-      s7 (readSize8) --> s8;
-      
-      s8 (emitStream8) --> s8;
-      s8 (readSize9) --> s9;
-      
-      s9 (emitStream9) --> s9;
-      s9 (readSize10) --> s10;
-      
-      s10 (emitStream10) --> s10;
-      s10 (readSize11) --> s11;
-      
-      s11 (emitStream11) --> s11;
-      s11 (readSize12) --> s12;
-      
-      s12 (emitStream12) --> s12;
-      s12 (readSize13) --> s13;
-      
-      s13 (emitStream13) --> s13;
-      s13 (readSize14) --> s14;
-      
-      s14 (emitStream14) --> s14;
-      s14 (readSize15) --> s15;
-      
-      s15 (emitStream15) --> s15;
-      s15 (readSize0) --> s0;
+      s1 (readSize0) --> s0;
       
     end
     
@@ -285,35 +61,7 @@ namespace hetero.security.sha:
     
       emitStream0 > readSize1;
       
-      emitStream1 > readSize2;
-      
-      emitStream2 > readSize3;
-      
-      emitStream3 > readSize4;
-      
-      emitStream4 > readSize5;
-      
-      emitStream5 > readSize6;
-      
-      emitStream6 > readSize7;
-      
-      emitStream7 > readSize8;
-      
-      emitStream8 > readSize9;
-      
-      emitStream9 > readSize10;
-      
-      emitStream10 > readSize11;
-      
-      emitStream11 > readSize12;
-      
-      emitStream12 > readSize13;
-      
-      emitStream13 > readSize14;
-      
-      emitStream14 > readSize15;
-      
-      emitStream15 > readSize0;
+      emitStream1 > readSize0;
       
     end
     
@@ -325,35 +73,7 @@ namespace hetero.security.sha:
     
         uint(size = 32) stream0, 
       
-        uint(size = 32) stream1, 
-      
-        uint(size = 32) stream2, 
-      
-        uint(size = 32) stream3, 
-      
-        uint(size = 32) stream4, 
-      
-        uint(size = 32) stream5, 
-      
-        uint(size = 32) stream6, 
-      
-        uint(size = 32) stream7, 
-      
-        uint(size = 32) stream8, 
-      
-        uint(size = 32) stream9, 
-      
-        uint(size = 32) stream10, 
-      
-        uint(size = 32) stream11, 
-      
-        uint(size = 32) stream12, 
-      
-        uint(size = 32) stream13, 
-      
-        uint(size = 32) stream14, 
-      
-        uint(size = 32) stream15
+        uint(size = 32) stream1
       
     ==>
     uint(size = 32) hashStream:
@@ -378,76 +98,6 @@ namespace hetero.security.sha:
         counter := counter + 1;
       end
       
-      collectStream2: action stream2:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream3: action stream3:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream4: action stream4:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream5: action stream5:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream6: action stream6:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream7: action stream7:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream8: action stream8:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream9: action stream9:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream10: action stream10:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream11: action stream11:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream12: action stream12:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream13: action stream13:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream14: action stream14:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
-      collectStream15: action stream15:[h] ==> hashStream:[h]
-      do
-        counter := counter + 1;
-      end
-      
 
     
     schedule fsm s0:
@@ -456,49 +106,7 @@ namespace hetero.security.sha:
       s0(stop) --> s1;
       
       s1(collectStream1) --> s1;
-      s1(stop) --> s2;
-      
-      s2(collectStream2) --> s2;
-      s2(stop) --> s3;
-      
-      s3(collectStream3) --> s3;
-      s3(stop) --> s4;
-      
-      s4(collectStream4) --> s4;
-      s4(stop) --> s5;
-      
-      s5(collectStream5) --> s5;
-      s5(stop) --> s6;
-      
-      s6(collectStream6) --> s6;
-      s6(stop) --> s7;
-      
-      s7(collectStream7) --> s7;
-      s7(stop) --> s8;
-      
-      s8(collectStream8) --> s8;
-      s8(stop) --> s9;
-      
-      s9(collectStream9) --> s9;
-      s9(stop) --> s10;
-      
-      s10(collectStream10) --> s10;
-      s10(stop) --> s11;
-      
-      s11(collectStream11) --> s11;
-      s11(stop) --> s12;
-      
-      s12(collectStream12) --> s12;
-      s12(stop) --> s13;
-      
-      s13(collectStream13) --> s13;
-      s13(stop) --> s14;
-      
-      s14(collectStream14) --> s14;
-      s14(stop) --> s15;
-      
-      s15(collectStream15) --> s15;
-      s15(stop) --> s0;
+      s1(stop) --> s0;
       
     end
     
@@ -509,34 +117,6 @@ namespace hetero.security.sha:
       stop > collectStream0;   
       
       stop > collectStream1;   
-      
-      stop > collectStream2;   
-      
-      stop > collectStream3;   
-      
-      stop > collectStream4;   
-      
-      stop > collectStream5;   
-      
-      stop > collectStream6;   
-      
-      stop > collectStream7;   
-      
-      stop > collectStream8;   
-      
-      stop > collectStream9;   
-      
-      stop > collectStream10;   
-      
-      stop > collectStream11;   
-      
-      stop > collectStream12;   
-      
-      stop > collectStream13;   
-      
-      stop > collectStream14;   
-      
-      stop > collectStream15;   
       
     end
     
@@ -558,34 +138,6 @@ namespace hetero.security.sha:
       
       pe1 = SHA1();
       
-      pe2 = SHA1();
-      
-      pe3 = SHA1();
-      
-      pe4 = SHA1();
-      
-      pe5 = SHA1();
-      
-      pe6 = SHA1();
-      
-      pe7 = SHA1();
-      
-      pe8 = SHA1();
-      
-      pe9 = SHA1();
-      
-      pe10 = SHA1();
-      
-      pe11 = SHA1();
-      
-      pe12 = SHA1();
-      
-      pe13 = SHA1();
-      
-      pe14 = SHA1();
-      
-      pe15 = SHA1();
-      
     
     structure
 
@@ -598,49 +150,7 @@ namespace hetero.security.sha:
       dispatcher.stream1 --> pe1.text;
       pe1.hash --> collector.stream1;
       
-      dispatcher.stream2 --> pe2.text;
-      pe2.hash --> collector.stream2;
-      
-      dispatcher.stream3 --> pe3.text;
-      pe3.hash --> collector.stream3;
-      
-      dispatcher.stream4 --> pe4.text;
-      pe4.hash --> collector.stream4;
-      
-      dispatcher.stream5 --> pe5.text;
-      pe5.hash --> collector.stream5;
-      
-      dispatcher.stream6 --> pe6.text;
-      pe6.hash --> collector.stream6;
-      
-      dispatcher.stream7 --> pe7.text;
-      pe7.hash --> collector.stream7;
-      
-      dispatcher.stream8 --> pe8.text;
-      pe8.hash --> collector.stream8;
-      
-      dispatcher.stream9 --> pe9.text;
-      pe9.hash --> collector.stream9;
-      
-      dispatcher.stream10 --> pe10.text;
-      pe10.hash --> collector.stream10;
-      
-      dispatcher.stream11 --> pe11.text;
-      pe11.hash --> collector.stream11;
-      
-      dispatcher.stream12 --> pe12.text;
-      pe12.hash --> collector.stream12;
-      
-      dispatcher.stream13 --> pe13.text;
-      pe13.hash --> collector.stream13;
-      
-      dispatcher.stream14 --> pe14.text;
-      pe14.hash --> collector.stream14;
-      
-      dispatcher.stream15 --> pe15.text;
-      pe15.hash --> collector.stream15;
-      
-      collectors.hashStream --> hashes;
+      collector.hashStream --> hashes;
   end
   
 end

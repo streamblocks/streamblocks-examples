@@ -50,7 +50,7 @@ class ParallelSHA():
       strings --> cast.In;
       cast.Out -->dispatcher.stringStream;
       {connections}
-      collectors.hashStream --> hashes;
+      collector.hashStream --> hashes;
   end
   """.format(peInstances = self.getPEInstances(), 
     connections = self.getConnections())
@@ -60,9 +60,7 @@ class ParallelSHA():
     
     return """
 namespace hetero.security.sha:
-  import ART.art_Sink_txt;
-  import ART.art_Source_txt;
-
+ 
   actor IntToCharCast() uint In ==> uint(size = 8) Out:
     action In:[t] ==> Out:[(t::uint(size = 8))]
     end
