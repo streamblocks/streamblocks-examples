@@ -1,10 +1,11 @@
-namespace System.util:
+namespace system.util:
 
   	
-  		function Integers(int start, int stop) --> List(type:int) :
-  			 start .. stop
-  		end
+		function Integers(int start, int stop) --> List(type:int) :
+				start .. stop
+		end
 
+		external function randint(int min, int max) --> int end
 
 end
 

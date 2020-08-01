@@ -30,7 +30,7 @@ def stringGenerator(min_size, max_size, num_pe, str_per_pe):
           stringsStream.write(line)
           text += character
         
-        hash = hashlib.sha1(text)
+        hash = hashlib.sha1(text.encode('utf-8'))
         # print("Text: %s Hash:%s"%(text, hash.hexdigest()))
 
         byte_ix = 24

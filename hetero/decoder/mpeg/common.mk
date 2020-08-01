@@ -26,5 +26,5 @@ XDF_SOURCE_PATH := $(XDF_SOURCE_PATH):$(SB_EXAMPLES_PATH)/
 SOURCE_PATH := $(ART_SOURCE_PATH):$(UTILS_PATH):$(CAL_SOURCE_PATH)
 
 
-PATH_SETTINGS := --source-path $(SOURCE_PATH) --orcc-source-path $(ORCC_SOURCE_PATH) --xdf-source-path $(XDF_SOURCE_PATH) --target-path $(TARGET_PATH)
+SOURCE_PATH_SETTINGS := --source-path $(SOURCE_PATH) --orcc-source-path $(ORCC_SOURCE_PATH) --xdf-source-path $(XDF_SOURCE_PATH)
 

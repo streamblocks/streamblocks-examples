@@ -43,6 +43,6 @@ namespace system.io:
     external procedure dprint_trace2(String s1, String s2, int i1, int i2)end
     
     external procedure dprint_trace3(String s1, String s2, int i1, int i2, int i3)end
-  
+    
 
 end
