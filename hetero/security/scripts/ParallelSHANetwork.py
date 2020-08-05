@@ -5,8 +5,11 @@ import HashCollector
 class ParallelSHA():
 
 
-  def __init__(self, num_pes):
+  def __init__(self, num_pes, strings_per_pe, min_size, max_size):
     self.size = num_pes
+    self.strings_per_pe = strings_per_pe
+    self.min_size = min_size
+    self.max_size = max_size
 
   def getPEInstances(self):
 
@@ -47,16 +50,17 @@ class ParallelSHA():
     
     structure
 
-      strings --> cast.In;
+      strings --> cast.In {{bufferSize={buff_size};}};
       cast.Out -->dispatcher.stringStream;
       {connections}
       collector.hashStream --> hashes;
   end
   """.format(peInstances = self.getPEInstances(), 
-    connections = self.getConnections())
+    connections = self.getConnections(),
+    buff_size = self.max_size * self.size)
     return actor
 
-  def getActors(self, strings_per_pe, min_string_size, max_string_size):
+  def getActors(self):
     
     return """
 namespace hetero.security.sha:
@@ -92,9 +96,9 @@ end
       dispatcher = StreamDispatcher.getStreamDispatcher(self.size),
       collector = HashCollector.getHashCollector(self.size),
       network = self.getNetwork(),
-      num_strings=strings_per_pe * self.size,
-      min_size=min_string_size,
-      max_size=max_string_size)
+      num_strings=self.strings_per_pe * self.size,
+      min_size=self.min_size - 4,
+      max_size=self.max_size - 4)
 
 
 if __name__ == "__main__":
@@ -108,4 +112,4 @@ if __name__ == "__main__":
   parser.add_argument('--strings-per-pe', type=int, help='number of strings per pe', required=True)
   
   args = parser.parse_args()
-  print(ParallelSHA(args.num_pes).getActors(args.strings_per_pe, args.min_size, args.max_size))
+  print(ParallelSHA(args.num_pes, args.strings_per_pe, args.min_size, args.max_size).getActors())
