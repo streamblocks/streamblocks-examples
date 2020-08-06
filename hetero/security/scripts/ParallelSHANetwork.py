@@ -39,7 +39,6 @@ class ParallelSHA():
   network ParallelSHA() uint strings ==> uint hashes:
 
     entities
-      cast = IntToCharCast();
 
       dispatcher = StreamDispatcher();
 
@@ -50,8 +49,8 @@ class ParallelSHA():
     
     structure
 
-      strings --> cast.In {{bufferSize={buff_size};}};
-      cast.Out -->dispatcher.stringStream;
+      strings --> dispatcher.stringStream {{bufferSize={buff_size};}};
+     
       {connections}
       collector.hashStream --> hashes;
   end
