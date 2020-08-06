@@ -1,0 +1,50 @@
+namespace hetero.simple.pipes:
+
+  int network_size = 10;
+  actor Source(int payload_size) ==> int Out:
+    int counter := 0;
+    transmit: action ==> Out:[t]
+    guard counter < payload_size
+    var t = counter
+    do
+      counter := counter + 1;
+    end
+  end
+
+  actor Sink() int In ==>:
+    action In:[t] ==>
+    end
+  end
+
+  actor PlusPlus(int coeff) int In ==> int Out:
+    action In:[t] ==> Out:[coeff * t + 1]
+    end
+  end
+
+  network PipelinedNetwork() ==>:
+
+    entities
+      source = Source(payload_size = 1 << 30);
+      // pe = [PlusPlus() : for int i in 0 .. (network_size - 1)];
+      pe0 = PlusPlus(coeff = 1);
+      pe1 = PlusPlus(coeff = 2);
+      pe2 = PlusPlus(coeff = 3);
+      pe3 = PlusPlus(coeff = 4);
+      pe4 = PlusPlus(coeff = 5);
+      pe5 = PlusPlus(coeff = 6);
+      sink = Sink();
+    structure
+
+      source.Out --> pe0.In;
+      pe0.Out --> pe1.In;
+      pe1.Out --> pe2.In;
+      pe2.Out --> pe3.In;
+      pe3.Out --> pe4.In;
+      pe4.Out --> pe5.In;
+      pe5.Out --> sink.In;
+
+
+
+  end
+
+end
