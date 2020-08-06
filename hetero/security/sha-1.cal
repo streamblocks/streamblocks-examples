@@ -265,7 +265,7 @@ namespace hetero.security.sha:
       string_id := string_id + 1;
     end
 
-    stream: action ==> rand:[((randint(A_ASCII, z_ASCII))::uint(size = 8))]
+    stream: action ==> rand:[A_ASCII]
     guard char_count > 0
     do
       char_count := char_count - 1;
@@ -277,6 +277,10 @@ namespace hetero.security.sha:
 
   end
 
+  actor Sink() uint(size = 32) In ==>:
+    action In:[t] ==>
+    end
+  end
 
 end
 
