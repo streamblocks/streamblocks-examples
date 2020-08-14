@@ -10,9 +10,9 @@ include ../common.mk
 SOURCE_PATH_SETTINGS = --source-path $(shell pwd):$(ART_SOURCE_PATH)
 
 NUM_PES ?= 8
-MIN_STRING_SIZE ?= 2048
-MAX_STRING_SIZE ?= 2048
-STRINGS_PER_PE ?= 16384
+MIN_STRING_SIZE ?= 8
+MAX_STRING_SIZE ?= 8
+STRINGS_PER_PE ?= 4
 
 PYTHON_SOURCES = scripts/HashCollector.py scripts/ParallelSHANetwork.py scripts/StreamDispatcher.py scripts/StringGenerator.py
 
