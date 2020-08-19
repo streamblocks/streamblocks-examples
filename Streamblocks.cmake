@@ -1,0 +1,208 @@
+################################################################################
+# CMake utilities for streamblocks-platform
+################################################################################
+
+cmake_minimum_required(VERSION 3.10)
+
+
+# Make sure that STREAMBLOCKS_HOME is defined
+if (NOT DEFINED ENV{STREAMBLOCKS_HOME})
+  message(FATAL_ERROR "STREAMBLOCKS_HOME environment variable is not set")
+endif()
+
+set(STREAMBLOCKS_HOME "$ENV{STREAMBLOCKS_HOME}" CACHE PATH "STREAMBLOCKS_HOME")
+
+# -- streamblocks binary
+set(STREAMBLOCKS_BIN "${STREAMBLOCKS_HOME}/streamblocks-platforms/streamblocks")
+
+function (streamblocks TARGET)
+
+  # Extra arguments and settings
+  # -- on/off settings
+  set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE)
+  
+  # -- value settings
+  set(streamblocks_value_settings 
+    PLATFORM
+    QID 
+    TARGET_PATH 
+    MAX_BRAM)
+
+  #-- path settings
+  set(streamblocks_path_settings 
+    SOURCE_PATH 
+    ORCC_SOURCE_PATH
+    XDF_SOURCE_PATH
+    XCF_PATH)
+  
+  
+  cmake_parse_arguments(STREAMBLOCKS_ARGS 
+    "${streamblocks_settings}"
+    "${streamblocks_value_settings}"
+    "${streamblocks_path_settings}"
+    ${ARGN})
+
+  
+  
+
+  if (NOT STREAMBLOCKS_ARGS_QID) 
+    message(FATAL_ERROR "Entity QID not defined for ${TARGET}")
+  endif()
+  
+  if (NOT STREAMBLOCKS_ARGS_PLATFORM) 
+    message(FATAL_ERROR "streamblocks platform not defined for ${TARGET}")
+  endif()
+  if (NOT STREAMBLOCKS_ARGS_SOURCE_PATH)
+    message(FATAL_ERROR "--source-path not defined for ${TARGET}")
+  endif()
+
+  if (NOT STREAMBLOCKS_ARGS_TARGET_PATH)
+    message(FATAL_ERROR "--target-path not defined for ${TARGET}")
+  endif()
+
+  set(STREAMBLOCKS_SETTINGS_OPTIONS "")
+
+  # --set enable-systemc
+  if (STREAMBLOCKS_ARGS_SYSTEMC)
+  list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set enable-systemc=on)
+  endif()
+  
+  # --set enable-action-profile
+  if (STREAMBLOCKS_ARGS_ACTION_PROFILE)
+    list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set enable-action-profile=on)
+  endif()
+  
+  # --set partitioning
+  if (STREAMBLOCKS_ARGS_PARTITIONING)
+    list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set partitioning=on)
+  endif()
+  
+  # --set max-bram
+  if (STREAMBLOCKS_ARGS_MAX_BRAM)
+    list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set max-bram=${STREAMBLOCKS_ARGS_MAX_BRAM})
+  endif()
+  
+  
+  
+  # -- xcf input
+  if (STREAMBLOCKS_ARGS_XCF_PATH) 
+    set(STREAMBLOCKS_XCF_PATH --xcf-path ${STREAMBLOCKS_ARGS_XCF_PATH})
+  endif()
+  
+  # -- xdf source path
+  if (STREAMBLOCKS_ARGS_XDF_SOURCE_PATH)
+  set(STREAMBLOCKS_XDF_PATH --xdf-source-path ${STREAMBLOCKS_ARGS_XDF_SOURCE_PATH})
+  endif()
+  
+  # -- orcc source path 
+  if (STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH)
+  set(STREAMBLOCKS_ORCC_SOURCE_PATH --orcc-source-path ${STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH})
+  endif()
+  
+
+  # -- Glob all the .cal files in the source path directories
+  
+  # -- cal source files
+  analyze_path(SOURCE_PATH_STRING SOURCE_CAL_DEPS "${STREAMBLOCKS_ARGS_SOURCE_PATH}" "cal")
+  
+
+  
+  make_absolute_path_list(TRAGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
+  message(STATUS "Adding target ${TARGET} for entity ${STREAMBLOCKS_ARGS_QID}")
+
+  message(STATUS "Target path: ${TRAGET_PATH_STRING}")
+
+
+
+ 
+  add_custom_command(
+    OUTPUT ${TRAGET_PATH_STRING}
+    # COMMAND "${STREAMBLOCKS_COMMAND}"
+    COMMAND ${STREAMBLOCKS_BIN}
+    ${STREAMBLOCKS_ARGS_PLATFORM}
+    ${STREAMBLOCKS_SETTINGS_OPTIONS}
+    "--source-path" ${SOURCE_PATH_STRING}
+    ${ORCC_SOURCE_PATH_STRING}
+    ${XCF_SOURCE_PATH_STRING}
+    ${XDF_SOURCE_PATH_STRING}
+    "--target-path" ${TRAGET_PATH_STRING}
+    ${STREAMBLOCKS_ARGS_QID} 
+    COMMENT "Generating code for ${STREAMBLOCKS_ARGS_QID}"
+    DEPENDS ${SOURCE_CAL_DEPS}
+    VERBATIM
+    )
+    
+    add_custom_target(
+      ${TARGET}
+      DEPENDS ${TRAGET_PATH_STRING} 
+    )
+      
+endfunction()
+
+
+function (streamblocks_systemc TARGET)
+
+  cmake_parse_arguments(STREAMBLOCKS_ARGS
+    ""
+    ""
+    ""
+    ${ARGN}
+  )
+
+  streamblocks(
+    ${TARGET}
+    PLATFORM vivado-hls
+    SYSTEMC
+    PARTITIONING
+    MAX_BRAM 128MiB
+    ${ARGN}
+  )
+
+
+endfunction()
+
+# -- make the paths absolute
+macro (make_absolute_path_list ABSOLUTE_PATH_LIST PATH_LIST) 
+
+  
+  foreach(__PATH__ ${PATH_LIST})
+    if (NOT IS_ABSOLUTE ${__PATH__})
+      
+      list(APPEND ${ABSOLUTE_PATH_LIST} "${CMAKE_CURRENT_SOURCE_DIR}/${__PATH__}")
+    else()
+      list(APPEND ${ABSOLUTE_PATH_LIST} "${ABSOLUTE_PATH_LIST} ${__PATH__}")
+    endif()
+  endforeach()
+  
+  
+endmacro()
+
+
+
+# -- recursively finds the files with FILE_EXTENSTION in PATH_LIST
+macro (find_source_dependencies CAL_DEPS PATH_LIST FILE_EXTENTION)
+  
+  foreach (__PATH__ ${PATH_LIST})
+    file(GLOB_RECURSE cal_source "${__PATH__}/*.${FILE_EXTENTION}")
+ 
+    list(APPEND ${CAL_DEPS} ${cal_source})
+   
+  endforeach()
+  
+endmacro()
+
+macro (analyze_path PATH_STRING SOURCE_DEPS PATH_LIST FILE_EXTENSION )
+
+
+  make_absolute_path_list(ABSOLUTE_PATH_LIST "${PATH_LIST}")
+
+
+  find_source_dependencies(__SOURCE_DEPS__ "${ABSOLUTE_PATH_LIST}" "cal")
+
+ 
+  string(REPLACE ";" ":" __PATH_STRING__ "${ABSOLUTE_PATH_LIST}")
+
+  set(${PATH_STRING} "${__PATH_STRING__}")
+  set(${SOURCE_DEPS} "${__SOURCE_DEPS__}")
+
+endmacro()
