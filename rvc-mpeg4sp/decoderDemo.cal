@@ -38,6 +38,8 @@ namespace RVC:
 
 import entity ART.art_Source_byte;
 import entity ART.art_Sink_txt;
+import entity ART.art_Sink_8bit_txt;
+import entity ART.art_Sink_16bit_txt;
 import entity ART.art_Display_yuv_width_height;
 
   network decoderDemo () ==> :
@@ -64,15 +66,66 @@ import entity ART.art_Display_yuv_width_height;
                           SAMPLE_SZ=13);
                           
 
-    sourceBits = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=0);
+    source = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=0);
 
     display = art_Display_yuv_width_height(title="Foreman QCIF", width=176, height=144);
 
 
   structure
-    sourceBits.Out --> decoder.bits;
+    source.Out --> decoder.bits;
+    decoder.VID --> display.In;
+    decoder.WIDTH --> display.WIDTH;
+    decoder.HEIGHT --> display.HEIGHT; 
+  end
+
+
+  network decoderDemoTraces () ==> :
+
+  entities
+    decoder=orcc_decoder(ACCODED=2,
+                          ACPRED=1,
+                          ADDR_SZ=24,
+                          BTYPE_SZ=12,
+                          FCODE_MASK=448,
+                          FCODE_SHIFT=6,
+                          FOURMV=4,
+                          INTER=512,
+                          INTRA=1024,
+                          MAXH_IN_MB=69,
+                          MAXW_IN_MB=121,
+                          MB_COORD_SZ=8,
+                          MOTION=8,
+                          MV_SZ=9,
+                          NEWVOP=2048,
+                          QUANT_MASK=31,
+                          ROUND_TYPE=32,
+                          SAMPLE_COUNT_SZ=8,
+                          SAMPLE_SZ=13);
+                          
+
+    source = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=0);
+
+    display = art_Display_yuv_width_height(title="Foreman QCIF", width=176, height=144);
+
+    sourceSink = art_Sink_8bit_txt(fileName="./source_Out_serialize_in8.txt");
+
+    displaySink = art_Sink_txt(fileName="./GEN_mgnt_Merger420_YUV_display_In.txt");
+
+    sinkHEIGHT = art_Sink_16bit_txt(fileName="./parseheaders_HEIGHT_display_HEIGHT.txt");
+    sinkWIDTH = art_Sink_16bit_txt(fileName="./parseheaders_WIDTH_display_WIDTH.txt");
+
+  structure
+    source.Out --> decoder.bits;
     decoder.VID --> display.In;
     decoder.WIDTH --> display.WIDTH;
     decoder.HEIGHT --> display.HEIGHT;
+
+    source.Out --> sourceSink.In;
+    decoder.VID --> displaySink.In;
+    decoder.WIDTH --> sinkWIDTH.In;
+    decoder.HEIGHT --> sinkHEIGHT.In;
+
   end
+
+
 end

@@ -226,7 +226,7 @@ import System.bitops.lshift;
   read_fb: action ==> RD:[rd] repeat 81
   guard outstanding_writes < max_outstanding_writes
   var
-    List(type:int(size=PIX_SZ), size=81) rd := [0: for int k in 0 .. 80],
+    List(type:int(size=PIX_SZ), size=81) rd,
     int x = mbx_read*SAMPLES_PER_MB + 8*bitand(comp_read,1) + mvx,
     int y := mby_read*SAMPLES_PER_MB + 8*rshift(comp_read,1) + mvy,
     int clip_left := 0,
