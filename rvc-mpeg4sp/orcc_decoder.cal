@@ -197,11 +197,11 @@ network orcc_decoder(
 		parser.BTYPE_V --> texture_V.BTYPE;
 		parser.B_V --> texture_V.QFS;
 		texture_V.f --> motion_V.TEX;
-		motion_Y.VID --> GEN_mgnt_Merger420.Y {bufferSize = 256;};
-		motion_U.VID --> GEN_mgnt_Merger420.U {bufferSize = 64;};
-		motion_V.VID --> GEN_mgnt_Merger420.V {bufferSize = 64;};
+		motion_Y.VID --> GEN_mgnt_Merger420.Y;
+		motion_U.VID --> GEN_mgnt_Merger420.U;
+		motion_V.VID --> GEN_mgnt_Merger420.V;
 		
-		GEN_mgnt_Merger420.YUV -->VID {bufferSize = 384;};
+		GEN_mgnt_Merger420.YUV -->VID;
 		parser.WIDTH --> WIDTH;
 		parser.HEIGHT --> HEIGHT; 
     	parser.QUANT_Y --> texture_Y.QP;
