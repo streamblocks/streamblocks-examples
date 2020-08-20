@@ -22,8 +22,7 @@ function (streamblocks TARGET)
   set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE)
   
   # -- value settings
-  set(streamblocks_value_settings
-    OUTPUT 
+  set(streamblocks_value_settings 
     PLATFORM
     QID 
     TARGET_PATH 
@@ -125,8 +124,7 @@ function (streamblocks TARGET)
   endif()
   
   message(STATUS "Target path: ${TARGET_PATH_STRING}")
-  message(STATUS "Generated path: ${TARGET_PATH_OUTPUT_STRING}")
-
+  message(STATUS "Generated path: ${TARGET_PATH_OUTPUT_STRING}")  
   add_custom_command(
     OUTPUT ${TARGET_PATH_OUTPUT_STRING}
     
@@ -139,7 +137,7 @@ function (streamblocks TARGET)
     ${STREAMBLOCKS_XCF_SOURCE_PATH}
     "--target-path" ${TARGET_PATH_STRING}
     ${STREAMBLOCKS_ARGS_QID} 
-    COMMENT "Generating code for ${STREAMBLOCKS_ARGS_QID}"
+    COMMENT "Generating code for ${STREAMBLOCKS_ARGS_QID} on platform ${STREAMBLOCKS_ARGS_PLATFORM}"
     DEPENDS ${SOURCE_CAL_DEPS} ${SOURCE_ORCC_DEPS} ${SOURCE_XDF_DEPS} ${SOURCE_XCF_DEPS}
     VERBATIM
     ) 
@@ -180,6 +178,10 @@ function (streamblocks_systemc TARGET)
     ${ARGN}
   )
 
+  add_custom_target(
+    ${TARGET}
+    DEPENDS ${MULTICORE_TARGET} ${HLS_TARGET}
+  )
 
 endfunction()
 
