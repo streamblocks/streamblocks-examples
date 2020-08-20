@@ -22,7 +22,8 @@ function (streamblocks TARGET)
   set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE)
   
   # -- value settings
-  set(streamblocks_value_settings 
+  set(streamblocks_value_settings
+    OUTPUT 
     PLATFORM
     QID 
     TARGET_PATH 
@@ -33,7 +34,7 @@ function (streamblocks TARGET)
     SOURCE_PATH 
     ORCC_SOURCE_PATH
     XDF_SOURCE_PATH
-    XCF_PATH)
+    XCF_SOURCE_PATH)
   
   
   cmake_parse_arguments(STREAMBLOCKS_ARGS 
@@ -85,18 +86,22 @@ function (streamblocks TARGET)
   
   
   # -- xcf input
-  if (STREAMBLOCKS_ARGS_XCF_PATH) 
-    set(STREAMBLOCKS_XCF_PATH --xcf-path ${STREAMBLOCKS_ARGS_XCF_PATH})
+  if (STREAMBLOCKS_ARGS_XCF_SOURCE_PATH) 
+    message(STATUS "XCF PATH ${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}")
+    analyze_path(XCF_SOURCE_PATH_STRING SOURCE_XCF_DEPS "${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}" "xcf")
+    set(STREAMBLOCKS_XCF_SOURCE_PATH --xcf-path ${XCF_SOURCE_PATH_STRING})
   endif()
   
   # -- xdf source path
   if (STREAMBLOCKS_ARGS_XDF_SOURCE_PATH)
-  set(STREAMBLOCKS_XDF_PATH --xdf-source-path ${STREAMBLOCKS_ARGS_XDF_SOURCE_PATH})
+    analyze_path(XDF_SOURCE_STRING SOURCE_XDF_DEPS "${STREAMBLOCKS_ARGS_XDF_SOURCE_PATH}" "xdf")
+    set(STREAMBLOCKS_XDF_SOURCE_PATH --xdf-source-path ${XDF_SOURCE_STRING})
   endif()
   
   # -- orcc source path 
   if (STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH)
-  set(STREAMBLOCKS_ORCC_SOURCE_PATH --orcc-source-path ${STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH})
+    analyze_path(ORCC_SOURCE_PATH_STRING SOURCE_ORCC_DEPS "${STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH}" "cal")
+    set(STREAMBLOCKS_ORCC_SOURCE_PATH --orcc-source-path ${ORCC_SOURCE_PATH_STRING})
   endif()
   
 
@@ -107,34 +112,41 @@ function (streamblocks TARGET)
   
 
   
-  make_absolute_path_list(TRAGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
+  make_absolute_path_list(TARGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
   message(STATUS "Adding target ${TARGET} for entity ${STREAMBLOCKS_ARGS_QID}")
 
-  message(STATUS "Target path: ${TRAGET_PATH_STRING}")
+  
+  
+  # append the platform to the output directory
+  if (STREAMBLOCKS_ARGS_PARTITIONING)
+    set(TARGET_PATH_OUTPUT_STRING "${TARGET_PATH_STRING}/${STREAMBLOCKS_ARGS_PLATFORM}")
+  else()
+    set(TARGET_PATH_OUTPUT_STRING "${TARGET_PATH_STRING}")
+  endif()
+  
+  message(STATUS "Target path: ${TARGET_PATH_STRING}")
+  message(STATUS "Generated path: ${TARGET_PATH_OUTPUT_STRING}")
 
-
-
- 
   add_custom_command(
-    OUTPUT ${TRAGET_PATH_STRING}
-    # COMMAND "${STREAMBLOCKS_COMMAND}"
+    OUTPUT ${TARGET_PATH_OUTPUT_STRING}
+    
     COMMAND ${STREAMBLOCKS_BIN}
     ${STREAMBLOCKS_ARGS_PLATFORM}
     ${STREAMBLOCKS_SETTINGS_OPTIONS}
     "--source-path" ${SOURCE_PATH_STRING}
-    ${ORCC_SOURCE_PATH_STRING}
-    ${XCF_SOURCE_PATH_STRING}
-    ${XDF_SOURCE_PATH_STRING}
-    "--target-path" ${TRAGET_PATH_STRING}
+    ${STREAMBLOCKS_ORCC_SOURCE_PATH}
+    ${STREAMBLOCKS_XDF_SOURCE_PATH}
+    ${STREAMBLOCKS_XCF_SOURCE_PATH}
+    "--target-path" ${TARGET_PATH_STRING}
     ${STREAMBLOCKS_ARGS_QID} 
     COMMENT "Generating code for ${STREAMBLOCKS_ARGS_QID}"
-    DEPENDS ${SOURCE_CAL_DEPS}
+    DEPENDS ${SOURCE_CAL_DEPS} ${SOURCE_ORCC_DEPS} ${SOURCE_XDF_DEPS} ${SOURCE_XCF_DEPS}
     VERBATIM
-    )
+    ) 
     
     add_custom_target(
       ${TARGET}
-      DEPENDS ${TRAGET_PATH_STRING} 
+      DEPENDS ${TARGET_PATH_OUTPUT_STRING} 
     )
       
 endfunction()
@@ -148,13 +160,23 @@ function (streamblocks_systemc TARGET)
     ""
     ${ARGN}
   )
-
+  set(HLS_TARGET ${TARGET}_HLS)
+  set(MULTICORE_TARGET ${TARGET}_MULTICORE)
+  message(STATUS "Creating systemc simulation targets ${HLS_TARGET} and ${MULTICORE_TARGET}")
   streamblocks(
-    ${TARGET}
+    ${HLS_TARGET}
     PLATFORM vivado-hls
     SYSTEMC
     PARTITIONING
     MAX_BRAM 128MiB
+    ${ARGN}
+  )
+
+  streamblocks(
+    ${MULTICORE_TARGET}
+    PLATFORM multicore
+    SYSTEMC
+    PARTITIONING
     ${ARGN}
   )
 
