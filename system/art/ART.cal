@@ -4,6 +4,8 @@ namespace ART :
   external actor art_Sink_bin(String fileName) int In ==> ;
   external actor art_Sink_txt(String fileName) int In ==> ;
   external actor art_Sink_real(String fileName) float In ==> ;
+  external actor art_Sink_8bit_txt(String fileName) uint(size=8) In ==> ;
+  external actor art_Sink_16bit_txt(String fileName) uint(size=16) In ==> ;
   
   // -- Displays
   external actor art_Display_yuv (String title, int width, int height) int In ==> ;
@@ -18,3 +20,4 @@ namespace ART :
   // -- Streaming
   external actor art_Streaming(int activeMode, String port) ==> int Out;
 end
+ 

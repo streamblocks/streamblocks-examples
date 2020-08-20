@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configuration>
+    <Network id="RVC.decoderDemo"/>
+    <Partitioning>
+        <Partition id="0" pe="x86_64" code-generator="sw" host="true">
+            <Instance id="source"/>
+            <Instance id="display"/>
+
+            <Instance id="framebuf"/>
+            <Instance id="interpolation"/>
+            <Instance id="add"/>
+            
+            <Instance id="framebuf_0"/>
+            <Instance id="interpolation_0"/>
+            <Instance id="add_0"/>
+            
+            <Instance id="framebuf_1"/>
+            <Instance id="interpolation_1"/>
+            <Instance id="add_1"/>
+
+            <Instance id="GEN_mgnt_Merger420"/>
+        </Partition>
+        <Partition id="1" pe="FPGA" code-generator="hw">
+            <Instance id="serialize"/>
+            <Instance id="parseheaders"/>
+            <Instance id="mvseq"/>
+            <Instance id="blkexp"/>
+            <Instance id="mvrecon"/>
+            <Instance id="splitter_BTYPE"/>
+            <Instance id="splitter_MV"/>
+            <Instance id="splitter_420_B"/>
+            <Instance id="splitter_Qp"/>
+            <Instance id="DCsplit"/>
+            <Instance id="IS_r"/>
+            <Instance id="IAP"/>
+            <Instance id="IQ"/>
+            <Instance id="addressing"/>
+            <Instance id="invpred"/>
+            <Instance id="scale"/>
+            <Instance id="row"/>
+            <Instance id="column"/>
+            <Instance id="transpose"/>
+            <Instance id="retranspose"/>
+            <Instance id="shift"/>
+            <Instance id="clip"/>
+            <Instance id="DCsplit_0"/>
+            <Instance id="IS_0"/>
+            <Instance id="IAP_0"/>
+            <Instance id="IQ_0"/>
+            <Instance id="addressing_0"/>
+            <Instance id="invpred_0"/>
+            <Instance id="scale_0"/>
+            <Instance id="row_0"/>
+            <Instance id="column_0"/>
+            <Instance id="transpose_0"/>
+            <Instance id="retranspose_0"/>
+            <Instance id="shift_0"/>
+            <Instance id="clip_0"/>
+            <Instance id="DCsplit_1"/>
+            <Instance id="IS_1"/>
+            <Instance id="IAP_1"/>
+            <Instance id="IQ_1"/>
+            <Instance id="addressing_1"/>
+            <Instance id="invpred_1"/>
+            <Instance id="scale_1"/>
+            <Instance id="row_1"/>
+            <Instance id="column_1"/>
+            <Instance id="transpose_1"/>
+            <Instance id="retranspose_1"/>
+            <Instance id="shift_1"/>
+            <Instance id="clip_1"/>   
+        </Partition>
+    </Partitioning>
+    <Code-Generators>
+        <Code-Generator id="sw" platform="multicore"/>
+        <Code-Generator id="hw" platform="vivado-hls"/>
+    </Code-Generators>
+</Configuration>
