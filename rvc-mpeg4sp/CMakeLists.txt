@@ -51,3 +51,11 @@ streamblocks_systemc(
   XCF_SOURCE_PATH configuration_1.xcf
 )
 
+streamblocks(
+  rvc-mpeg4sp_SOFTWARE
+  PLATFORM multicore
+  QID RVC.decoderDemo
+  TARGET_PATH generated/profiling/sw
+  SOURCE_PATH . ../system
+)
+
