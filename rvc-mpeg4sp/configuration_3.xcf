@@ -5,22 +5,6 @@
         <partition id="0" pe="x86_64" code-generator="sw" host="true">
             <instance id="source"/>
             <instance id="display"/>
-
-            <instance id="framebuf"/>
-            <instance id="interpolation"/>
-            <instance id="add"/>
-            
-            <instance id="framebuf_0"/>
-            <instance id="interpolation_0"/>
-            <instance id="add_0"/>
-            
-            <instance id="framebuf_1"/>
-            <instance id="interpolation_1"/>
-            <instance id="add_1"/>
-
-            <instance id="GEN_mgnt_Merger420"/>
-        </partition>
-        <partition id="1" pe="FPGA" code-generator="hw">
             <instance id="serialize"/>
             <instance id="parseheaders"/>
             <instance id="mvseq"/>
@@ -33,9 +17,34 @@
             <instance id="DCsplit"/>
             <instance id="IS_r"/>
             <instance id="IAP"/>
-            <instance id="IQ"/>
             <instance id="addressing"/>
             <instance id="invpred"/>
+
+            <instance id="DCsplit_0"/>
+            <instance id="IS_0"/>
+            <instance id="IAP_0"/>
+            <instance id="addressing_0"/>
+            <instance id="invpred_0"/>
+            
+            <instance id="DCsplit_1"/>
+            <instance id="IS_1"/>
+            <instance id="IAP_1"/>
+            <instance id="addressing_1"/>
+            <instance id="invpred_1"/>
+           
+            <instance id="framebuf"/>
+            <instance id="interpolation"/>
+            <instance id="add"/>
+            <instance id="framebuf_0"/>
+            <instance id="interpolation_0"/>
+            <instance id="add_0"/>
+            <instance id="framebuf_1"/>
+            <instance id="interpolation_1"/>
+            <instance id="add_1"/>
+            <instance id="GEN_mgnt_Merger420"/>
+        </partition>
+        <partition id="1" pe="FPGA" code-generator="hw">
+            <instance id="IQ"/>
             <instance id="scale"/>
             <instance id="row"/>
             <instance id="column"/>
@@ -43,12 +52,8 @@
             <instance id="retranspose"/>
             <instance id="shift"/>
             <instance id="clip"/>
-            <instance id="DCsplit_0"/>
-            <instance id="IS_0"/>
-            <instance id="IAP_0"/>
+            
             <instance id="IQ_0"/>
-            <instance id="addressing_0"/>
-            <instance id="invpred_0"/>
             <instance id="scale_0"/>
             <instance id="row_0"/>
             <instance id="column_0"/>
@@ -56,19 +61,15 @@
             <instance id="retranspose_0"/>
             <instance id="shift_0"/>
             <instance id="clip_0"/>
-            <instance id="DCsplit_1"/>
-            <instance id="IS_1"/>
-            <instance id="IAP_1"/>
+            
             <instance id="IQ_1"/>
-            <instance id="addressing_1"/>
-            <instance id="invpred_1"/>
             <instance id="scale_1"/>
             <instance id="row_1"/>
             <instance id="column_1"/>
             <instance id="transpose_1"/>
             <instance id="retranspose_1"/>
             <instance id="shift_1"/>
-            <instance id="clip_1"/>   
+            <instance id="clip_1"/>
         </partition>
     </partitioning>
     <code-generators>
