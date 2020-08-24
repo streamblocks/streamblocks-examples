@@ -14,7 +14,7 @@ streamblocks(
 
 
 set(iter 1)
-while(${iter} LESS_EQUAL 5)
+while(${iter} LESS_EQUAL 7)
 
   set(TARGET_NAME Loopback_${iter})
   streamblocks(
@@ -34,9 +34,21 @@ while(${iter} LESS_EQUAL 5)
     PARTITIONING
   )
 
+  
   add_custom_target(
     ${TARGET_NAME} ALL
     DEPENDS ${TARGET_NAME}_MULTICORE ${TARGET_NAME}_HLS
+  )
+  
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/generated/loopback${iter}/build)
+
+  add_custom_command(
+    TARGET ${TARGET_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=10 -DUSE_SDACCEL=true ..
+    COMMAND make Loopback${iter}_kernel_xclbin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/generated/loopback${iter}/build
+    COMMENT "Configuring generated cmake project ${TARGET_NAME}"
   )
 
   math(EXPR iter "${iter} + 1")

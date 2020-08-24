@@ -4,43 +4,64 @@ project(rvc-mpgeg4sp)
 
 include(../Streamblocks.cmake)
 
-# -- Heterogeneous HLS target
-streamblocks(
-  rvc-mpeg4sp_HLS
-  generated_rvc_hls
-  PLATFORM vivado-hls
-  QID RVC.decoderDemo
-  TARGET_PATH generated
-  SOURCE_PATH . ../system
-  XCF_SOURCE_PATH configuration.xcf
-  PARTITIONING
-)
 
-# -- Heterogeneous MULTICORE target
-streamblocks(
-  rvc-mpeg4sp_MULTICORE
-  PLATFORM multicore
-  QID RVC.decoderDemo
-  TARGET_PATH generated
-  SOURCE_PATH . ../system
-  XCF_SOURCE_PATH configuration.xcf
-  PARTITIONING
-)
+macro(rvc_generate CONFIG_PATH)
 
-# -- Heterogenous target, generates both software and hardware
-add_custom_target(
-  rvc-mpeg4sp 
-  DEPENDS rvc-mpeg4sp_HLS rvc-mpeg4sp_MULTICORE
-)
+    # -- Heterogeneous HLS target
+  streamblocks(
+    rvc-mpeg4sp_HLS_${CONFIG_PATH}
+    generated_rvc_hls
+    PLATFORM vivado-hls
+    QID RVC.decoderDemo
+    TARGET_PATH generated/${CONFIG_PATH}
+    SOURCE_PATH . ../system
+    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+    PARTITIONING
+  )
+
+  # -- Heterogeneous MULTICORE target
+  streamblocks(
+    rvc-mpeg4sp_MULTICORE_${CONFIG_PATH}
+    PLATFORM multicore
+    QID RVC.decoderDemo
+    TARGET_PATH generated/${CONFIG_PATH}
+    SOURCE_PATH . ../system
+    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+    PARTITIONING
+  )
+
+  # -- Heterogenous target, generates both software and hardware
+  add_custom_target(
+    rvc-mpeg4sp_${CONFIG_PATH} ALL
+    DEPENDS rvc-mpeg4sp_MULTICORE_${CONFIG_PATH} rvc-mpeg4sp_HLS_${CONFIG_PATH}
+  )
+endmacro()
+
+rvc_generate(configuration_1)
+rvc_generate(configuration_2)
 
 
 # -- SystemC simulation target
 
-streamblocks_systemc(
-  rvc-mpeg4sp_SYSTEMC
-  QID RVC.decoderDemo
-  TARGET_PATH generated/profiling/sc
-  SOURCE_PATH . ../system
-  XCF_SOURCE_PATH configuration.xcf
-)
+macro(rvc_generate_sc CONFIG_PATH)
+  streamblocks_systemc(
+    rvc-mpeg4sp_SYSTEMC_${CONFIG_PATH}
+    QID RVC.decoderDemo
+    TARGET_PATH generated/profiling/${CONFIG_PATH}/sc
+    SOURCE_PATH . ../system
+    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+  )
+endmacro()
 
+rvc_generate_sc(configuration_1)
+rvc_generate_sc(configuration_2)
+
+
+# -- software only target
+streamblocks(
+  rvc-mpeg4sp_SOFTWARE
+  PLATFORM multicore
+  QID RVC.decoderDemo
+  TARGET_PATH generated/profiling/sw
+  SOURCE_PATH . ../system
+)

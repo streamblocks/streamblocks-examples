@@ -8,7 +8,7 @@ namespace hetero.simple.pipes:
   network PipelinedNetwork() ==>:
 
     entities
-      source = Source(payload_size = 1 << 30);
+      source = Source(payload_size = 1 << 28);
       // pe = [PlusPlus() : for int i in 0 .. (network_size - 1)];
       pe0 = PlusPlus(coeff = 1);
       pe1 = PlusPlus(coeff = 2);
@@ -16,6 +16,16 @@ namespace hetero.simple.pipes:
       pe3 = PlusPlus(coeff = 4);
       pe4 = PlusPlus(coeff = 5);
       pe5 = PlusPlus(coeff = 6);
+      pe6 = PlusPlus(coeff = 6);
+      pe7 = PlusPlus(coeff = 6);
+      pe8 = PlusPlus(coeff = 6);
+      pe9 = PlusPlus(coeff = 6);
+      pe10 = PlusPlus(coeff = 6);
+      pe11 = PlusPlus(coeff = 6);
+      pe12 = PlusPlus(coeff = 6);
+      pe13 = PlusPlus(coeff = 6);
+      pe14 = PlusPlus(coeff = 6);
+      pe15 = PlusPlus(coeff = 6);
       sink = Sink();
     structure
 
@@ -25,7 +35,18 @@ namespace hetero.simple.pipes:
       pe2.Out --> pe3.In;
       pe3.Out --> pe4.In;
       pe4.Out --> pe5.In;
-      pe5.Out --> sink.In;
+      pe5.Out --> pe6.In;
+      pe6.Out --> pe7.In;
+      pe7.Out --> pe8.In;
+      pe8.Out --> pe9.In;
+      pe9.Out --> pe10.In;
+      pe10.Out --> pe11.In;
+      pe11.Out --> pe12.In;
+      pe12.Out --> pe13.In;
+      pe13.Out --> pe14.In;
+      pe14.Out --> pe15.In;
+      
+      pe15.Out --> sink.In;
 
 
 
