@@ -43,14 +43,21 @@ rvc_generate(configuration_2)
 
 # -- SystemC simulation target
 
-streamblocks_systemc(
-  rvc-mpeg4sp_SYSTEMC
-  QID RVC.decoderDemo
-  TARGET_PATH generated/profiling/sc
-  SOURCE_PATH . ../system
-  XCF_SOURCE_PATH configuration_1.xcf
-)
+macro(rvc_generate_sc CONFIG_PATH)
+  streamblocks_systemc(
+    rvc-mpeg4sp_SYSTEMC_${CONFIG_PATH}
+    QID RVC.decoderDemo
+    TARGET_PATH generated/profiling/${CONFIG_PATH}/sc
+    SOURCE_PATH . ../system
+    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+  )
+endmacro()
 
+rvc_generate_sc(configuration_1)
+rvc_generate_sc(configuration_2)
+
+
+# -- software only target
 streamblocks(
   rvc-mpeg4sp_SOFTWARE
   PLATFORM multicore
@@ -58,4 +65,3 @@ streamblocks(
   TARGET_PATH generated/profiling/sw
   SOURCE_PATH . ../system
 )
-
