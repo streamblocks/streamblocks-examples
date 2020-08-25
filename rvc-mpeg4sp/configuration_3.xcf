@@ -42,9 +42,11 @@
             <instance id="interpolation_1"/>
             <instance id="add_1"/>
             <instance id="GEN_mgnt_Merger420"/>
+            <instance id="IQ"/>
+            <instance id="IQ_0"/>
+            <instance id="IQ_1"/>
         </partition>
         <partition id="1" pe="FPGA" code-generator="hw">
-            <instance id="IQ"/>
             <instance id="scale"/>
             <instance id="row"/>
             <instance id="column"/>
@@ -53,7 +55,6 @@
             <instance id="shift"/>
             <instance id="clip"/>
             
-            <instance id="IQ_0"/>
             <instance id="scale_0"/>
             <instance id="row_0"/>
             <instance id="column_0"/>
@@ -62,7 +63,6 @@
             <instance id="shift_0"/>
             <instance id="clip_0"/>
             
-            <instance id="IQ_1"/>
             <instance id="scale_1"/>
             <instance id="row_1"/>
             <instance id="column_1"/>
