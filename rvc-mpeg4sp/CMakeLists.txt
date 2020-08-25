@@ -4,6 +4,8 @@ project(rvc-mpgeg4sp)
 
 include(../Streamblocks.cmake)
 
+# List of HLS_CLOCK_PERIOD settings to build binaries for
+set(CLOCK_LIST 3.3 10)
 
 macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
@@ -49,7 +51,6 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   )
 endmacro()
 
-set(CLOCK_LIST 3.3 10)
 
 foreach(index RANGE 1 5)
   foreach(CLK ${CLOCK_LIST})
