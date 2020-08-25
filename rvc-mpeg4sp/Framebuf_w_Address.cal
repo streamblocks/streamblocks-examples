@@ -53,17 +53,17 @@ import System.bitops.lshift;
   int COMP_PER_MB      = if LAYOUT=1 then 4 else 1 end; // 8x8 blocks/MB
 
   //EKER int MAXW_IN_SAMPLES  = MAXW_IN_MB * SAMPLES_PER_MB;
-  int MAXW_IN_SAMPLES  = MAXW_IN_MB * 16;
+  int MAXW_IN_SAMPLES  = MAXW_IN_MB * SAMPLES_PER_MB;
   //EKER int MAXH_IN_SAMPLES  = MAXH_IN_MB * SAMPLES_PER_MB;
-  int MAXH_IN_SAMPLES  = MAXH_IN_MB * 16;
+  int MAXH_IN_SAMPLES  = MAXH_IN_MB * SAMPLES_PER_MB;
   int MAX_FRAME_SIZE   = MAXW_IN_SAMPLES * MAXH_IN_SAMPLES;
 
   
-  int HALF_SEARCH      = (SEARCHWIN_IN_MB+1)/2;
+  int HALF_SEARCH      = (SEARCHWIN_IN_MB + 1) / 2;
   //EKER int EXTRA_SPACE      = HALF_SEARCH * SAMPLES_PER_MB * MAXW_IN_SAMPLES;
-  int EXTRA_SPACE      = HALF_SEARCH * 16 * MAXW_IN_SAMPLES;
+  int EXTRA_SPACE      = HALF_SEARCH * SAMPLES_PER_MB * MAXW_IN_SAMPLES;
 
-  int BUFFER_SIZE      = MAX_FRAME_SIZE+EXTRA_SPACE;
+  int BUFFER_SIZE      = MAX_FRAME_SIZE + EXTRA_SPACE;
 
   // Note: size is a multiple of SAMPLES_PER_MB*MAXW_IN_SAMPLES
   // (a complete row of macro blocks). Testing for buffer wrap-around
