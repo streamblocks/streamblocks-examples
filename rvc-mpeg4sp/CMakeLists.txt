@@ -41,14 +41,51 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   )
 
   file(MAKE_DIRECTORY ${__TARGET_PATH__}/build)
+
+  
+
+  # -- command to build FPGA binary
   add_custom_command(
-    TARGET ${__TARGET__}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} -DUSE_SDACCEL=true ..
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
+    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} -DUSE_SDACCEL=true -DTARGET=hw ..
     COMMAND make decoderDemo_kernel_xclbin -j
+    DEPENDS ${__TARGET__}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
     COMMENT "Building FPGA binary for ${__TARGET__}"
+  
   )
+  add_custom_target(
+    ${__TARGET__}_xclbin ALL
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
+  )
+
+  # -- software binary
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/decoderDemo
+    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release ..
+    COMMAND make decoderDemo -j
+    DEPENDS ${__TARGET__}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
+  )
+  
+  add_custom_target(
+    ${__TARGET__}_bin ALL
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/decoderDemo
+  )
+
+  
+  add_custom_target(
+    ${__TARGET__}_run
+    DEPENDS ${__TARGET__}_bin
+  )
+  add_custom_command(
+    TARGET ${__TARGET__}_run
+    PRE_BUILD
+    COMMAND time ./decoderDemo > decoderDemo.out
+    DEPENDS ${__TARGET__}_bin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin
+  )
+  
 endmacro()
 
 
