@@ -31,4 +31,37 @@ namespace jpeg.decoder:
 		decoder.YCbCr --> vid_sink.In;
 	end
 
+	import entity jpeg.Source;
+	
+	network Top_JPEG_Decoder_io() ==> :
+	entities 
+		source = Source(fileName="./foreman_qcif.mjpg");
+		display = SinkVID();
+		sinkSOI = SinkSOI();
+		decoder = JpegDecoderWithSize();
+	structure
+		source.O --> decoder.BYTE; 
+		decoder.YCbCr --> display.VID;
+		decoder.SOI --> sinkSOI.SOI;
+	end
+
+
+	actor SinkSOI() int(size=16) SOI ==> :
+	
+		action SOI:[w,h] ==>
+		do
+			println("Width : " + w + ", Height : " + h);
+		end
+
+	end
+
+	actor SinkVID() int VID ==> :
+	
+		action VID:[vid] ==>
+		do
+			println("VID : " + vid);
+		end
+	
+	end
+
 end

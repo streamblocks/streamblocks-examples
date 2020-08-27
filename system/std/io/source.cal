@@ -1,0 +1,36 @@
+namespace std.io.source:
+
+    uint(size=32) NB_TOKEN_TO_SENT = 4096;
+	uint NB_TOKEN_TO_SENT_FB = 524288;
+
+	external procedure source_init(String fileName)
+    end
+
+	external procedure source_readNBytes(List(type:uint(size=8)) outTable, uint nbTokenToRead)
+    end
+	
+	external function source_readByte() --> uint(size=8)
+    end
+
+	external function source_sizeOfFile() --> int(size=32)
+	end
+
+	external procedure source_rewind()
+	end
+
+	// Deprecated method, will be removed in the future
+	external procedure source_decrementNbLoops()
+	end
+
+	// Deprecated method, will be removed in the future
+	external function source_isMaxLoopsReached() --> bool
+	end
+	
+	external function source_getNbLoop() --> int
+	end
+
+	// Copied to std.stdio.Exit, remove from std.stdio.Source?
+	external procedure source_exit(int exitCode)
+	end
+
+end

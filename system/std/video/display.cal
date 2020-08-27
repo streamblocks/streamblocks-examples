@@ -1,0 +1,78 @@
+namespace std.video.display:
+
+	uint MAX_WIDTH = 4096;
+	uint MAX_HEIGHT = 2240;
+	uint MB_SIZE_LUMA = 16;
+	uint MB_SIZE_CHROMA = 8;
+
+	/**
+	 * Display flag.
+	 */
+	uint(size=8) DISP_ENABLE = 1;
+
+	/**
+	 * Initializes the given display.
+	 */
+	external procedure displayYUV_init() end
+
+	/**
+	 * Displays a picture. Sizes are in pixels.
+	 */
+	external procedure displayYUV_displayPicture(List(type:uint(size=8)) pictureBufferY,
+	                                           List(type:uint(size=8)) pictureBufferU,
+	                                           List(type:uint(size=8)) pictureBufferV,
+	                                           int(size=16) pictureWidth, int(size=16) pictureSize) end
+	
+	/**
+	 * Gets flags of display
+	 */
+	external function displayYUV_getFlags ( ) --> uint(size=8) end
+
+	/**
+	 * Gets the number of frames the display should decode and show
+	 * before closing application.
+	 */
+	external function displayYUV_getNbFrames() --> int end
+
+	/**
+	 * Initializes the compare module.
+	 */
+	external procedure compareYUV_init() end
+
+	/**
+	 * Compares a picture. Sizes are in pixels.
+	 */
+	external procedure compareYUV_comparePicture(List(type:uint(size=8)) pictureBufferY,
+	                                           List(type:uint(size=8)) pictureBufferU,
+	                                           List(type:uint(size=8)) pictureBufferV,
+	                                           int(size=16) pictureWidth, int(size=16) pictureSize) end
+
+	/**
+	 * Initializes the frame rate.
+	 */
+	external procedure fpsPrintInit() end
+
+	/**
+	 * Prints the current frame rate.
+	 */
+	external procedure fpsPrintNewPicDecoded() end
+	
+	/**
+	 * Initializes the given display.
+	 */
+	external procedure displayYUV444_init(int(size=16) winWidth, int(size=16) winHeight,
+										int(size=16) pictureWidth, int(size=16) pictureHeight) end
+	/**
+	 * Gets event.
+	 */
+	external procedure displayYUV_getEvent() end
+
+	/**
+	 * Displays a picture. The sizes are in pixels.
+	 */
+	external procedure displayYUV444_displayPicture(List(type:uint(size=8)) pictureBufferY,
+											      List(type:uint(size=8)) pictureBufferU,
+	                                              List(type:uint(size=8)) pictureBufferV,
+	                                              int(size=16) pictureWidth, int(size=16) pictureHeight) end
+
+end
