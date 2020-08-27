@@ -17,15 +17,7 @@ namespace RVC:
 
 	actor GEN_mgnt_DCSplit ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
 
-		dc : action IN:[x] ==> DC:[0]
-		end
-		  
-		ac : action IN:[x] repeat 63 ==> AC:[x] repeat 63
-		end
-	
-		schedule fsm s0:
-			s0	(dc)	--> s1;
-			s1	(ac)	--> s0;
+		action IN:[ x ] repeat 64 ==> DC:[ x[0] ], AC:[ [ x[i] : for int i in 1 .. 63 ] ] repeat 63
 		end
 	end
 end
