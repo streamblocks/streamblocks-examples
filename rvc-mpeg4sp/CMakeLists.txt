@@ -5,8 +5,13 @@ project(rvc-mpgeg4sp)
 include(../Streamblocks.cmake)
 
 # List of HLS_CLOCK_PERIOD settings to build binaries for
-set(CLOCK_LIST 3.3 10)
+# Current clock speeds 300, 250, 200, 150 and 100 MHz
+set(CLOCK_LIST 3.3 4 5 6.6 10)
 
+
+
+add_custom_target(all_xclbin)
+add_custom_target(all_bin)
 macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
   set(__TARGET_PATH__ generated/${CONFIG_PATH}_${CLOCK_SETTING})
@@ -86,6 +91,8 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin
   )
   
+  add_dependencies(all_xclbin ${__TARGET__}_xclbin)
+  add_dependencies(all_bin ${__TARGET__}_bin)
 endmacro()
 
 
