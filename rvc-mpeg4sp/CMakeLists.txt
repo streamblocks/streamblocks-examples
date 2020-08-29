@@ -6,16 +6,18 @@ include(../Streamblocks.cmake)
 
 # List of HLS_CLOCK_PERIOD settings to build binaries for
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
-set(CLOCK_LIST 3.3 4 5 6.6 10)
+set(CLOCK_LIST 3.3 10)
 
 
 
 add_custom_target(all_xclbin)
 add_custom_target(all_bin)
+add_custom_target(all_sc_bin)
+
 macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
   set(__TARGET_PATH__ generated/${CONFIG_PATH}_${CLOCK_SETTING})
-  set(__TARGET__ rvc-mpeg4sp_${CONFIG_PATH}_${CLOCK_SETTING})
+  set(__TARGET__ ${CONFIG_PATH}_${CLOCK_SETTING})
   # message(STATUS "")
     # -- Heterogeneous HLS target
   streamblocks(
@@ -93,6 +95,36 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   
   add_dependencies(all_xclbin ${__TARGET__}_xclbin)
   add_dependencies(all_bin ${__TARGET__}_bin)
+
+
+  set(__TARGET_SC_PATH__ generated/${CONFIG_PATH}_${CLOCK_SETTING}_sc)
+  set(__TARGET_SC__ ${__TARGET__}_SC)
+
+  streamblocks_systemc(
+    ${__TARGET_SC__}
+    QID RVC.decoderDemo
+    TARGET_PATH ${__TARGET_SC_PATH__}
+    SOURCE_PATH . ../system
+    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+  )
+
+  file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/build)
+
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
+    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release ..
+    DEPENDS ${__TARGET_SC__}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
+    COMMENT "Building binary for ${__TARGET_SC__}"
+  )
+
+  add_custom_target(
+    ${__TARGET_SC__}_bin
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
+  )
+
+  add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
+
 endmacro()
 
 
