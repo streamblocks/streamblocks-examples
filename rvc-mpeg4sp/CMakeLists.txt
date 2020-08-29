@@ -71,7 +71,7 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
     # -- remotely copy xclbin
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
-      COMMAND scp ${REMOTE_USER}@${REMOTE_IP}:${REMOTE_REPO} ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/
+      COMMAND scp ${REMOTE_USER}@${REMOTE_IP}:${REMOTE_REPO}/${CONFIG_PATH}_${CLOCK_SETTING}/decoderDemo_kernel.hw.xclbin ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/
       DEPENDS ${__TARGET__}
       COMMENT "Fetching ${__TARGET__} xclbin from ${REMOTE_IP}"
     )
