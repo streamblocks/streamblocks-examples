@@ -10,9 +10,11 @@ set(CLOCK_LIST 3.3 10)
 
 
 
-add_custom_target(all_xclbin)
-add_custom_target(all_bin)
-add_custom_target(all_sc_bin)
+add_custom_target(all_xclbin) # build all xclbins
+add_custom_target(all_bin)    # build all multicore hetero binaries
+add_custom_target(all_sc_bin) # build all sc binaries
+add_custom_target(all_sc_run) # run all sc simulations
+
 
 macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
@@ -48,13 +50,14 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   )
 
   file(MAKE_DIRECTORY ${__TARGET_PATH__}/build)
-
-  
+  file(MAKE_DIRECTORY ${__TARGET_PATH__}/bin)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit 
+    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/)
 
   # -- command to build FPGA binary
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
-    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} -DUSE_SDACCEL=true -DTARGET=hw ..
+    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} -DUSE_SDACCEL=true -DTARGET=hw .. > cmake.xclbin.config.log
     COMMAND make decoderDemo_kernel_xclbin -j
     DEPENDS ${__TARGET__}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
@@ -69,8 +72,8 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   # -- software binary
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/decoderDemo
-    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release ..
-    COMMAND make decoderDemo -j
+    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release .. > cmake.bin.config.log
+    COMMAND make decoderDemo -j &> cmake.make.log
     DEPENDS ${__TARGET__}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
   )
@@ -80,6 +83,7 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/decoderDemo
   )
 
+  
   
   add_custom_target(
     ${__TARGET__}_run
@@ -97,6 +101,9 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   add_dependencies(all_bin ${__TARGET__}_bin)
 
 
+
+  # -- SystemC build and run commands
+
   set(__TARGET_SC_PATH__ generated/${CONFIG_PATH}_${CLOCK_SETTING}_sc)
   set(__TARGET_SC__ ${__TARGET__}_SC)
 
@@ -109,13 +116,17 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
   )
 
   file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/build)
+  file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/bin)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit 
+    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/)
 
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
-    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release ..
+    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} .. &> cmake.sc.config.log
+    COMMAND make decoderDemo -j &> cmake.sc.make.log
     DEPENDS ${__TARGET_SC__}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
-    COMMENT "Building binary for ${__TARGET_SC__}"
+    COMMENT "Building SystemC binary for ${__TARGET_SC__}"
   )
 
   add_custom_target(
@@ -125,6 +136,25 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
   add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
 
+  add_custom_command(
+    OUTPUT 
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml 
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
+    COMMAND ./decoderDemo --hardware-profile=systemc-profile.xml &> decoderDemo.log
+    DEPENDS ${__TARGET_SC__}_bin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
+    COMMENT "Executing SystemC simulation for ${__TARGET_SC__} see ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log"
+  )
+  add_custom_target(
+    ${__TARGET_SC__}_run
+    DEPENDS 
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml 
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
+  )
+
+  add_dependencies(
+    all_sc_run ${__TARGET_SC__}_run
+  )
 endmacro()
 
 
@@ -135,21 +165,6 @@ foreach(index RANGE 1 5)
 
   endforeach()
 endforeach()
-
-# -- SystemC simulation target
-
-macro(rvc_generate_sc CONFIG_PATH)
-  streamblocks_systemc(
-    rvc-mpeg4sp_SYSTEMC_${CONFIG_PATH}
-    QID RVC.decoderDemo
-    TARGET_PATH generated/profiling/${CONFIG_PATH}/sc
-    SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
-  )
-endmacro()
-
-# rvc_generate_sc(configuration_1)
-# rvc_generate_sc(configuration_2)
 
 
 # -- software only target
