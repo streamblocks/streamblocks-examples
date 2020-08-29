@@ -8,7 +8,7 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 
 # List of HLS_CLOCK_PERIOD settings to build binaries for
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
-set(CLOCK_LIST 3.3 10)
+set(CLOCK_LIST 3.3 4 5 6.6 10)
 
 
 
