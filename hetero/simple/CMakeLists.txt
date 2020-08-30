@@ -3,6 +3,15 @@ cmake_minimum_required(VERSION 3.10)
 project(hetero.simple)
 
 include(../../Streamblocks.cmake)
+
+
+
+set(CLOCK_SETTINGS 3.3 4 5 6.6 10)
+
+
+
+add_custom_target(all_xclbin)
+
 # -- software profiling target for the PipelinedNetwork
 streamblocks(
   PipelinedNetwork_SOFTWARE
@@ -13,43 +22,60 @@ streamblocks(
 )
 
 
-set(iter 1)
-while(${iter} LESS_EQUAL 7)
+macro(generate_loopback NUM CLOCK) 
 
-  set(TARGET_NAME Loopback_${iter})
+  set(TARGET_NAME Loopback_${NUM}_${CLOCK})
+  set(TARGET_PATH generated/Loopback_${NUM}_${CLOCK}
+  )
   streamblocks(
     ${TARGET_NAME}_HLS
-    QID hetero.simple.loopback.Loopback${iter}
+    QID hetero.simple.loopback.Loopback${NUM}
     PLATFORM vivado-hls
     SOURCE_PATH .
-    TARGET_PATH generated/loopback${iter}
+    TARGET_PATH ${TARGET_PATH}
     PARTITIONING
   )
+  
   streamblocks(
     ${TARGET_NAME}_MULTICORE
-    QID hetero.simple.loopback.Loopback${iter}
+    QID hetero.simple.loopback.Loopback${NUM}
     PLATFORM multicore
     SOURCE_PATH .
-    TARGET_PATH generated/loopback${iter}
+    TARGET_PATH ${TARGET_PATH}
     PARTITIONING
   )
 
-  
+
   add_custom_target(
     ${TARGET_NAME} ALL
     DEPENDS ${TARGET_NAME}_MULTICORE ${TARGET_NAME}_HLS
   )
-  
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/generated/loopback${iter}/build)
+
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/build)
 
   add_custom_command(
-    TARGET ${TARGET_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=10 -DUSE_SDACCEL=true ..
-    COMMAND make Loopback${iter}_kernel_xclbin
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/generated/loopback${iter}/build
-    COMMENT "Configuring generated cmake project ${TARGET_NAME}"
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/bin/xclbin/Loopback.hw._kernel_xclbin
+    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK} -DUSE_SDACCEL=true ..
+    COMMAND make Loopback${NUM}_kernel_xclbin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/build
+    COMMENT "Generating xclbin ${TARGET_NAME}"
+    DEPENDS ${TARGET_NAME}
   )
 
-  math(EXPR iter "${iter} + 1")
-endwhile()
+  add_custom_target(
+    ${TARGET_NAME}_xclbin
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/bin/xclbin/Loopback.hw._kernel_xclbin
+  )
+  
+  add_dependencies(all_xclbin ${TARGET_NAME}_xclbin)
+
+
+endmacro()
+
+
+foreach (FANOUT RANGE 1 7)
+  foreach (CLK ${CLOCK_SETTINGS})
+    generate_loopback(${FANOUT} ${CLK})
+  endforeach()
+endforeach()
+
