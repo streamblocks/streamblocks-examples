@@ -211,7 +211,7 @@ void DeviceHandle::allocateInputBuffer(const PortAddress &port,
       cl_int err;
       OCL_MSG("Allocating %s port buffer (%llu bytes) \n",
               port.toString().c_str(), size);
-      OCL_CHECK(err, input.allocate(context, CL_MEM_READ_ONLY, size));
+      OCL_CHECK(err, err = input.allocate(context, CL_MEM_READ_ONLY, size));
       return;
     }
   OCL_ERR("Invalid input port %s\n", port.toString());
@@ -225,7 +225,7 @@ void DeviceHandle::allocateOutputBuffer(const PortAddress &port,
       cl_int err;
       OCL_MSG("Allocating %s port buffer (%llu bytes)\n",
               port.toString().c_str(), size);
-      OCL_CHECK(err, output.allocate(context, CL_MEM_WRITE_ONLY, size));
+      OCL_CHECK(err, err = output.allocate(context, CL_MEM_WRITE_ONLY, size));
       return;
     }
   }
@@ -388,5 +388,55 @@ void DeviceHandle::allocateExternals(std::vector<cl::size_type> size_bytes) {
     OCL_MSG("Allocating %lu bytes of external memories\n", sz);
     external_memories.emplace_back(context, CL_MEM_READ_WRITE, sz);
   }
+}
+
+std::pair<cl_ulong, cl_ulong> DeviceHandle::getKernelTime() {
+
+  cl_ulong start_time = 0;
+  kernel_event[0].getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_QUEUED,
+                                             &start_time);
+  cl_ulong end_time = 0;
+  kernel_event[0].getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END,
+                                             &end_time);
+  return std::make_pair(start_time, end_time);
+}
+
+std::pair<cl_ulong, cl_ulong>
+DeviceHandle::getWriteTime(const PortAddress &port) {
+
+  cl_ulong start_time = 0;
+  cl_ulong end_time = 0;
+  std::pair<cl_ulong, cl_ulong> res(start_time, end_time);
+  for (auto &input : input_ports) {
+
+    if (input.getAddress() == port) {
+
+      input.getBufferEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_QUEUED, &start_time);
+      input.getBufferEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_END, &end_time);
+      return std::make_pair(start_time, end_time);
+    }
+  }
+  OCL_ERR("Could not find write time for %s\n", port.toString().c_str());
+  return res;
+}
+std::pair<cl_ulong, cl_ulong>
+DeviceHandle::getReadTime(const PortAddress &port) {
+  cl_ulong start_time = 0;
+  cl_ulong end_time = 0;
+  for (auto &output : output_ports) {
+    if (output.getAddress() == port) {
+      output.getBufferEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_QUEUED, &start_time);
+      output.getBufferEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_END, &end_time);
+      return std::make_pair(start_time, end_time);
+    }
+  }
+
+  OCL_ERR("Could not find read time for %s\n", port.toString().c_str());
+  
+  return std::make_pair(0, 0);
 }
 };

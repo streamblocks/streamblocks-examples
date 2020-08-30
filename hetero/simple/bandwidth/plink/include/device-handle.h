@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <unistd.h>
+#include <utility>
 
 #include "xcl2.h"
 
@@ -282,6 +283,13 @@ public:
 
   void allocateExternals(std::vector<cl::size_type> size_bytes);
 
+  std::pair<cl_ulong, cl_ulong> getKernelTime();
+
+  std::pair<cl_ulong, cl_ulong> getWriteTime(const PortAddress &port);
+
+  std::pair<cl_ulong, cl_ulong> getReadTime(const PortAddress &port);
+
+
 private:
   const int NUM_INPUTS;
   const int NUM_OUTPUTS;
@@ -311,6 +319,7 @@ private:
   std::vector<uint32_t> available_size;
 
   std::vector<cl::Buffer> external_memories;
+
 };
 };
 
