@@ -37,7 +37,8 @@ public:
 
   void runTest(const int buffer_size, const int repeats) {
 
-    os << "\t<test size=\"" << buffer_size << "\" num=\"" << num << "\">" << std::endl;
+    os << "\t<test size=\"" << buffer_size << "\" num=\"" << num << "\">"
+       << std::endl;
 
     std::cout << "Allocating buffers (" << buffer_size << " bytes)"
               << std::endl;
@@ -56,6 +57,8 @@ public:
     for (int r = 0; r < repeats; r++) {
       os << "\t\t<experiment index=\"" << r << "\">" << std::endl;
 
+      // std::cout << "Testing " << buffer_size << " (" << r << ")" <<
+      // std::endl;
       dev->enqueueWriteBuffers();
       dev->setArgs();
       dev->enqueueExecution();
@@ -74,35 +77,54 @@ public:
       auto kernel_time = dev->getKernelTime();
       auto kernel_diff = std::get<1>(kernel_time) - std::get<0>(kernel_time);
 
-      std::cout << "Kernel time: " << kernel_diff << " ns" << std::endl;
+      // std::cout << "\tKernel time: " << kernel_diff << " ns" << std::endl;
 
       os << "\t\t\t<kernel start=\"" << std::get<0>(kernel_time) << "\" end=\""
          << std::get<1>(kernel_time) << "\"/>" << std::endl;
 
       int ix = 0;
+      cl_ulong start_min = -1;
+      cl_ulong end_max = 0;
       for (auto &input : input_ports) {
         auto write_time = dev->getWriteTime(input);
         auto write_diff = std::get<1>(write_time) - std::get<0>(write_time);
-        std::cout << input.toString() << " write time " << write_diff << " ns"
-                  << std::endl;
-
+        // std::cout << "\t" << input.toString() << " write time " << write_diff
+        // << " ns"
+        //           << std::endl;
+        if (start_min > std::get<0>(write_time))
+          start_min = std::get<0>(write_time);
+        if (end_max < std::get<1>(write_time))
+          end_max = std::get<1>(write_time);
         os << "\t\t\t<write id=\"" << ix << "\" ";
         os << "start=\"" << std::get<0>(write_time) << "\" ";
         os << "end=\"" << std::get<1>(write_time) << "\"/>" << std::endl;
         ix++;
       }
 
+      os << "\t\t\t<write-summary start=\"" << start_min << "\" ";
+      os << "end=\"" << end_max << "\" />" << std::endl;
+
+      start_min = -1;
+      end_max = 0;
       ix = 0;
       for (auto &output : output_ports) {
         auto read_time = dev->getReadTime(output);
         auto read_diff = std::get<1>(read_time) - std::get<0>(read_time);
-        std::cout << output.toString() << " read time " << read_diff << " ns"
-                  << std::endl;
+        // std::cout << "\t" << output.toString() << "read time " << read_diff
+        // << " ns"
+        //           << std::endl;
+
+        if (start_min > std::get<0>(read_time))
+          start_min = std::get<0>(read_time);
+        if (end_max < std::get<1>(read_time))
+          end_max = std::get<1>(read_time);
         os << "\t\t\t<read id=\"" << ix << "\" ";
         os << "start=\"" << std::get<0>(read_time) << "\" ";
         os << "end=\"" << std::get<1>(read_time) << "\"/>" << std::endl;
         ix++;
       }
+      os << "\t\t\t<read-summary start=\"" << start_min << "\" ";
+      os << "end=\"" << end_max << "\" />" << std::endl;
       dev->releaseEvents();
       os << "\t\t</experiment>" << std::endl;
     }
@@ -122,13 +144,41 @@ private:
 };
 int main(int argc, char *argv[]) {
 
-  const int num_repeeats = 2;
+  int num_repeats = 1 << 10;
   const int buffer_size_min = sizeof(int);
-  const int buffer_size_max = sizeof(int) * 4;
+  const int buffer_size_max = sizeof(int) * (1 << 25);
+  if (argc != 3) {
+    std::cout << "usage " << argv[0] << " NUM_INPUTS NUM_REPEATS" << std::endl;
+    std::exit(-1);
+  }
+  int num_inputs = 1;
+  std::stringstream kernelname_builder;
+  kernelname_builder << "Loopback" << argv[1] << "_kernel";
+  std::stringstream res_builder;
+  res_builder << "res" << argv[1] << ".xml";
+  std::stringstream num_builder;
+  num_builder << argv[1];
+  num_builder >> num_inputs;
 
-  BandwidthTester tester(2, "Loopback2_kernel", "xclbin", "res.xml");
+  std::stringstream reps_builder;
+  reps_builder << argv[2];
+  reps_builder >> num_repeats;
+
+  if (num_inputs == 0) {
+    std::cerr << "invalid number of inputs" << std::endl;
+    std::exit(-1);
+  }
+  if (num_repeats <= 0) {
+    std::cerr << "invalid num repeats " << num_repeats << std::endl;
+    std::exit(-1);
+  }
+  BandwidthTester tester(num_inputs, kernelname_builder.str(), "xclbin",
+                         res_builder.str());
   for (int buffer_size = buffer_size_min; buffer_size <= buffer_size_max;
        buffer_size <<= 1) {
-    tester.runTest(buffer_size, num_repeeats);
+
+    tester.runTest(buffer_size, num_repeats);
+    if (num_repeats >= 1024)
+      num_repeats = num_repeats >> 1;
   }
 }
