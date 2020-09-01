@@ -22,20 +22,20 @@ namespace sw.systolic:
 
         action IN_LEFT:[ left ] , REF:[ a ] , READ:[ b ] ==> V:[ v ]
 	    var
-		    int(size=16) v, int(size=16) v1, int(size=16) v2, int(size=16) v3
+		    int(size=16) v, int(size=16) v1, int(size=16) v2, int(size=16) v3, int(size=16) _left
 	    do
             if (b = EOS) then
                 v := 0 | UNDEFINED;
                 diagonal := 0;
                 up := 0;
             else
-                left := left & MASK_VALUE;
+                _left := left & MASK_VALUE;
                 v1 := (if a = b then MATCH else MISMATCH end) + diagonal;
-                v2 := left + GAP;
+                v2 := _left + GAP;
                 v3 := up + GAP;
                 v := max4(0, v2, v3, v1);
                     
-                diagonal := left;
+                diagonal := _left;
                 up := v;
                 
                 // compute direction

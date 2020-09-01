@@ -2,9 +2,9 @@ namespace sw.systolic:
 
     import all sw.configuration;
     import all sw.utils;
-    import var system.io.println_s;
-    import var system.io.print_s;
-    import var system.io.print_i;
+    // import var system.io.println_s;
+    // import var system.io.print_s;
+    // import var system.io.print_i;
 
     actor Aligner() 	
             uint(size=8) SIZE_READ,
@@ -129,29 +129,29 @@ namespace sw.systolic:
         do
             
             
-            if DEBUG_MODE then
-                println_s("H matrix");
-                foreach int ib in 0 .. sizeRead  do
-                    foreach int ia in 0 .. macroblocks * PE do
-                        print_i(H[ib][ia] & MASK_VALUE);
-                        print_s("\t");                        
-                    end
-                    print_s("\n");
-                end
+            // if DEBUG_MODE then
+            //     println_s("H matrix");
+            //     foreach int ib in 0 .. sizeRead  do
+            //         foreach int ia in 0 .. macroblocks * PE do
+            //             print_i(H[ib][ia] & MASK_VALUE);
+            //             print_s("\t");                        
+            //         end
+            //         print_s("\n");
+            //     end
                 
-                print_s("\n");
+            //     print_s("\n");
                 
-                println_s("D matrix");
-                foreach int ib in 0 .. sizeRead  do
-                    foreach int ia in 0 .. macroblocks * PE do
-                        printDir(H[ib][ia]);
-                        print_s("\t");
-                    end
-                    print_s("\n");
-                end
+            //     println_s("D matrix");
+            //     foreach int ib in 0 .. sizeRead  do
+            //         foreach int ia in 0 .. macroblocks * PE do
+            //             printDir(H[ib][ia]);
+            //             print_s("\t");
+            //         end
+            //         print_s("\n");
+            //     end
                 
-                print_s("\n");
-            end
+            //     print_s("\n");
+            // end
             
             
             // print("vmax: "+ maxV+", maxAi: "+ maxAi+", maxBi: "+maxBi+"\n");
