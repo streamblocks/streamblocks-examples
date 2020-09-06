@@ -17,6 +17,11 @@ add_custom_target(all_bin)    # build all multicore hetero binaries
 add_custom_target(all_sc_bin) # build all sc binaries
 add_custom_target(all_sc_run) # run all sc simulations
 
+foreach(index RANGE 6 7)
+  foreach(CLK ${CLOCK_LIST})
+    add_custom_target(all_configuration_${index}_${CLK}_SC_sc_run)
+  endforeach()
+endforeach()
 
 
 set(REMOTE_USER "user" CACHE STRING "remote ssh username")
@@ -170,29 +175,47 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
   add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
 
-  add_custom_command(
-    OUTPUT 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
-    COMMAND ./decoderDemo --hardware-profile=systemc-profile.xml &> decoderDemo.log
-    DEPENDS ${__TARGET_SC__}_bin
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
-    COMMENT "Executing SystemC simulation for ${__TARGET_SC__} see ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log"
-  )
-  add_custom_target(
-    ${__TARGET_SC__}_run
-    DEPENDS 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
-  )
+  
+  # rules for different buffer configuration runs
+  set(buff_sz 4096)
+  while(${buff_sz} LESS_EQUAL 134217728)
 
-  add_dependencies(
-    all_sc_run ${__TARGET_SC__}_run
-  )
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${CONFIG_PATH}.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/configs/${CONFIG_PATH}_${buff_sz}.xml)
+
+    add_custom_command(
+      OUTPUT 
+        ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/profile_${buff_sz}.xml 
+        ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo_${buff_sz}.log
+      COMMAND ./decoderDemo --cfile=${CMAKE_CURRENT_SOURCE_DIR}/configs/${CONFIG_PATH}_${buff_sz}.xml --hardware-profile=profile_${buff_sz}.xml &> decoderDemo_${buff_sz}.log
+      DEPENDS ${__TARGET_SC__}_bin
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
+      COMMENT "Executing SystemC simulation for ${__TARGET_SC__} see ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo_${buff_sz}.log"
+    )
+    add_custom_target(
+      ${__TARGET_SC__}_run_${buff_sz}
+      DEPENDS 
+        ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/profile_${buff_sz}.xml 
+        ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo_${buff_sz}.log
+    )
+
+    add_dependencies(
+      all_sc_run ${__TARGET_SC__}_run_${buff_sz}
+    )
+
+    add_dependencies(
+      all_${__TARGET_SC__}_sc_run
+      ${__TARGET_SC__}_run_${buff_sz}
+    )
+
+
+    math(EXPR buff_sz "${buff_sz}*2")
+
+  endwhile()
+  
 endmacro()
 
 
-foreach(index RANGE 1 5)
+foreach(index RANGE 6 7)
   foreach(CLK ${CLOCK_LIST})
 
     rvc_generate(configuration_${index} ${CLK})

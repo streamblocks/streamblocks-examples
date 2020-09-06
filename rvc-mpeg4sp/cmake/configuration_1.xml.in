@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Partitioning>
+		<Partition id="0">
+			<Instance actor-id="system_plink_0"/>
+			<Instance actor-id="source"/>
+			<Instance actor-id="display"/>
+		</Partition>
+		<Connection src="system_plink_0" src-port="GEN_mgnt_Merger420_YUV_display_In" dst="display" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="system_plink_0" src-port="parseheaders_WIDTH_display_WIDTH" dst="display" dst-port="WIDTH" size="${buff_sz}" token-size="2"/>
+		<Connection src="system_plink_0" src-port="parseheaders_HEIGHT_display_HEIGHT" dst="display" dst-port="HEIGHT" size="${buff_sz}" token-size="2"/>
+		<Connection src="source" src-port="Out" dst="system_plink_0" dst-port="source_Out_serialize_in8" size="${buff_sz}" token-size="1"/>
+	</Partitioning>
+	<Scheduling type="RoundRobin"/>
+</Configuration>
