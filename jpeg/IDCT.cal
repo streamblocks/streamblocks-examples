@@ -1,7 +1,7 @@
 namespace jpeg.decoder:
 
 	actor IDCT()
-		int(size=13) IN ==> int OUT :
+		int(size=13) IN ==> uint(size=8) OUT :
 
 		int A = 1024;
 
@@ -26,7 +26,7 @@ namespace jpeg.decoder:
 		
 			function clip_i32(int(size=32) Value, int(size=32) minVal, int(size=32) maxVal)
 					-->
-				int(size=32)
+				uint(size=8)
 			:
 				if Value > maxVal then
 					maxVal
@@ -57,7 +57,7 @@ namespace jpeg.decoder:
 		var	
 			List(type: int, size=64) X,
 			List(type: int, size=64) Y,
-			List(type: int, size=64) out
+			List(type: uint(size=8), size=64) out
 		do
 			X := [ scale[n] * x[n] : for int n in 0 .. 63 ];
 			X[0] := X[0] + 4096;

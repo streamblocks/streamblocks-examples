@@ -112,7 +112,6 @@ namespace jpeg:
         do
             fpsPrintNewPicDecoded();
             displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
-            compareYUV_comparePicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
         end
         
         displayDisable: action ==>
@@ -120,7 +119,6 @@ namespace jpeg:
             nbBlockGot >= pictureSizeInMb
         do
             fpsPrintNewPicDecoded();
-            compareYUV_comparePicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
         end
 
         
