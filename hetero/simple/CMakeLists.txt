@@ -6,9 +6,20 @@ include(../../Streamblocks.cmake)
 
 
 
-set(CLOCK_SETTINGS 3.3 4 5 6.6 10)
+set(CLOCK_SETTINGS "3.3;4;5;6.6;10" CACHE STRING "List of ; seperated HLS clock settings")
 
+set(FPGA_NAME "xczu7ev-ffvc1156-2-e" 
+  CACHE STRING 
+  "Name of Xilinx FPGA, e.g \"xcku115-flvb2104-2-e\", \"xcu250-figd2104-2L-e\", \"xczu7ev-ffvc1156-2-e\", \"xczu3eg-sbva484-1-e\", ...")
 
+set(PLATFORM "xilinx_zcu106_base_202010_1" 
+  CACHE STRING "Supported platform name, e.g \"xilinx_kcu1500_dynamic_5_0\", \"xilinx_u250_xdma_201830_2\", \"zcu102_base\", \"xilinx_zcu106_base_202010_1\", \"ultra96_base\",... ")
+
+set(KERNEL_FREQ "150" CACHE STRING "Clock frequency in MHz.")
+
+option(USE_VITIS "Build an RTL OpenCL Kernel for Vitis" OFF)
+option(USE_SDACCEL "Build an RTL OpenCL Kernel for SDAccel" OFF)
+option(IS_MPSOC "Vitis Embedded Platform" OFF)
 
 add_custom_target(all_xclbin)
 
@@ -55,7 +66,7 @@ macro(generate_loopback NUM CLOCK)
 
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/bin/xclbin/Loopback.hw._kernel_xclbin
-    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK} -DUSE_SDACCEL=true ..
+    COMMAND ${CMAKE_COMMAND} -DHLS_CLOCK_PERIOD=${CLOCK} -DUSE_SDACCEL=true -DUSE_SDACCEL=${USE_SDACCEL} -DUSE_VITIS=${USE_VITIS} -DFPGA_NAME=${FPGA_NAME} -DPLATFORM=${PLATFORM} ..
     COMMAND make Loopback${NUM}_kernel_xclbin
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/build
     COMMENT "Generating xclbin ${TARGET_NAME}"
