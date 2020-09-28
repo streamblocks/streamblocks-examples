@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Partitioning>
+		<Partition id="0">
+			<Instance actor-id="system_plink_0"/>
+			<Instance actor-id="source"/>
+			<Instance actor-id="display"/>
+		</Partition>
+		<Connection src="system_plink_0" src-port="decoder_AL_REF_display_AL_REF" dst="display" dst-port="AL_REF" size="${buff_sz}" token-size="1"/>
+		<Connection src="system_plink_0" src-port="decoder_AL_READ_display_AL_READ" dst="display" dst-port="AL_READ" size="${buff_sz}" token-size="1"/>
+		<Connection src="system_plink_0" src-port="aligner_SCORE_display_SCORE" dst="display" dst-port="SCORE" size="${buff_sz}" token-size="2"/>
+		<Connection src="source" src-port="REF" dst="system_plink_0" dst-port="source_REF_controller_REF" size="${buff_sz}" token-size="1"/>
+		<Connection src="source" src-port="READ" dst="system_plink_0" dst-port="source_READ_controller_READ" size="${buff_sz}" token-size="1"/>
+	</Partitioning>
+	<Scheduling type="RoundRobin"/>
+</Configuration>

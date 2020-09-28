@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Configuration>
+<Partitioning>
+<Partition id="0">
+<Instance actor-id="display"/>
+<Instance actor-id="GEN_mgnt_Merger420"/>
+<Instance actor-id="clip"/>
+<Instance actor-id="framebuf"/>
+<Instance actor-id="interpolation"/>
+<Instance actor-id="add"/>
+</Partition>
+<Partition id="1">
+<Instance actor-id="system_plink_0"/>
+<Instance actor-id="source"/>
+<Instance actor-id="serialize"/>
+<Instance actor-id="parseheaders"/>
+<Instance actor-id="blkexp"/>
+<Instance actor-id="splitter_BTYPE"/>
+<Instance actor-id="splitter_420_B"/>
+<Instance actor-id="clip_0"/>
+<Instance actor-id="clip_1"/>
+<Instance actor-id="framebuf_1"/>
+<Instance actor-id="interpolation_1"/>
+<Instance actor-id="add_1"/>
+</Partition>
+<Partition id="2">
+<Instance actor-id="mvrecon"/>
+<Instance actor-id="row"/>
+<Instance actor-id="column"/>
+<Instance actor-id="transpose"/>
+<Instance actor-id="retranspose"/>
+<Instance actor-id="shift"/>
+<Instance actor-id="framebuf_0"/>
+<Instance actor-id="interpolation_0"/>
+<Instance actor-id="add_0"/>
+</Partition>
+<Partition id="3">
+<Instance actor-id="mvseq"/>
+<Instance actor-id="splitter_MV"/>
+<Instance actor-id="splitter_Qp"/>
+<Instance actor-id="DCsplit"/>
+<Instance actor-id="IS_r"/>
+<Instance actor-id="IAP"/>
+<Instance actor-id="IQ"/>
+<Instance actor-id="invpred"/>
+<Instance actor-id="scale"/>
+</Partition>
+<!-- <Partition id="4">
+<Instance actor-id="addressing"/>
+<Instance actor-id="DCsplit_0"/>
+<Instance actor-id="IS_0"/>
+<Instance actor-id="IAP_0"/>
+<Instance actor-id="IQ_0"/>
+<Instance actor-id="addressing_0"/>
+<Instance actor-id="invpred_0"/>
+<Instance actor-id="scale_0"/>
+<Instance actor-id="row_0"/>
+<Instance actor-id="column_0"/>
+<Instance actor-id="transpose_0"/>
+<Instance actor-id="retranspose_0"/>
+<Instance actor-id="shift_0"/>
+<Instance actor-id="DCsplit_1"/>
+<Instance actor-id="IS_1"/>
+<Instance actor-id="IAP_1"/>
+<Instance actor-id="IQ_1"/>
+<Instance actor-id="addressing_1"/>
+<Instance actor-id="invpred_1"/>
+<Instance actor-id="scale_1"/>
+<Instance actor-id="row_1"/>
+<Instance actor-id="column_1"/>
+<Instance actor-id="transpose_1"/>
+<Instance actor-id="retranspose_1"/>
+<Instance actor-id="shift_1"/>
+</Partition> -->
+</Partitioning>
+</Configuration>

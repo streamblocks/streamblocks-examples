@@ -16,7 +16,7 @@ namespace sw.systolic:
             pe_c = SwCell();
             pe_d = SwCell();
 
-            buffer = LeftBuffer();
+            lbuffer = LeftBuffer();
 
             aligner = Aligner();
 
@@ -29,9 +29,9 @@ namespace sw.systolic:
             READ --> decoder.READ;
 
             controller.SIZE_READ --> aligner.SIZE_READ;
-            controller.SIZE_READ --> buffer.SIZE_READ;
+            controller.SIZE_READ --> lbuffer.SIZE_READ;
             controller.SIZE_REF_CUTS --> aligner.SIZE_REF_CUTS;
-            controller.SIZE_REF_CUTS --> buffer.SIZE_REF_CUTS;
+            controller.SIZE_REF_CUTS --> lbuffer.SIZE_REF_CUTS;
             controller.PE_A_REF --> pe_a.REF;
             controller.PE_B_REF --> pe_b.REF;
             controller.PE_C_REF --> pe_c.REF;
@@ -41,7 +41,7 @@ namespace sw.systolic:
             controller.PE_ALL_READ --> pe_c.READ;
             controller.PE_ALL_READ --> pe_d.READ;
 
-            buffer.O --> pe_a.IN_LEFT;
+            lbuffer.O --> pe_a.IN_LEFT;
 
             pe_a.V --> pe_b.IN_LEFT;
             pe_a.V --> aligner.PE_A_v;
@@ -52,7 +52,7 @@ namespace sw.systolic:
             pe_c.V --> pe_d.IN_LEFT;
             pe_c.V --> aligner.PE_C_v;
 
-            pe_d.V --> buffer.V;
+            pe_d.V --> lbuffer.V;
             pe_d.V --> aligner.PE_D_v;
 
             aligner.ENC_AL_REF --> decoder.ENC_AL_REF;

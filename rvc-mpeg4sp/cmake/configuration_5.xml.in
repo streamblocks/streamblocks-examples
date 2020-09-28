@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Partitioning>
+		<Partition id="0">
+			<Instance actor-id="system_plink_0"/>
+			<Instance actor-id="source"/>
+			<Instance actor-id="display"/>
+			<Instance actor-id="serialize"/>
+			<Instance actor-id="GEN_mgnt_Merger420"/>
+			<Instance actor-id="parseheaders"/>
+			<Instance actor-id="mvseq"/>
+			<Instance actor-id="blkexp"/>
+			<Instance actor-id="mvrecon"/>
+			<Instance actor-id="splitter_BTYPE"/>
+			<Instance actor-id="splitter_MV"/>
+			<Instance actor-id="splitter_420_B"/>
+			<Instance actor-id="splitter_Qp"/>
+			<Instance actor-id="DCsplit_0"/>
+			<Instance actor-id="IS_0"/>
+			<Instance actor-id="IAP_0"/>
+			<Instance actor-id="IQ_0"/>
+			<Instance actor-id="addressing_0"/>
+			<Instance actor-id="invpred_0"/>
+			<Instance actor-id="scale_0"/>
+			<Instance actor-id="row_0"/>
+			<Instance actor-id="column_0"/>
+			<Instance actor-id="transpose_0"/>
+			<Instance actor-id="retranspose_0"/>
+			<Instance actor-id="shift_0"/>
+			<Instance actor-id="clip_0"/>
+			<Instance actor-id="DCsplit_1"/>
+			<Instance actor-id="IS_1"/>
+			<Instance actor-id="IAP_1"/>
+			<Instance actor-id="IQ_1"/>
+			<Instance actor-id="addressing_1"/>
+			<Instance actor-id="invpred_1"/>
+			<Instance actor-id="scale_1"/>
+			<Instance actor-id="row_1"/>
+			<Instance actor-id="column_1"/>
+			<Instance actor-id="transpose_1"/>
+			<Instance actor-id="retranspose_1"/>
+			<Instance actor-id="shift_1"/>
+			<Instance actor-id="clip_1"/>
+			<Instance actor-id="framebuf_0"/>
+			<Instance actor-id="interpolation_0"/>
+			<Instance actor-id="add_0"/>
+			<Instance actor-id="framebuf_1"/>
+			<Instance actor-id="interpolation_1"/>
+			<Instance actor-id="add_1"/>
+		</Partition>
+		<Connection src="system_plink_0" src-port="add_VID_GEN_mgnt_Merger420_Y" dst="GEN_mgnt_Merger420" dst-port="Y" size="${buff_sz}" token-size="2"/>
+		<Connection src="source" src-port="Out" dst="serialize" dst-port="in8" size="${buff_sz}" token-size="1"/>
+		<Connection src="serialize" src-port="out" dst="parseheaders" dst-port="bits" size="${buff_sz}" token-size="1"/>
+		<Connection src="GEN_mgnt_Merger420" src-port="YUV" dst="display" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="parseheaders" src-port="BTYPE" dst="mvseq" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="BTYPE" dst="mvrecon" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="BTYPE" dst="splitter_BTYPE" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="BTYPE" dst="splitter_MV" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="BTYPE" dst="splitter_420_B" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="MV" dst="mvrecon" dst-port="MVIN" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="RUN" dst="blkexp" dst-port="RUN" size="${buff_sz}" token-size="1"/>
+		<Connection src="parseheaders" src-port="VALUE" dst="blkexp" dst-port="VALUE" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="LAST" dst="blkexp" dst-port="LAST" size="${buff_sz}" token-size="1"/>
+		<Connection src="parseheaders" src-port="WIDTH" dst="display" dst-port="WIDTH" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="HEIGHT" dst="display" dst-port="HEIGHT" size="${buff_sz}" token-size="2"/>
+		<Connection src="parseheaders" src-port="QP" dst="splitter_Qp" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="mvseq" src-port="A" dst="mvrecon" dst-port="A" size="${buff_sz}" token-size="2"/>
+		<Connection src="blkexp" src-port="OUT" dst="splitter_420_B" dst-port="B" size="${buff_sz}" token-size="2"/>
+		<Connection src="mvrecon" src-port="MV" dst="splitter_MV" dst-port="MV" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="Y" dst="system_plink_0" dst-port="splitter_BTYPE_Y_framebuf_BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="U" dst="addressing_0" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="U" dst="invpred_0" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="U" dst="framebuf_0" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="U" dst="add_0" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="V" dst="addressing_1" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="V" dst="invpred_1" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="V" dst="framebuf_1" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_BTYPE" src-port="V" dst="add_1" dst-port="BTYPE" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_MV" src-port="Y" dst="system_plink_0" dst-port="splitter_MV_Y_framebuf_MV" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_MV" src-port="U" dst="framebuf_0" dst-port="MV" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_MV" src-port="V" dst="framebuf_1" dst-port="MV" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_420_B" src-port="Y" dst="system_plink_0" dst-port="splitter_420_B_Y_DCsplit_IN" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_420_B" src-port="U" dst="DCsplit_0" dst-port="IN" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_420_B" src-port="V" dst="DCsplit_1" dst-port="IN" size="${buff_sz}" token-size="2"/>
+		<Connection src="splitter_Qp" src-port="QUANT_Y" dst="system_plink_0" dst-port="splitter_Qp_QUANT_Y_invpred_QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="splitter_Qp" src-port="QUANT_U" dst="invpred_0" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="splitter_Qp" src-port="QUANT_V" dst="invpred_1" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="DCsplit_0" src-port="DC" dst="invpred_0" dst-port="QFS_DC" size="${buff_sz}" token-size="2"/>
+		<Connection src="DCsplit_0" src-port="AC" dst="IS_0" dst-port="QFS_AC" size="${buff_sz}" token-size="2"/>
+		<Connection src="IS_0" src-port="PQF_AC" dst="IAP_0" dst-port="PQF_AC" size="${buff_sz}" token-size="2"/>
+		<Connection src="IAP_0" src-port="QF_AC" dst="IQ_0" dst-port="AC" size="${buff_sz}" token-size="2"/>
+		<Connection src="IQ_0" src-port="OUT" dst="scale_0" dst-port="SIn" size="${buff_sz}" token-size="2"/>
+		<Connection src="addressing_0" src-port="A" dst="invpred_0" dst-port="A" size="${buff_sz}" token-size="1"/>
+		<Connection src="addressing_0" src-port="B" dst="invpred_0" dst-port="B" size="${buff_sz}" token-size="1"/>
+		<Connection src="addressing_0" src-port="C" dst="invpred_0" dst-port="C" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="QF_DC" dst="IQ_0" dst-port="DC" size="${buff_sz}" token-size="2"/>
+		<Connection src="invpred_0" src-port="PTR" dst="IAP_0" dst-port="PTR" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="AC_PRED_DIR" dst="IS_0" dst-port="AC_PRED_DIR" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="AC_PRED_DIR" dst="IAP_0" dst-port="AC_PRED_DIR" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="SIGNED" dst="clip_0" dst-port="SIGNED" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="QUANT" dst="IAP_0" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="QUANT" dst="IQ_0" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_0" src-port="PREV_QUANT" dst="IAP_0" dst-port="PREV_QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="scale_0" src-port="SOut" dst="row_0" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="row_0" src-port="Out" dst="transpose_0" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="column_0" src-port="Out" dst="retranspose_0" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="transpose_0" src-port="Out" dst="column_0" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="retranspose_0" src-port="Out" dst="shift_0" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="shift_0" src-port="Out" dst="clip_0" dst-port="I" size="${buff_sz}" token-size="4"/>
+		<Connection src="clip_0" src-port="O" dst="add_0" dst-port="TEX" size="${buff_sz}" token-size="2"/>
+		<Connection src="DCsplit_1" src-port="DC" dst="invpred_1" dst-port="QFS_DC" size="${buff_sz}" token-size="2"/>
+		<Connection src="DCsplit_1" src-port="AC" dst="IS_1" dst-port="QFS_AC" size="${buff_sz}" token-size="2"/>
+		<Connection src="IS_1" src-port="PQF_AC" dst="IAP_1" dst-port="PQF_AC" size="${buff_sz}" token-size="2"/>
+		<Connection src="IAP_1" src-port="QF_AC" dst="IQ_1" dst-port="AC" size="${buff_sz}" token-size="2"/>
+		<Connection src="IQ_1" src-port="OUT" dst="scale_1" dst-port="SIn" size="${buff_sz}" token-size="2"/>
+		<Connection src="addressing_1" src-port="A" dst="invpred_1" dst-port="A" size="${buff_sz}" token-size="1"/>
+		<Connection src="addressing_1" src-port="B" dst="invpred_1" dst-port="B" size="${buff_sz}" token-size="1"/>
+		<Connection src="addressing_1" src-port="C" dst="invpred_1" dst-port="C" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="QF_DC" dst="IQ_1" dst-port="DC" size="${buff_sz}" token-size="2"/>
+		<Connection src="invpred_1" src-port="PTR" dst="IAP_1" dst-port="PTR" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="AC_PRED_DIR" dst="IS_1" dst-port="AC_PRED_DIR" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="AC_PRED_DIR" dst="IAP_1" dst-port="AC_PRED_DIR" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="SIGNED" dst="clip_1" dst-port="SIGNED" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="QUANT" dst="IAP_1" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="QUANT" dst="IQ_1" dst-port="QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="invpred_1" src-port="PREV_QUANT" dst="IAP_1" dst-port="PREV_QP" size="${buff_sz}" token-size="1"/>
+		<Connection src="scale_1" src-port="SOut" dst="row_1" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="row_1" src-port="Out" dst="transpose_1" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="column_1" src-port="Out" dst="retranspose_1" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="transpose_1" src-port="Out" dst="column_1" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="retranspose_1" src-port="Out" dst="shift_1" dst-port="In" size="${buff_sz}" token-size="4"/>
+		<Connection src="shift_1" src-port="Out" dst="clip_1" dst-port="I" size="${buff_sz}" token-size="4"/>
+		<Connection src="clip_1" src-port="O" dst="add_1" dst-port="TEX" size="${buff_sz}" token-size="2"/>
+		<Connection src="framebuf_0" src-port="halfpel" dst="interpolation_0" dst-port="halfpel" size="${buff_sz}" token-size="1"/>
+		<Connection src="framebuf_0" src-port="RD" dst="interpolation_0" dst-port="RD" size="${buff_sz}" token-size="2"/>
+		<Connection src="interpolation_0" src-port="MOT" dst="add_0" dst-port="MOT" size="${buff_sz}" token-size="2"/>
+		<Connection src="add_0" src-port="VID" dst="GEN_mgnt_Merger420" dst-port="U" size="${buff_sz}" token-size="2"/>
+		<Connection src="add_0" src-port="VID" dst="framebuf_0" dst-port="WD" size="${buff_sz}" token-size="2"/>
+		<Connection src="framebuf_1" src-port="halfpel" dst="interpolation_1" dst-port="halfpel" size="${buff_sz}" token-size="1"/>
+		<Connection src="framebuf_1" src-port="RD" dst="interpolation_1" dst-port="RD" size="${buff_sz}" token-size="2"/>
+		<Connection src="interpolation_1" src-port="MOT" dst="add_1" dst-port="MOT" size="${buff_sz}" token-size="2"/>
+		<Connection src="add_1" src-port="VID" dst="GEN_mgnt_Merger420" dst-port="V" size="${buff_sz}" token-size="2"/>
+		<Connection src="add_1" src-port="VID" dst="framebuf_1" dst-port="WD" size="${buff_sz}" token-size="2"/>
+	</Partitioning>
+	<Scheduling type="RoundRobin"/>
+</Configuration>
