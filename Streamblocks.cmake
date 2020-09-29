@@ -26,7 +26,8 @@ function (streamblocks TARGET)
     PLATFORM
     QID 
     TARGET_PATH 
-    MAX_BRAM)
+    MAX_BRAM,
+    QUEUE_DEPTH)
 
   #-- path settings
   set(streamblocks_path_settings 
@@ -82,6 +83,10 @@ function (streamblocks TARGET)
     list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set max-bram=${STREAMBLOCKS_ARGS_MAX_BRAM})
   endif()
   
+    # --set max-bram
+  if (STREAMBLOCKS_ARGS_QUEUE_DEPTH)
+    list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set queue-depth=${STREAMBLOCKS_ARGS_QUEUE_DEPTH})
+  endif()
   
   
   # -- xcf input
