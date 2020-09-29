@@ -8,7 +8,7 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 
 # List of HLS_CLOCK_PERIOD settings to build binaries for
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
-set(CLOCK_LIST 3.3 4 5 6.6 10)
+set(CLOCK_LIST 3.3)
 
 
 
@@ -17,7 +17,7 @@ add_custom_target(all_bin)    # build all multicore hetero binaries
 add_custom_target(all_sc_bin) # build all sc binaries
 add_custom_target(all_sc_run) # run all sc simulations
 
-foreach(index RANGE 6 7)
+foreach(index RANGE 1 3)
   foreach(CLK ${CLOCK_LIST})
     add_custom_target(all_configuration_${index}_${CLK}_SC_sc_run)
   endforeach()
@@ -27,12 +27,13 @@ endforeach()
 set(REMOTE_USER "user" CACHE STRING "remote ssh username")
 set(REMOTE_REPO "/scratch/mayy/streamblocks/streamblocks-examples/rvc-mpeg4sp/xclbin_repo" CACHE STRING "remote xclbin repo")
 set(REMOTE_IP   "iccluster126.iccluster.epfl.ch" CACHE STRING "remote server name")
-
+set(FIFO_QUEUE_DEPTH 4096 CACHE STRING "Default buffer size")
+set(OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/genx" CACHE STRING "Output path, where to generate the source code")
 
 macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
   
-  set(__TARGET_PATH__ generated/${CONFIG_PATH}_${CLOCK_SETTING})
+  set(__TARGET_PATH__ "${OUTPUT_PATH}/${CONFIG_PATH}_${CLOCK_SETTING}")
   set(__TARGET__ ${CONFIG_PATH}_${CLOCK_SETTING})
   # message(STATUS "")
     # -- Heterogeneous HLS target
@@ -44,6 +45,7 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
     SOURCE_PATH . ../system
     XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
     PARTITIONING
+    QUEUE_DEPTH ${FIFO_QUEUE_DEPTH}
   )
 
   # -- Heterogeneous MULTICORE target
@@ -215,7 +217,7 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 endmacro()
 
 
-foreach(index RANGE 6 7)
+foreach(index RANGE 1 3)
   foreach(CLK ${CLOCK_LIST})
 
     rvc_generate(configuration_${index} ${CLK})
