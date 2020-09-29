@@ -28,15 +28,16 @@ set(REMOTE_USER "user" CACHE STRING "remote ssh username")
 set(REMOTE_REPO "/scratch/mayy/streamblocks/streamblocks-examples/rvc-mpeg4sp/xclbin_repo" CACHE STRING "remote xclbin repo")
 set(REMOTE_IP   "iccluster126.iccluster.epfl.ch" CACHE STRING "remote server name")
 set(FIFO_QUEUE_DEPTH 4096 CACHE STRING "Default buffer size")
-set(OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/genx" CACHE STRING "Output path, where to generate the source code")
+set(OUTPUT_PATH "genx" CACHE STRING "Output path, where to generate the source code")
 
 macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 
   
-  set(__TARGET_PATH__ "${OUTPUT_PATH}/${CONFIG_PATH}_${CLOCK_SETTING}")
+  set(__TARGET_PATH__ ${OUTPUT_PATH}/${CONFIG_PATH}_${CLOCK_SETTING})
+
   set(__TARGET__ ${CONFIG_PATH}_${CLOCK_SETTING})
-  # message(STATUS "")
-    # -- Heterogeneous HLS target
+  
+  # -- Heterogeneous HLS target
   streamblocks(
     ${__TARGET__}_HLS
     PLATFORM vivado-hls
