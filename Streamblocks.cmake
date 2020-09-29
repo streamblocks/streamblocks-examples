@@ -83,7 +83,7 @@ function (streamblocks TARGET)
     list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set max-bram=${STREAMBLOCKS_ARGS_MAX_BRAM})
   endif()
   
-    # --set max-bram
+    # --set queue-depth
   if (STREAMBLOCKS_ARGS_QUEUE_DEPTH)
     list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set queue-depth=${STREAMBLOCKS_ARGS_QUEUE_DEPTH})
   endif()
