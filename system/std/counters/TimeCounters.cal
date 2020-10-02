@@ -1,0 +1,7 @@
+namespace std.counters:
+
+    external function timeMSec() --> float end
+
+    external function timeSec() --> float end
+
+end

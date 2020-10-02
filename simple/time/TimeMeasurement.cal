@@ -1,0 +1,71 @@
+namespace simple.time:
+    import var std.counters.timeMSec;
+
+    actor Source()
+        ==> int OUT:
+
+        int Counter := 0;
+
+        action ==> OUT:[token]
+        guard
+            Counter < 1024*1024*1024/4 // 1 GBytes
+        var
+            int token = Counter
+        do
+            Counter := Counter + 1;
+        end
+    end
+
+    actor ThroughputInMbit(uint seconds) int IN ==> :
+
+        float relativeStartTime;
+
+        uint(size=64) tokenCounter;
+        uint(size=64) lastTokenCounter;
+
+        initialize ==> 
+        do
+            relativeStartTime := timeMSec();
+            tokenCounter := 0;
+            lastTokenCounter := 0;
+        end
+
+        action IN:[token] ==>
+        var
+            float currentTime
+        do
+            // -- Increase the token Counter
+            tokenCounter := tokenCounter + 1;
+
+            // -- Get the current time
+            currentTime := timeMSec();
+            
+            // -- Display the Throuhgput every defined seconds
+            if (currentTime - relativeStartTime > seconds * 1000) then
+                begin
+                var 
+                    float throuhgput
+                do
+                    throuhgput := 1000 * (tokenCounter - lastTokenCounter) / (currentTime - relativeStartTime);
+                    relativeStartTime := currentTime;
+                    lastTokenCounter := tokenCounter;
+
+                    println("Throughput : " + 32 * throuhgput / (1024*1024) + " Mbit/s");
+                end    
+            end
+        end
+
+    end
+
+    network SimpleThroughput() ==> :
+    
+    entities
+        source = Source();
+        throuhgput = ThroughputInMbit(seconds=5);
+
+    structure
+        source.OUT --> throuhgput.IN;
+    end
+
+
+end
