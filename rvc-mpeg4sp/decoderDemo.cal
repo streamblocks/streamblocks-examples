@@ -43,6 +43,11 @@ import entity ART.art_Sink_16bit_txt;
 import entity ART.art_Display_yuv_width_height;
 
   network decoderDemo () ==> :
+  var 
+    //int MAX_WIDTH = 176;
+    //int MAX_HEIGHT = 144;
+    int MAX_WIDTH = 1920;
+    int MAX_HEIGHT = 1080;
 
   entities
     decoder=orcc_decoder(ACCODED=2,
@@ -54,10 +59,8 @@ import entity ART.art_Display_yuv_width_height;
                           FOURMV=4,
                           INTER=512,
                           INTRA=1024,
-                          //MAXH_IN_MB=69,
-                          //MAXW_IN_MB=121,
-                          MAXH_IN_MB=45,
-                          MAXW_IN_MB=80,
+                          MAXH_IN_MB=MAX_HEIGHT/16+1,
+                          MAXW_IN_MB=MAX_WIDTH/16+1,
                           MB_COORD_SZ=8,
                           MOTION=8,
                           MV_SZ=9,
@@ -70,7 +73,7 @@ import entity ART.art_Display_yuv_width_height;
 
     source = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=0);
 
-    display = art_Display_yuv_width_height(title="Foreman QCIF", width=176, height=144);
+    display = art_Display_yuv_width_height(title="Foreman QCIF", width=1280, height=720);
 
 
   structure
@@ -82,6 +85,9 @@ import entity ART.art_Display_yuv_width_height;
 
 
   network decoderDemoTraces () ==> :
+  var 
+    int MAX_WIDTH = 176;
+    int MAX_HEIGHT = 144;
 
   entities
     decoder=orcc_decoder(ACCODED=2,
@@ -93,8 +99,8 @@ import entity ART.art_Display_yuv_width_height;
                           FOURMV=4,
                           INTER=512,
                           INTRA=1024,
-                          MAXH_IN_MB=69,
-                          MAXW_IN_MB=121,
+                          MAXH_IN_MB=MAX_HEIGHT/16+1,
+                          MAXW_IN_MB=MAX_WIDTH/16+1,
                           MB_COORD_SZ=8,
                           MOTION=8,
                           MV_SZ=9,
