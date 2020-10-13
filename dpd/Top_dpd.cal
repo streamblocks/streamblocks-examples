@@ -1,0 +1,21 @@
+namespace dpd:
+
+	
+	import entity dpd.datasource;
+	import entity dpd.datasink;
+	
+	network Top_dpd() ==> :
+	entities 
+		dataSource = datasource(fileName_ii="./in_i.txt", fileName_iq="./in_q.txt");
+		DPD = dpd();
+		dataSink = datasink(fileName_oi="./out_i.txt", fileName_oq="./out_q.txt");
+		
+	structure
+		dataSource.i_out --> DPD.i_in {bufferSize=1000;}; 
+		dataSource.q_out --> DPD.q_in {bufferSize=1000;}; 
+		DPD.i_out --> dataSink.i_in {bufferSize=1000;}; 
+		DPD.q_out --> dataSink.q_in {bufferSize=1000;}; 		
+	end
+	
+
+end
