@@ -1,0 +1,40 @@
+namespace dpd:
+	
+
+	network dpd() float i_in, float q_in ==> float i_out, float q_out :
+	entities 
+		Poly = polynomial();	
+		FIR_1 = fir5(mul_1_re_c=0.5763239860534668, mul_1_im_c=0.14452700316905975, mul_5_im_c=0.013358999975025654, mul_4_im_c=0.003737000050023198, mul_4_re_c=0.0056570000015199184, mul_3_im_c=0.031537000089883804, mul_5_re_c=0.006176999770104885, mul_2_im_c=0.023437000811100006, mul_3_re_c=0.039023999124765396, mul_2_re_c=0.012299999594688416);
+		FIR_2 = fir5(mul_1_re_c=0.0009369999752379954, mul_1_im_c=0.033640000969171524, mul_5_im_c=0.0026390000712126493, mul_4_im_c=0.001361000002361834, mul_4_re_c=0.002463999902829528, mul_3_im_c=0.009353999979794025, mul_5_re_c=0.0022009999956935644, mul_2_im_c=0.004606999922543764, mul_3_re_c=0.011575000360608101, mul_2_re_c=0.005369000136852264);
+		FIR_3 = fir5(mul_1_re_c=0.0009970000246539712, mul_1_im_c=0.003665999975055456, mul_5_im_c=0.00011700000322889537, mul_4_im_c=0.00006299999949987978, mul_4_re_c=0.0001230000052601099, mul_3_im_c=0.0005959999980404973, mul_5_re_c=0.00013000000035390258, mul_2_im_c=0.00016999999934341758, mul_3_re_c=0.000674000009894371, mul_2_re_c=0.0004149999876972288);
+		FIR_4 = fir5(mul_1_re_c=0.010666999965906143, mul_1_im_c=0.03667299821972847, mul_5_im_c=0.004215000197291374, mul_4_im_c=0.003166999900713563, mul_4_re_c=0.007526999805122614, mul_3_im_c=0.005371999926865101, mul_5_re_c=0.00030499999411404133, mul_2_im_c=0.011742999777197838, mul_3_re_c=0.003992999903857708, mul_2_re_c=0.012357999570667744);
+		FIR_5 = fir5(mul_1_re_c=0.0017450000159442425, mul_1_im_c=0.004038999788463116, mul_5_im_c=0.00008800000068731606, mul_4_im_c=0.0000019999999949504854, mul_4_re_c=0.0007249999907799065, mul_3_im_c=0.00025499999173916876, mul_5_re_c=0.0003380000125616789, mul_2_im_c=0.0012420000275596976, mul_3_re_c=0.000506000011228025, mul_2_re_c=0.0014250000240281224);
+		Adder = addertree(i_in_lo=0.03335300087928772, q_in_lo=0.03655099868774414);
+	structure
+		i_in --> Poly.i_in {bufferSize=1000;};
+		q_in --> Poly.q_in {bufferSize=1000;};
+		Poly.i_out3 --> FIR_3.i_in {bufferSize=1000;}; 
+		Poly.q_out3 --> FIR_3.q_in {bufferSize=1000;}; 
+		Poly.i_out4 --> FIR_4.i_in {bufferSize=1000;}; 
+		Poly.q_out4 --> FIR_4.q_in {bufferSize=1000;}; 
+		Poly.i_out5 --> FIR_5.i_in {bufferSize=1000;}; 
+		Poly.q_out5 --> FIR_5.q_in {bufferSize=1000;}; 
+		Poly.i_out1 --> FIR_1.i_in {bufferSize=1000;}; 
+		Poly.q_out1 --> FIR_1.q_in {bufferSize=1000;}; 
+		Poly.i_out2 --> FIR_2.i_in {bufferSize=1000;}; 
+		Poly.q_out2 --> FIR_2.q_in {bufferSize=1000;};		
+		FIR_1.i_out --> Adder.i_in1 {bufferSize=1000;};
+		FIR_1.q_out --> Adder.q_in1 {bufferSize=1000;};
+		FIR_2.i_out --> Adder.i_in2 {bufferSize=1000;};
+		FIR_2.q_out --> Adder.q_in2 {bufferSize=1000;};		
+		FIR_3.i_out --> Adder.i_in3 {bufferSize=1000;};
+		FIR_3.q_out --> Adder.q_in3 {bufferSize=1000;};
+		FIR_4.i_out --> Adder.i_in4 {bufferSize=1000;};
+		FIR_4.q_out --> Adder.q_in4 {bufferSize=1000;};
+		FIR_5.i_out --> Adder.i_in5 {bufferSize=1000;};
+		FIR_5.q_out --> Adder.q_in5 {bufferSize=1000;};
+		Adder.i_out --> i_out {bufferSize=1000;};
+		Adder.q_out --> q_out {bufferSize=1000;};
+	end
+
+end
