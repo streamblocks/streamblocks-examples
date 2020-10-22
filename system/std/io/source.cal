@@ -32,5 +32,18 @@ namespace std.io.source:
 	// Copied to std.stdio.Exit, remove from std.stdio.Source?
 	external procedure source_exit(int exitCode)
 	end
+	
+	
+	//Added for dpd benchmark
+	external procedure source_init_dpd(String fileName_ii, String fileName_iq) end
+	external function source_read_i() --> float end
+	external function source_read_q() --> float end
+	
+	//Added for ZigBee benchmark
+	external procedure source_init_ZB(String fileName_ZB_i) end
+	external function source_readByte_ZB() --> uint(size=8) end
+	external function source_sizeOfFile_ZB() --> int(size=32) end
+	external procedure throw_away(int value) end
+	external procedure print_cyclecount() end
 
 end
