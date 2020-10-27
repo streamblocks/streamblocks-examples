@@ -74,5 +74,12 @@ namespace std.video.display:
 											      List(type:uint(size=8)) pictureBufferU,
 	                                              List(type:uint(size=8)) pictureBufferV,
 	                                              int(size=16) pictureWidth, int(size=16) pictureHeight) end
-
+					
+	
+	//Added for dpd benchmark	
+	external procedure sink_init(String fileName_oi, String fileName_oq) end
+	external procedure sink_consume_i(float value) end
+	external procedure sink_consume_q(float value) end
+	
+	
 end
