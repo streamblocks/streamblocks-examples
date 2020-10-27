@@ -36,14 +36,15 @@
 
 namespace RVC:
 
-import entity RVC.orcc_parser;
+import entity RVC.parser;
 import entity RVC.byte2bit;
 import entity RVC.texture_16x16;
 import entity RVC.texture_8x8;
+//import entity RVC.motion_ext_mem;
 import entity RVC.motion;
 import entity RVC.GEN_mgnt_Merger420;
 
-network orcc_decoder(
+network decoder(
 		int ACCODED,
 		int ACPRED,
 		int ADDR_SZ,
@@ -73,7 +74,7 @@ network orcc_decoder(
 	entities
 		serialize = byte2bit();
 		
-		parser = orcc_parser(ACCODED = ACCODED, 
+		parser =     parser(ACCODED = ACCODED, 
 							ACPRED = ACPRED,
 							BTYPE_SZ = BTYPE_SZ,
 							FCODE_MASK = FCODE_MASK,

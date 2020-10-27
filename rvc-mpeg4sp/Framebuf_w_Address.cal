@@ -359,7 +359,7 @@ import System.bitops.lshift;
       if (mbx_write = vop_width_write) then
         // Advance to next row of macro blocks
         mbx_write := 0;
-	mby_write := mby_write+1;
+	      mby_write := mby_write+1;
         mb_write_ptr := mb_write_ptr 
                       - SAMPLES_PER_MB*vop_width_write
                       + SAMPLES_PER_MB*MAXW_IN_SAMPLES;

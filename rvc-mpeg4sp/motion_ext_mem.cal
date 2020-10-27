@@ -33,14 +33,15 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+ 
 namespace RVC:
+/*
 
  import entity RVC.Framebuf_w_Address;
  import entity RVC.MPEG4_algo_Interpolation_halfpel;
  import entity RVC.MPEG4_algo_Add;
 
- network motion(int SEARCHWIN_IN_MB,
+ network motion_ext_mem(int SEARCHWIN_IN_MB,
                 int MAXW_IN_MB,
                 int MAXH_IN_MB,
                 int ADDR_SZ, 
@@ -63,42 +64,50 @@ namespace RVC:
     int FLAG_SZ = 4;
     
    entities
-   framebuf = Framebuf_w_Address(ADDR_SZ = ADDR_SZ, 
-                                 BTYPE_SZ = BTYPE_SZ,
-                                 FLAG_SZ = FLAG_SZ,
-                                 INTRA = INTRA,
-                                 LAYOUT = LAYOUT,
-                                 MAXH_IN_MB = MAXH_IN_MB,
-                                 MAXW_IN_MB = MAXW_IN_MB,
-                                 MB_COORD_SZ = MB_COORD_SZ,
-                                 MOTION = MOTION,
-                                 MV_SZ = MV_SZ,
-                                 NEWVOP = NEWVOP,
-                                 ROUND_TYPE = ROUND_TYPE,
-                                 SEARCHWIN_IN_MB = SEARCHWIN_IN_MB,
-                                 PIX_SZ = PIX_SZ);
-    interpolation = MPEG4_algo_Interpolation_halfpel(FLAG_SZ = FLAG_SZ,
-                                                     PIX_SZ = PIX_SZ);
-                                                     
-    add = MPEG4_algo_Add(ACCODED = ACCODED,
-                         BTYPE_SZ = BTYPE_SZ,
-                         INTRA = INTRA,
-                         MB_COORD_SZ = MB_COORD_SZ,
-                         NEWVOP = NEWVOP,
-                         PIX_SZ = PIX_SZ);
+
+        framebuff_mgnt_address = MPEG4_mgnt_Address(SEARCHWIN_IN_MB=SEARCHWIN_IN_MB,      
+                                                    MAXW_IN_MB=MAXW_IN_MB,           
+                                                    MAXH_IN_MB=MAXH_IN_MB,          
+                                                    ADDR_SZ=ADDR_SZ,
+                                                    FLAG_SZ=FLAG_SZ,
+                                                    MV_SZ=MV_SZ,
+                                                    MB_COORD_SZ=MB_COORD_SZ,
+                                                    BTYPE_SZ=BTYPE_SZ,
+                                                    INTRA=INTRA,
+                                                    NEWVOP=NEWVOP,
+                                                    MOTION=MOTION,
+                                                    ROUND_TYPE=ROUND_TYPE,
+                                                    LAYOUT=LAYOUT);
+
+        framebuf_mgnt_buf = MPEG4_mgnt_Framebuf(BUF_SZ=BUF_SZ, 
+                             ADDR_SZ=ADDR_SZ, 
+                             PIX_SZ=PIX_SZ);
+
+        interpolation = MPEG4_algo_Interpolation_halfpel(FLAG_SZ = FLAG_SZ,
+                                                        PIX_SZ = PIX_SZ);
+                                                        
+        add = MPEG4_algo_Add(ACCODED = ACCODED,
+                            BTYPE_SZ = BTYPE_SZ,
+                            INTRA = INTRA,
+                            MB_COORD_SZ = MB_COORD_SZ,
+                            NEWVOP = NEWVOP,
+                            PIX_SZ = PIX_SZ);
                          
     structure
 
-        MV --> framebuf.MV;
-        BTYPE --> framebuf.BTYPE;
+        MV --> framebuff_mgnt_address.MV;
+        BTYPE --> framebuff_mgnt_address.BTYPE;
         BTYPE --> add.BTYPE;
         TEX --> add.TEX; 
-        framebuf.halfpel --> interpolation.halfpel;
-        framebuf.RD --> interpolation.RD;
+        framebuff_mgnt_address.halfpel --> interpolation.halfpel;
+        framebuff_mgnt_address.WA --> framebuf_mgnt_buf.WA;
+        framebuff_mgnt_address.RA --> framebuf_mgnt_buf.RA;
+        framebuf_mgnt_buf.RD --> interpolation.RD;
+
         interpolation.MOT --> add.MOT; 
-        add.VID --> framebuf.WD;
+        add.VID --> framebuf_mgnt_buf.WD;
         add.VID -->VID;
  end
  
- 
+ */
 end

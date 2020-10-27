@@ -26,7 +26,7 @@ function (streamblocks TARGET)
     PLATFORM
     QID 
     TARGET_PATH 
-    MAX_BRAM,
+    MAX_BRAM
     QUEUE_DEPTH)
 
   #-- path settings
@@ -171,6 +171,7 @@ function (streamblocks_systemc TARGET)
     PLATFORM vivado-hls
     SYSTEMC
     PARTITIONING
+    ACTION_PROFILE
     MAX_BRAM 128MiB
     ${ARGN}
   )
