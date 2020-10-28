@@ -13,6 +13,7 @@ namespace ART :
 
   // -- Sources
   external actor art_Source_bin(String fileName, int loops) ==> uint(size=8) Out;
+  external actor art_Source_32bit_bin(String fileName, int loops) ==> int Out;
   external actor art_Source_real(String fileName) ==> float Out;
   external actor art_Source_txt(String fileName) ==> uint Out;
   external actor art_Source_byte(String fileName, int loops) ==> uint(size=8) Out;

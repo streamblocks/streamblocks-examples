@@ -1,0 +1,7 @@
+namespace std.audio:
+
+    external function openAudioOutput(int channels, int sampleRate, int bitsPerSample) --> int end
+
+    external procedure audioOutput(int fd, List(type:float) x, int size) end
+
+end

@@ -20,6 +20,15 @@ namespace System.math:
 		
 		float PI=3.14159265358979323846; 
 
+
+		function log2n(uint n) --> uint :
+			if n > 1 then 
+				1 + log2n(n/2) 
+			else 
+				0 
+			end
+		end
+
 	
 	
 end
