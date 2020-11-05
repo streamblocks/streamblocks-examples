@@ -2,10 +2,39 @@
 <configuration>
     <network id="RVC.decoderDemo"/>
     <partitioning>
-        <partition id="0" pe="x86_64" code-generator="sw" host="true">
-         	<instance id="source"/>
+        <partition id="0" pe="x86_64" scheduling="ROUND_ROBIN" code-generator="sw" host="true">
+            <instance id="source"/>
             <instance id="display"/>
-            <instance id="serialize"/>
+
+
+
+	    
+	    <instance id="DCsplit_1"/>
+            <instance id="IS_1"/>
+            <instance id="IAP_1"/>
+            <instance id="IQ_1"/>
+            <instance id="addressing_1"/>
+            <instance id="invpred_1"/>
+            <instance id="scale_1"/>
+            <instance id="row_1"/>
+            <instance id="column_1"/>
+            <instance id="transpose_1"/>
+            <instance id="retranspose_1"/>
+            <instance id="shift_1"/>
+            <instance id="clip_1"/>
+ 	    
+	   
+            <instance id="framebuf_1"/>
+            <instance id="interpolation_1"/>
+            <instance id="add_1"/>
+ 	    <instance id="GEN_mgnt_Merger420"/>
+            
+	   
+ 	   
+        </partition>
+ 	<partition id="1" pe="FPGA" code-generator="hw">
+	   
+	    <instance id="serialize"/>
             <instance id="parseheaders"/>
             <instance id="mvseq"/>
             <instance id="blkexp"/>
@@ -13,34 +42,10 @@
             <instance id="splitter_BTYPE"/>
             <instance id="splitter_MV"/>
             <instance id="splitter_420_B"/>
-            <instance id="splitter_Qp"/>
-            <instance id="clip_0"/>
-            <instance id="clip_1"/>   
-            <instance id="framebuf_0"/>
-            <instance id="add_0"/>
-            <instance id="framebuf_1"/>
-            <instance id="add_1"/>
-            <instance id="GEN_mgnt_Merger420"/>
-            <instance id="interpolation_1"/>
-            <instance id="interpolation_0"/>
-        	<instance id="DCsplit"/>
-            <instance id="IS_r"/>
-            <instance id="IAP"/>
-            <instance id="IQ"/>
-            <instance id="invpred"/>
-            <instance id="scale"/>
-            <instance id="row"/>
-            <instance id="column"/>
-            <instance id="transpose"/>
-            <instance id="retranspose"/>
-            <instance id="shift"/>
-            <instance id="clip"/>
-            <instance id="interpolation"/>
-            <instance id="framebuf"/>
-            <instance id="add"/>
-        </partition>
-        <partition id="1" pe="FPGA" code-generator="hw">
-            <instance id="addressing"/>
+            <instance id="splitter_Qp"/>         
+
+	   
+
             <instance id="DCsplit_0"/>
             <instance id="IS_0"/>
             <instance id="IAP_0"/>
@@ -53,23 +58,166 @@
             <instance id="transpose_0"/>
             <instance id="retranspose_0"/>
             <instance id="shift_0"/>
-            <instance id="DCsplit_1"/>
-            <instance id="IS_1"/>
-            <instance id="IAP_1"/>
-            <instance id="IQ_1"/>
-            <instance id="addressing_1"/>
-            <instance id="invpred_1"/>
-            <instance id="scale_1"/>
-            <instance id="row_1"/>
-            <instance id="column_1"/>
-            <instance id="transpose_1"/>
-            <instance id="retranspose_1"/>
-            <instance id="shift_1"/>
+            <instance id="clip_0"/> 
+           
+	    <instance id="framebuf_0"/>
+            <instance id="interpolation_0"/>
+            <instance id="add_0"/>
+	
+
+	    <instance id="DCsplit"/>
+            <instance id="IS_r"/>
+            <instance id="IAP"/>
+            <instance id="IQ"/>
+            <instance id="addressing"/>
+            <instance id="invpred"/>
+            <instance id="scale"/>
+            <instance id="row"/>
+            <instance id="column"/>
+            <instance id="transpose"/>
+            <instance id="retranspose"/>
+            <instance id="shift"/>
+            <instance id="clip"/>  	
+           
+
+ 	    <instance id="framebuf"/>
+            <instance id="interpolation"/>
+            <instance id="add"/>
+            		
+ 	    
+            
+           
+            
+	    
         </partition>
     </partitioning>
     <code-generators>
         <code-generator id="sw" platform="multicore"/>
-        <code-generator id="hw" platform="vivado-hls"/>
+	<code-generator id="hw" platform="vivado-hls"/>
     </code-generators>
+    <connections>
+        <fifo-connection source="source" source-port="Out" target="serialize" target-port="in8" size="4096"/>
+        <fifo-connection source="GEN_mgnt_Merger420" source-port="YUV" target="display" target-port="In" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="WIDTH" target="display" target-port="WIDTH" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="HEIGHT" target="display" target-port="HEIGHT" size="4096"/>
+        <fifo-connection source="serialize" source-port="out" target="parseheaders" target-port="bits" size="4096"/>
+        <fifo-connection source="splitter_MV" source-port="Y" target="framebuf" target-port="MV" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="Y" target="framebuf" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="Y" target="add" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="Y" target="addressing" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="Y" target="invpred" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_420_B" source-port="Y" target="DCsplit" target-port="IN" size="4096"/>
+        <fifo-connection source="clip" source-port="O" target="add" target-port="TEX" size="4096"/>
+        <fifo-connection source="splitter_MV" source-port="U" target="framebuf_0" target-port="MV" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="U" target="framebuf_0" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="U" target="add_0" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="U" target="addressing_0" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="U" target="invpred_0" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_420_B" source-port="U" target="DCsplit_0" target-port="IN" size="4096"/>
+        <fifo-connection source="clip_0" source-port="O" target="add_0" target-port="TEX" size="4096"/>
+        <fifo-connection source="splitter_MV" source-port="V" target="framebuf_1" target-port="MV" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="V" target="framebuf_1" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="V" target="add_1" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="V" target="addressing_1" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_BTYPE" source-port="V" target="invpred_1" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="splitter_420_B" source-port="V" target="DCsplit_1" target-port="IN" size="4096"/>
+        <fifo-connection source="clip_1" source-port="O" target="add_1" target-port="TEX" size="4096"/>
+        <fifo-connection source="add" source-port="VID" target="GEN_mgnt_Merger420" target-port="Y" size="4096"/>
+        <fifo-connection source="add_0" source-port="VID" target="GEN_mgnt_Merger420" target-port="U" size="4096"/>
+        <fifo-connection source="add_1" source-port="VID" target="GEN_mgnt_Merger420" target-port="V" size="4096"/>
+        <fifo-connection source="splitter_Qp" source-port="QUANT_Y" target="invpred" target-port="QP" size="4096"/>
+        <fifo-connection source="splitter_Qp" source-port="QUANT_V" target="invpred_1" target-port="QP" size="4096"/>
+        <fifo-connection source="splitter_Qp" source-port="QUANT_U" target="invpred_0" target-port="QP" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="BTYPE" target="splitter_BTYPE" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="BTYPE" target="mvseq" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="BTYPE" target="mvrecon" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="MV" target="mvrecon" target-port="MVIN" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="RUN" target="blkexp" target-port="RUN" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="VALUE" target="blkexp" target-port="VALUE" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="LAST" target="blkexp" target-port="LAST" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="BTYPE" target="splitter_MV" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="BTYPE" target="splitter_420_B" target-port="BTYPE" size="4096"/>
+        <fifo-connection source="mvseq" source-port="A" target="mvrecon" target-port="A" size="4096"/>
+        <fifo-connection source="blkexp" source-port="OUT" target="splitter_420_B" target-port="B" size="4096"/>
+        <fifo-connection source="mvrecon" source-port="MV" target="splitter_MV" target-port="MV" size="4096"/>
+        <fifo-connection source="parseheaders" source-port="QP" target="splitter_Qp" target-port="QP" size="4096"/>
+        <fifo-connection source="DCsplit" source-port="DC" target="invpred" target-port="QFS_DC" size="4096"/>
+        <fifo-connection source="DCsplit" source-port="AC" target="IS_r" target-port="QFS_AC" size="4096"/>
+        <fifo-connection source="IS_r" source-port="PQF_AC" target="IAP" target-port="PQF_AC" size="4096"/>
+        <fifo-connection source="IAP" source-port="QF_AC" target="IQ" target-port="AC" size="4096"/>
+        <fifo-connection source="invpred" source-port="QUANT" target="IQ" target-port="QP" size="4096"/>
+        <fifo-connection source="invpred" source-port="QF_DC" target="IQ" target-port="DC" size="4096"/>
+        <fifo-connection source="invpred" source-port="PTR" target="IAP" target-port="PTR" size="4096"/>
+        <fifo-connection source="invpred" source-port="AC_PRED_DIR" target="IAP" target-port="AC_PRED_DIR" size="4096"/>
+        <fifo-connection source="invpred" source-port="AC_PRED_DIR" target="IS_r" target-port="AC_PRED_DIR" size="4096"/>
+        <fifo-connection source="IQ" source-port="OUT" target="scale" target-port="SIn" size="4096"/>
+        <fifo-connection source="invpred" source-port="SIGNED" target="clip" target-port="SIGNED" size="4096"/>
+        <fifo-connection source="invpred" source-port="QUANT" target="IAP" target-port="QP" size="4096"/>
+        <fifo-connection source="invpred" source-port="PREV_QUANT" target="IAP" target-port="PREV_QP" size="4096"/>
+        <fifo-connection source="addressing" source-port="A" target="invpred" target-port="A" size="4096"/>
+        <fifo-connection source="addressing" source-port="B" target="invpred" target-port="B" size="4096"/>
+        <fifo-connection source="addressing" source-port="C" target="invpred" target-port="C" size="4096"/>
+        <fifo-connection source="shift" source-port="Out" target="clip" target-port="I" size="4096"/>
+        <fifo-connection source="scale" source-port="SOut" target="row" target-port="In" size="4096"/>
+        <fifo-connection source="row" source-port="Out" target="transpose" target-port="In" size="4096"/>
+        <fifo-connection source="transpose" source-port="Out" target="column" target-port="In" size="4096"/>
+        <fifo-connection source="column" source-port="Out" target="retranspose" target-port="In" size="4096"/>
+        <fifo-connection source="retranspose" source-port="Out" target="shift" target-port="In" size="4096"/>
+        <fifo-connection source="DCsplit_0" source-port="DC" target="invpred_0" target-port="QFS_DC" size="4096"/>
+        <fifo-connection source="DCsplit_0" source-port="AC" target="IS_0" target-port="QFS_AC" size="4096"/>
+        <fifo-connection source="IS_0" source-port="PQF_AC" target="IAP_0" target-port="PQF_AC" size="4096"/>
+        <fifo-connection source="IAP_0" source-port="QF_AC" target="IQ_0" target-port="AC" size="4096"/>
+        <fifo-connection source="IQ_0" source-port="OUT" target="scale_0" target-port="SIn" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="SIGNED" target="clip_0" target-port="SIGNED" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="QUANT" target="IQ_0" target-port="QP" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="QF_DC" target="IQ_0" target-port="DC" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="PTR" target="IAP_0" target-port="PTR" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="AC_PRED_DIR" target="IAP_0" target-port="AC_PRED_DIR" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="AC_PRED_DIR" target="IS_0" target-port="AC_PRED_DIR" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="QUANT" target="IAP_0" target-port="QP" size="4096"/>
+        <fifo-connection source="invpred_0" source-port="PREV_QUANT" target="IAP_0" target-port="PREV_QP" size="4096"/>
+        <fifo-connection source="addressing_0" source-port="A" target="invpred_0" target-port="A" size="4096"/>
+        <fifo-connection source="addressing_0" source-port="B" target="invpred_0" target-port="B" size="4096"/>
+        <fifo-connection source="addressing_0" source-port="C" target="invpred_0" target-port="C" size="4096"/>
+        <fifo-connection source="shift_0" source-port="Out" target="clip_0" target-port="I" size="4096"/>
+        <fifo-connection source="scale_0" source-port="SOut" target="row_0" target-port="In" size="4096"/>
+        <fifo-connection source="row_0" source-port="Out" target="transpose_0" target-port="In" size="4096"/>
+        <fifo-connection source="transpose_0" source-port="Out" target="column_0" target-port="In" size="4096"/>
+        <fifo-connection source="column_0" source-port="Out" target="retranspose_0" target-port="In" size="4096"/>
+        <fifo-connection source="retranspose_0" source-port="Out" target="shift_0" target-port="In" size="4096"/>
+        <fifo-connection source="DCsplit_1" source-port="DC" target="invpred_1" target-port="QFS_DC" size="4096"/>
+        <fifo-connection source="DCsplit_1" source-port="AC" target="IS_1" target-port="QFS_AC" size="4096"/>
+        <fifo-connection source="IS_1" source-port="PQF_AC" target="IAP_1" target-port="PQF_AC" size="4096"/>
+        <fifo-connection source="IAP_1" source-port="QF_AC" target="IQ_1" target-port="AC" size="4096"/>
+        <fifo-connection source="IQ_1" source-port="OUT" target="scale_1" target-port="SIn" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="SIGNED" target="clip_1" target-port="SIGNED" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="QUANT" target="IQ_1" target-port="QP" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="QF_DC" target="IQ_1" target-port="DC" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="PTR" target="IAP_1" target-port="PTR" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="AC_PRED_DIR" target="IAP_1" target-port="AC_PRED_DIR" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="AC_PRED_DIR" target="IS_1" target-port="AC_PRED_DIR" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="QUANT" target="IAP_1" target-port="QP" size="4096"/>
+        <fifo-connection source="invpred_1" source-port="PREV_QUANT" target="IAP_1" target-port="PREV_QP" size="4096"/>
+        <fifo-connection source="addressing_1" source-port="A" target="invpred_1" target-port="A" size="4096"/>
+        <fifo-connection source="addressing_1" source-port="B" target="invpred_1" target-port="B" size="4096"/>
+        <fifo-connection source="addressing_1" source-port="C" target="invpred_1" target-port="C" size="4096"/>
+        <fifo-connection source="shift_1" source-port="Out" target="clip_1" target-port="I" size="4096"/>
+        <fifo-connection source="scale_1" source-port="SOut" target="row_1" target-port="In" size="4096"/>
+        <fifo-connection source="row_1" source-port="Out" target="transpose_1" target-port="In" size="4096"/>
+        <fifo-connection source="transpose_1" source-port="Out" target="column_1" target-port="In" size="4096"/>
+        <fifo-connection source="column_1" source-port="Out" target="retranspose_1" target-port="In" size="4096"/>
+        <fifo-connection source="retranspose_1" source-port="Out" target="shift_1" target-port="In" size="4096"/>
+        <fifo-connection source="framebuf" source-port="halfpel" target="interpolation" target-port="halfpel" size="4096"/>
+        <fifo-connection source="framebuf" source-port="RD" target="interpolation" target-port="RD" size="4096"/>
+        <fifo-connection source="interpolation" source-port="MOT" target="add" target-port="MOT" size="4096"/>
+        <fifo-connection source="add" source-port="VID" target="framebuf" target-port="WD" size="4096"/>
+        <fifo-connection source="framebuf_0" source-port="halfpel" target="interpolation_0" target-port="halfpel" size="4096"/>
+        <fifo-connection source="framebuf_0" source-port="RD" target="interpolation_0" target-port="RD" size="4096"/>
+        <fifo-connection source="interpolation_0" source-port="MOT" target="add_0" target-port="MOT" size="4096"/>
+        <fifo-connection source="add_0" source-port="VID" target="framebuf_0" target-port="WD" size="4096"/>
+        <fifo-connection source="framebuf_1" source-port="halfpel" target="interpolation_1" target-port="halfpel" size="4096"/>
+        <fifo-connection source="framebuf_1" source-port="RD" target="interpolation_1" target-port="RD" size="4096"/>
+        <fifo-connection source="interpolation_1" source-port="MOT" target="add_1" target-port="MOT" size="4096"/>
+        <fifo-connection source="add_1" source-port="VID" target="framebuf_1" target-port="WD" size="4096"/>
+    </connections>
 </configuration>
-

@@ -22,11 +22,11 @@ import System.bitops.bitand;
    end 
 
    // to delete the token relative to the width and the height
-   skip : action BTYPE:[cmd] repeat 2 ==> Y:[ cmd[0], cmd[1] ]  , U:[ cmd[0], cmd[1] ], V:[ cmd[0], cmd[1] ]
+   skip : action BTYPE:[cmd0, cmd1]  ==> Y:[ cmd0, cmd1 ]  , U:[ cmd0, cmd1 ], V:[cmd0, cmd1]
    end
 
    // to split the tokens 
-   cmd.split: action BTYPE:[list] repeat 6 ==> Y:[ list[0], list[1], list[2], list[3] ] , U:[ list[4] ], V:[ list[5] ]
+   cmd.split: action BTYPE:[y0, y1, y2, y3, u, v]  ==> Y:[ y0, y1, y2, y3 ] , U:[ u ], V:[ v ]
    end 
 
    schedule fsm cmd:

@@ -17,7 +17,7 @@ add_custom_target(all_bin)    # build all multicore hetero binaries
 add_custom_target(all_sc_bin) # build all sc binaries
 add_custom_target(all_sc_run) # run all sc simulations
 
-foreach(index RANGE 1 3)
+foreach(index RANGE 0 13)
   foreach(CLK ${CLOCK_LIST})
     add_custom_target(all_configuration_${index}_${CLK}_SC_sc_run)
   endforeach()
@@ -155,6 +155,7 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
     TARGET_PATH ${__TARGET_SC_PATH__}
     SOURCE_PATH . ../system
     XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+    
   )
 
   file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/build)
@@ -218,7 +219,7 @@ macro(rvc_generate CONFIG_PATH CLOCK_SETTING)
 endmacro()
 
 
-foreach(index RANGE 1 3)
+foreach(index RANGE 0 13)
   foreach(CLK ${CLOCK_LIST})
 
     rvc_generate(configuration_${index} ${CLK})
