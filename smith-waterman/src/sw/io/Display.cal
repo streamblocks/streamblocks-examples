@@ -64,19 +64,19 @@ namespace sw.io:
             hasScore and hasA and hasB
         do
             alignementCounter := alignementCounter + 1;
-            print_s("Alignement: ");
-            print_i(alignementCounter);
-            print_s(" >> score: ");
-            print_i(score);
-            print_s("\n  REF: ");
-            foreach int i in 0 .. sizeA - 1 do
-                printChar(stringA[i]);
-            end
-            print_s("\n READ: ");
-            foreach int i in 0 .. sizeB - 1 do
-                printChar(stringB[i]);
-            end
-            print_s("\n\n");
+            // print_s("Alignement: ");
+            // print_i(alignementCounter);
+            // print_s(" >> score: ");
+            // print_i(score);
+            // print_s("\n  REF: ");
+            // foreach int i in 0 .. sizeA - 1 do
+                // printChar(stringA[i]);
+            // end
+            // print_s("\n READ: ");
+            // foreach int i in 0 .. sizeB - 1 do
+                // printChar(stringB[i]);
+            // end
+            // print_s("\n\n");
             sizeA := 0;
             sizeB := 0;
             hasScore := false;
