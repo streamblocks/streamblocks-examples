@@ -227,12 +227,12 @@ macro (analyze_path PATH_STRING SOURCE_DEPS PATH_LIST FILE_EXTENSION )
   make_absolute_path_list(ABSOLUTE_PATH_LIST "${PATH_LIST}")
 
 
-  find_source_dependencies(__SOURCE_DEPS__ "${ABSOLUTE_PATH_LIST}" "cal")
+  # find_source_dependencies(__SOURCE_DEPS__ "${ABSOLUTE_PATH_LIST}" "cal")
 
  
   string(REPLACE ";" ":" __PATH_STRING__ "${ABSOLUTE_PATH_LIST}")
 
   set(${PATH_STRING} "${__PATH_STRING__}")
-  set(${SOURCE_DEPS} "${__SOURCE_DEPS__}")
+  # set(${SOURCE_DEPS} "${__SOURCE_DEPS__}")
 
 endmacro()

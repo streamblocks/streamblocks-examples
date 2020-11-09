@@ -9,6 +9,8 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 # List of HLS_CLOCK_PERIOD settings to build binaries for
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
 
+
+set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13" CACHE STRING "List of ; separated configuration ids")
 set(CLOCK_LIST "3.3;10;5;2.5;1.667;6.667;13.333" CACHE STRING "List of ; seperated HLS clock settings")
 set(CLOCK_IDS "1;3;4;5;6;0;2" CACHE STRING "List of clock ids coresponding to clocks")
 
@@ -19,11 +21,7 @@ set(FPGA_NAME "xczu7ev-ffvc1156-2-e"
 set(PLATFORM "xilinx_zcu106_base_dfx_202010_1" 
   CACHE STRING "Supported platform name, e.g \"xilinx_kcu1500_dynamic_5_0\", \"xilinx_u250_xdma_201830_2\", \"zcu102_base\", \"xilinx_zcu106_base_202010_1\", \"ultra96_base\",... ")
 
-foreach(index RANGE 0 13)
-  foreach(CLK ${CLOCK_LIST})
-    add_custom_target(all_configuration_${index}_${CLK}_SC_sc_run)
-  endforeach()
-endforeach()
+
 set(KERNEL_FREQ "150" CACHE STRING "Clock frequency in MHz.")
 
 option(USE_VITIS "Build an RTL OpenCL Kernel for Vitis" OFF)
@@ -48,17 +46,17 @@ add_custom_target(all_sc_run) # run all sc simulations
 list(LENGTH CLOCK_LIST CLOCKS_COUNT)
 math(EXPR MAX_CLOCK_INDEX "${CLOCKS_COUNT} - 1")
 
-message(STATUS "Found ${CLOCKS_COUNT} clock configs (max index ${MAX_CLOCK_INDEX}")
+message(STATUS "Found ${CLOCKS_COUNT} clock configs (max index ${MAX_CLOCK_INDEX})")
 
-foreach(index RANGE 1 5)
-  foreach(CLK_IX RANGE 0 ${MAX_CLOCK_INDEX})
+# foreach(index RANGE 1 13)
+#   foreach(CLK_IX RANGE 0 ${MAX_CLOCK_INDEX})
 
-    list(GET CLOCK_LIST ${CLK_IX} CLOCK_SETTING)
+#     list(GET CLOCK_LIST ${CLK_IX} CLOCK_SETTING)
     
-    add_custom_target(all_configuration_${index}_${CLOCK_SETTING}_SC_sc_run)
+#     add_custom_target(all_configuration_${index}_${CLOCK_SETTING}_SC_sc_run)
   
-  endforeach()
-endforeach()
+#   endforeach()
+# endforeach()
 
 
 macro(rvc_generate CONFIG_PATH CLK_IX)
@@ -93,19 +91,36 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     PARTITIONING
   )
 
+
+
+  
+  # Make directories
+
+  set(__TARGET_DIRS_FILES__
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/foreman_qcif_30.bit 
+    xclbin_repo/${CONFIG_PATH}_${CLOCK_SETTING}
+  )
+
+  add_custom_command(
+    OUTPUT ${__TARGET_DIRS_FILES__}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin xclbin_repo/${CONFIG_PATH}_${CLOCK_SETTING}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/foreman_qcif_30.bit
+    COMMENT "Making directories for ${__TARGET__} ${CMAKE_COMMAND} -E make_directory ${__TARGET_PATH__}/build ${__TARGET_PATH__}/bin ${__TARGET_PATH__}/bin/xclbin xclbin_repo/${CONFIG_PATH}_${CLOCK_SETTING}"
+    DEPENDS ${__TARGET__}_MULTICORE ${__TARGET__}_HLS
+  )
+
+ 
+
   # -- Heterogenous target, generates both software and hardware
   add_custom_target(
     ${__TARGET__} ALL
-    DEPENDS ${__TARGET__}_HLS ${__TARGET__}_MULTICORE
-  )
+    DEPENDS ${__TARGET__}_HLS ${__TARGET__}_MULTICORE ${__TARGET_DIRS_FILES__}
+  )  
 
-  file(MAKE_DIRECTORY ${__TARGET_PATH__}/build)
-  file(MAKE_DIRECTORY ${__TARGET_PATH__}/bin)
-  file(MAKE_DIRECTORY ${__TARGET_PATH__}/bin/xclbin)
-  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit 
-    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/)
 
-  file(MAKE_DIRECTORY xclbin_repo/${CONFIG_PATH}_${CLOCK_SETTING})
 
   if (REMOTE_XCLBIN)
 
@@ -121,10 +136,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
     )
   else()
-    # -- command to build FPGA
-    
-
-    
+    # -- command to build FPGA binary
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
       COMMAND ${CMAKE_COMMAND} 
@@ -147,6 +159,8 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
       ${__TARGET__}_xclbin ALL
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
     )
+
+   
     add_custom_command(
       TARGET ${__TARGET__}_xclbin
       POST_BUILD 
@@ -191,38 +205,38 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 
   # -- SystemC build and run commands
 
-  set(__TARGET_SC_PATH__ ${OUTPUT_PATH}/${CONFIG_PATH}_${CLOCK_SETTING}_sc)
-  set(__TARGET_SC__ ${__TARGET__}_SC)
+  # set(__TARGET_SC_PATH__ ${OUTPUT_PATH}/${CONFIG_PATH}_${CLOCK_SETTING}_sc)
+  # set(__TARGET_SC__ ${__TARGET__}_SC)
 
-  streamblocks_systemc(
-    ${__TARGET_SC__}
-    QID RVC.decoderDemo
-    TARGET_PATH ${__TARGET_SC_PATH__}
-    SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+  # streamblocks_systemc(
+  #   ${__TARGET_SC__}
+  #   QID RVC.decoderDemo
+  #   TARGET_PATH ${__TARGET_SC_PATH__}
+  #   SOURCE_PATH . ../system
+  #   XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
     
-  )
+  # )
 
-  file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/build)
-  file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/bin)
-  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit 
-    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/)
+  # file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/build)
+  # file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/bin)
+  # file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit 
+  #   DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/)
 
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
-    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} .. &> cmake.sc.config.log
-    COMMAND make decoderDemo -j &> cmake.sc.make.log
-    DEPENDS ${__TARGET_SC__}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
-    COMMENT "Building SystemC binary for ${__TARGET_SC__}"
-  )
+  # add_custom_command(
+  #   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
+  #   COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} .. &> cmake.sc.config.log
+  #   COMMAND make decoderDemo -j &> cmake.sc.make.log
+  #   DEPENDS ${__TARGET_SC__}
+  #   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
+  #   COMMENT "Building SystemC binary for ${__TARGET_SC__}"
+  # )
 
-  add_custom_target(
-    ${__TARGET_SC__}_bin
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
-  )
+  # add_custom_target(
+  #   ${__TARGET_SC__}_bin
+  #   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
+  # )
 
-  add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
+  # add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
 
   
   # rules for different buffer configuration runs
@@ -264,7 +278,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 endmacro()
 
 
-foreach(index RANGE 0 13)
+foreach(index ${CONFIGURATIONS})
   foreach(CLK_IX RANGE 0 ${MAX_CLOCK_INDEX})
 
     rvc_generate(configuration_${index} ${CLK_IX})
