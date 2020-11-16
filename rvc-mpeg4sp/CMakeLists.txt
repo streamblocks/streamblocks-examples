@@ -205,40 +205,76 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 
   # -- SystemC build and run commands
 
-  # set(__TARGET_SC_PATH__ ${OUTPUT_PATH}/${CONFIG_PATH}_${CLOCK_SETTING}_sc)
-  # set(__TARGET_SC__ ${__TARGET__}_SC)
+  set(__TARGET_SC_PATH__ ${__TARGET_PATH__}_SC)
+  set(__TARGET_SC__ ${__TARGET__}_SC)
 
-  # streamblocks_systemc(
-  #   ${__TARGET_SC__}
-  #   QID RVC.decoderDemo
-  #   TARGET_PATH ${__TARGET_SC_PATH__}
-  #   SOURCE_PATH . ../system
-  #   XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+  streamblocks_systemc(
+    ${__TARGET_SC__}
+    QID RVC.decoderDemo
+    TARGET_PATH ${__TARGET_SC_PATH__}
+    SOURCE_PATH . ../system
+    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
     
-  # )
+  )
 
-  # file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/build)
-  # file(MAKE_DIRECTORY ${__TARGET_SC_PATH__}/bin)
-  # file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit 
-  #   DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/)
+  # Make directories
 
-  # add_custom_command(
-  #   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
-  #   COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} .. &> cmake.sc.config.log
-  #   COMMAND make decoderDemo -j &> cmake.sc.make.log
-  #   DEPENDS ${__TARGET_SC__}
-  #   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
-  #   COMMENT "Building SystemC binary for ${__TARGET_SC__}"
-  # )
+  set(__TARGET_SC_DIRS_FILES__
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
+    ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/foreman_qcif_30.bit 
+    xclbin_repo/${CONFIG_PATH}_${CLOCK_SETTING}
+  )
 
-  # add_custom_target(
-  #   ${__TARGET_SC__}_bin
-  #   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
-  # )
+  add_custom_command(
+    OUTPUT ${__TARGET_SC_DIRS_FILES__}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin 
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/foreman_qcif_30.bit ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/foreman_qcif_30.bit
+    COMMENT "Making directories for ${__TARGET__} ${CMAKE_COMMAND} -E make_directory ${__TARGET_SC_PATH__}/build ${__TARGET_SC_PATH__}/bin"
+    DEPENDS ${__TARGET_SC__}
+  )
 
-  # add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
+  add_custom_target(
+    ${__TARGET_SC__}_DIRS_FILES__
+    DEPENDS ${__TARGET_SC__} ${__TARGET_SC_DIRS_FILES__}
+  )
+  # build the sc binary command
 
-  
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
+    COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DFPGA_NAME=${FPGA_NAME} -DCMAKE_BUILD_TYPE=Release -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} .. &> cmake.sc.config.log
+    COMMAND make decoderDemo -j &> cmake.sc.make.log
+    DEPENDS ${__TARGET_SC__} ${__TARGET_SC__}_DIRS_FILES__
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
+    COMMENT "Building SystemC binary for ${__TARGET_SC__}"
+  )
+
+  add_custom_target(
+    ${__TARGET_SC__}_bin
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo ${__TARGET_SC__}_DIRS_FILES__
+  )
+
+  add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
+
+  # Run the simulation command
+
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
+    COMMAND ./decoderDemo --hardware-profile=systemc-profile.xml &> decoderDemo.log
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
+    COMMENT "Executing SystemC simulation ${__TARGET_SC__}"
+    DEPENDS ${__TARGET_SC__}_bin
+  )
+
+  add_custom_target(
+    ${__TARGET_SC__}_run
+    DEPENDS
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml 
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
+      ${__TARGET_SC__}_bin
+  )
+
+  add_dependencies(all_sc_run ${__TARGET_SC__}_run)
   # rules for different buffer configuration runs
   # set(buff_sz 4096)
   # while(${buff_sz} LESS_EQUAL 134217728)
