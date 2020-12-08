@@ -64,20 +64,25 @@ DevicePort::DevicePort(PortAddress address) : address(address) {
 }
 
 DevicePort::DevicePort(const cl::Context &context, PortAddress address,
-                       cl_mem_flags flags, cl::size_type size)
+                       cl_mem_flags flags, cl::size_type size, const cl_int bank_id)
     : DevicePort(address) {
-  allocate(context, flags, size);
+  allocate(context, flags, size, bank_id);
 }
 
 cl_int DevicePort::allocate(const cl::Context &context, cl_mem_flags flags,
-                            cl::size_type size) {
+                            cl::size_type size, const cl_int bank_id) {
   cl_int err;
-  device_buffer = cl::Buffer(context, flags, size, NULL, &err);
+
+  extensions.flags = bank_id;
+  extensions.obj = 0;
+  extensions.param = 0;
+
+  device_buffer = cl::Buffer(context, flags | CL_MEM_EXT_PTR_XILINX, size, &extensions, &err);
 
   host_buffer.resize(size);
 
   cl_int err2;
-  device_size_buffer = cl::Buffer(context, CL_MEM_WRITE_ONLY, sizeof(uint32_t));
+  device_size_buffer = cl::Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_EXT_PTR_XILINX, sizeof(uint32_t), &extensions, &err2);
 
   host_size_buffer.resize(1);
 
@@ -204,28 +209,30 @@ DeviceHandle::DeviceHandle(int num_inputs, int num_outputs, int num_mems,
 }
 
 void DeviceHandle::allocateInputBuffer(const PortAddress &port,
-                                       const cl::size_type size) {
+                                       const cl::size_type size, 
+                                       const cl_int bank_id) {
 
   for (auto &input : input_ports)
     if (port == input.getAddress()) {
       cl_int err;
       OCL_MSG("Allocating %s port buffer (%llu bytes) \n",
               port.toString().c_str(), size);
-      OCL_CHECK(err, err = input.allocate(context, CL_MEM_READ_ONLY, size));
+      OCL_CHECK(err, err = input.allocate(context, CL_MEM_READ_ONLY, size, bank_id));
       return;
     }
   OCL_ERR("Invalid input port %s\n", port.toString());
 }
 
 void DeviceHandle::allocateOutputBuffer(const PortAddress &port,
-                                        const cl::size_type size) {
+                                        const cl::size_type size,
+                                        const cl_int bank_id) {
 
   for (auto &output : output_ports) {
     if (port == output.getAddress()) {
       cl_int err;
       OCL_MSG("Allocating %s port buffer (%llu bytes)\n",
               port.toString().c_str(), size);
-      OCL_CHECK(err, err = output.allocate(context, CL_MEM_WRITE_ONLY, size));
+      OCL_CHECK(err, err = output.allocate(context, CL_MEM_WRITE_ONLY, size, bank_id));
       return;
     }
   }
@@ -438,5 +445,36 @@ DeviceHandle::getReadTime(const PortAddress &port) {
   OCL_ERR("Could not find read time for %s\n", port.toString().c_str());
   
   return std::make_pair(0, 0);
+}
+
+
+std::pair<cl_ulong, cl_ulong>
+DeviceHandle::getReadSizeTime(const PortAddress &port, bool is_input) {
+  cl_ulong start_time = 0;
+  cl_ulong end_time = 0;
+
+  if (is_input) {
+    for (auto &input : input_ports) {
+      if (input.getAddress() == port) {
+        input.getSizeEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_QUEUED, &start_time);
+        input.getSizeEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_END, &end_time);
+          return std::make_pair(start_time, end_time);
+      }  
+    }
+  } else {
+    for (auto &output : output_ports) {
+      if (output.getAddress() == port) {
+        output.getSizeEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_QUEUED, &start_time);
+        output.getSizeEvent().getProfilingInfo<cl_ulong>(
+          CL_PROFILING_COMMAND_END, &end_time);
+          return std::make_pair(start_time, end_time);
+      }
+    
+    }
+  }
+  
 }
 };

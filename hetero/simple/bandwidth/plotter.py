@@ -1,9 +1,11 @@
 from xml.dom import minidom
 import argparse
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
+# import matplotlib
 from scipy.ndimage import gaussian_filter
+
+import lxml.etree as ET
 
 class TestStats():
 
@@ -14,13 +16,13 @@ class TestStats():
       self.kernel_duration = []
       self.write_duration = []
       self.read_duration = []
+      self.read_size_duration = []
       self.num = int(test_elem.attributes["num"].value)
       self.size = int(test_elem.attributes["size"].value) * self.num
       experiments = test_elem.getElementsByTagName("experiment")
       for expr in experiments:
         
-        # Get the kernel time
-       
+        # Get the kernel time     
         self.kernel_duration.append(self.getDuration(expr, "kernel"))
 
         # Get the write time
@@ -28,7 +30,9 @@ class TestStats():
 
         # Get the read time
         self.read_duration.append(self.getDuration(expr, "read-summary"))
-      
+
+        # Get the read size time
+        self.read_size_duration.append(self.getDuration(expr, "read-size-summary"))
 
       k_m = np.mean(self.kernel_duration)
       w_m = np.mean(self.write_duration)
@@ -43,7 +47,7 @@ class TestStats():
       self.kernel_mean = np.mean(self.kernel_duration) * 1e-9
       self.write_mean = np.mean(self.write_duration) * 1e-9
       self.read_mean = np.mean(self.read_duration) * 1e-9
-
+      self.read_size_mean = np.mean(self.read_size_duration) * 1e-9
 
       self.kernel_bw = self.size / 1024. /1024. / self.kernel_mean
       self.write_bw = self.size / 1024. / 1024. / self.write_mean
@@ -72,13 +76,6 @@ class LoopbackStats():
 
     test_elems = stats.getElementsByTagName("test")
     self.tests = [TestStats(t) for t in test_elems]
-
-
-  
-    
-    
-
-    
 
 
 
@@ -141,8 +138,33 @@ def makeLabel(x):
   else :
     return str(x) + "B"
 
+def crunch(stat):
 
-def pareProfile(file_name):
+  profile_data = ET.Element('profile-data')
+  bw_test =ET.SubElement(profile_data, 'bandwidth-test')
+  bw_test.set('type', 'FPGA')
+
+  for test in stat.tests:
+    num_bytes = test.size
+    kernel = int(test.kernel_mean * 1e+9)
+    write = int(test.write_mean * 1e+9)
+    read = int(test.read_mean * 1e+9)
+    read_size = int(test.read_size_mean * 1e+9)
+    reps = 1
+    con = ET.SubElement(bw_test, 'Connection')
+    con.set('kernel-total', str(kernel))
+    con.set('write-total', str(write))
+    con.set('read-total', str(read))
+    con.set('read-size-total', str(read_size))
+    con.set('repeats', str(reps))
+    con.set('buffer-size', str(num_bytes))
+
+  profile_data_raw = ET.tostring(profile_data, pretty_print=True)
+  myfile = open("opencl-bandwidth.xml", "wb")
+  myfile.write(profile_data_raw)
+
+
+def parseProfile(file_name):
 
   return LoopbackStats(file_name)
 
@@ -153,5 +175,6 @@ if __name__ == "__main__":
   args = argsParser.parse_args()
   
   
-  stats = [pareProfile(args.profile_xml + str(i) + ".xml") for i in range(1, 3)]
-  plotAll(stats)
+  stats = [parseProfile(args.profile_xml + str(i) + ".xml") for i in range(1, 2)]
+  # plotAll(stats)
+  crunch(stats[0])
