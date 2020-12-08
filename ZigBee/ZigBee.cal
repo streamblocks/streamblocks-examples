@@ -1,0 +1,23 @@
+namespace ZigBee:
+
+import all constants;
+	
+
+	network ZigBee() uint(size=PL_DATA_SZ) pl_bits ==> bool done, int(size=HSP_SZ) hsp  :
+	entities 
+		hadd = headerAdd();	
+		cMapper = chipMapper();
+		qpsk = qpskMod();
+		pshape = pulseShape(); 		
+		
+	structure
+		pl_bits --> hadd.pl_bits;
+		hadd.data --> cMapper.data;
+		hadd.len --> pshape.len;
+		cMapper.chip --> qpsk.chip;
+		qpsk.symb --> pshape.symb;
+		pshape.done --> done;
+		pshape.hsp --> hsp;		
+	end
+
+end

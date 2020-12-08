@@ -1,0 +1,21 @@
+namespace ZigBee:
+
+	
+	import entity ZigBee.source;
+	import entity ZigBee.sink;
+	
+	network Top_ZigBee() ==> :
+	entities 
+		dataSource = source(fileName_ZB_i="./tx_stream.in");
+		ZB = ZigBee();
+		dataSink = sink();
+		
+	structure
+		dataSource.pl_bits --> ZB.pl_bits; 
+		ZB.hsp --> dataSink.hsp; 
+		ZB.done --> dataSink.done; 
+				
+	end
+	
+
+end
