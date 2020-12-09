@@ -92,19 +92,20 @@ function (streamblocks TARGET)
   # -- xcf input
   if (STREAMBLOCKS_ARGS_XCF_SOURCE_PATH) 
     message(STATUS "XCF PATH ${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}")
-    analyze_path(XCF_SOURCE_PATH_STRING SOURCE_XCF_DEPS "${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}" "xcf")
+    string(REPLACE ";" ":" XCF_SOURCE_PATH_STRING "${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}")
     set(STREAMBLOCKS_XCF_SOURCE_PATH --xcf-path ${XCF_SOURCE_PATH_STRING})
   endif()
   
   # -- xdf source path
   if (STREAMBLOCKS_ARGS_XDF_SOURCE_PATH)
-    analyze_path(XDF_SOURCE_STRING SOURCE_XDF_DEPS "${STREAMBLOCKS_ARGS_XDF_SOURCE_PATH}" "xdf")
+    string(REPLACE ";" ":" XDF_SOURCE_STRING "${STREAMBLOCKS_ARGS_XDF_SOURCE_PATH}")
+    message(STATUS "XDF: ${XDF_SOURCE_STRING}")
     set(STREAMBLOCKS_XDF_SOURCE_PATH --xdf-source-path ${XDF_SOURCE_STRING})
   endif()
   
   # -- orcc source path 
   if (STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH)
-    analyze_path(ORCC_SOURCE_PATH_STRING SOURCE_ORCC_DEPS "${STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH}" "cal")
+    string(REPLACE ";" ":" ORCC_SOURCE_PATH_STRING "${STREAMBLOCKS_ARGS_ORCC_SOURCE_PATH}")
     set(STREAMBLOCKS_ORCC_SOURCE_PATH --orcc-source-path ${ORCC_SOURCE_PATH_STRING})
   endif()
   
@@ -112,8 +113,10 @@ function (streamblocks TARGET)
   # -- Glob all the .cal files in the source path directories
   
   # -- cal source files
-  analyze_path(SOURCE_PATH_STRING SOURCE_CAL_DEPS "${STREAMBLOCKS_ARGS_SOURCE_PATH}" "cal")
   
+  string(REPLACE ";" ":" SOURCE_PATH_STRING "${STREAMBLOCKS_ARGS_SOURCE_PATH}")
+
+  message(STATUS "SOURCE_PATH_STRING: ${SOURCE_PATH_STRING}")
 
   
   make_absolute_path_list(TARGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
@@ -224,7 +227,7 @@ endmacro()
 macro (analyze_path PATH_STRING SOURCE_DEPS PATH_LIST FILE_EXTENSION )
 
 
-  make_absolute_path_list(ABSOLUTE_PATH_LIST "${PATH_LIST}")
+  # make_absolute_path_list(ABSOLUTE_PATH_LIST "${PATH_LIST}")
 
 
   # find_source_dependencies(__SOURCE_DEPS__ "${ABSOLUTE_PATH_LIST}" "cal")
