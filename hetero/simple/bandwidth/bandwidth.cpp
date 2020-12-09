@@ -44,14 +44,22 @@ public:
               << std::endl;
 
     int num_tokens = buffer_size / sizeof(int);
+
+    cl_int banks[4] = {XCL_MEM_DDR_BANK0, XCL_MEM_DDR_BANK1, 
+      XCL_MEM_DDR_BANK2, XCL_MEM_DDR_BANK3};
+    int bank_index = 0;
     for (auto &input : input_ports) {
-      dev->allocateInputBuffer(input, buffer_size);
+      cl_int bank = banks[bank_index];
+      dev->allocateInputBuffer(input, buffer_size, bank);
       dev->setUsableInput<int>(input, buffer_size / sizeof(int));
+      bank_index = (bank_index + 1) % 4;
     }
 
     for (auto &output : output_ports) {
-      dev->allocateOutputBuffer(output, buffer_size);
+      cl_int bank = banks[bank_index];
+      dev->allocateOutputBuffer(output, buffer_size, bank);
       dev->setUsableOutput<int>(output, buffer_size / sizeof(int));
+      bank_index = (bank_index + 1) % 4;
     }
 
     for (int r = 0; r < repeats; r++) {
@@ -85,6 +93,9 @@ public:
       int ix = 0;
       cl_ulong start_min = -1;
       cl_ulong end_max = 0;
+
+      cl_ulong start_size_min = -1;
+      cl_ulong end_size_max = 0;
       for (auto &input : input_ports) {
         auto write_time = dev->getWriteTime(input);
         auto write_diff = std::get<1>(write_time) - std::get<0>(write_time);
@@ -98,11 +109,26 @@ public:
         os << "\t\t\t<write id=\"" << ix << "\" ";
         os << "start=\"" << std::get<0>(write_time) << "\" ";
         os << "end=\"" << std::get<1>(write_time) << "\"/>" << std::endl;
+
+        auto write_size_time = dev->getReadSizeTime(input, true);
+        auto write_size_diff = write_size_time.second - write_size_time.first;
+
+        if (start_size_min > write_size_time.first)
+          start_size_min = write_size_time.first;
+        
+        if (end_size_max < write_size_time.second)
+          end_size_max = write_size_time.second;
+
+        // os << "\t\t\t<read-size id=\"" << ix << "\"";
+        // os << "start=\"" << write_size_time.first << "\" ";
+        // os << "end=\"" << std::write_size_time.second << "\"/>" << std::endl;
+
         ix++;
       }
 
       os << "\t\t\t<write-summary start=\"" << start_min << "\" ";
       os << "end=\"" << end_max << "\" />" << std::endl;
+
 
       start_min = -1;
       end_max = 0;
@@ -121,10 +147,24 @@ public:
         os << "\t\t\t<read id=\"" << ix << "\" ";
         os << "start=\"" << std::get<0>(read_time) << "\" ";
         os << "end=\"" << std::get<1>(read_time) << "\"/>" << std::endl;
+
+        auto read_size_time = dev->getReadSizeTime(output, false);
+        auto read_size_diff = read_size_time.second - read_size_time.first;
+
+        if (start_size_min > read_size_time.first)
+          start_size_min = read_size_time.first;
+        
+        if (end_size_max < read_size_time.second)
+          end_size_max = read_size_time.second;
+
         ix++;
       }
       os << "\t\t\t<read-summary start=\"" << start_min << "\" ";
       os << "end=\"" << end_max << "\" />" << std::endl;
+
+      os << "\t\t\t<read-size-summary start=\"" << start_size_min << "\" ";
+      os << "end=\"" << end_size_max << "\" />" << std::endl;
+
       dev->releaseEvents();
       os << "\t\t</experiment>" << std::endl;
     }
