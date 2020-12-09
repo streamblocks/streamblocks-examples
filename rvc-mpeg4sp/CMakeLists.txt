@@ -11,6 +11,7 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 
 
 set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13" CACHE STRING "List of ; separated configuration ids")
+set(CONFIG_ROOT "." CACHE STRING "Root folder for the configurations name as configuration_N where N is a number")
 set(CLOCK_LIST "3.3;10;5;2.5;1.667;6.667;13.333" CACHE STRING "List of ; seperated HLS clock settings")
 set(CLOCK_IDS "1;3;4;5;6;0;2" CACHE STRING "List of clock ids coresponding to clocks")
 
@@ -75,7 +76,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     QID RVC.decoderDemo
     TARGET_PATH ${__TARGET_PATH__}
     SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+    XCF_SOURCE_PATH ${CONFIG_ROOT}/${CONFIG_PATH}.xcf
     PARTITIONING
     QUEUE_DEPTH ${FIFO_QUEUE_DEPTH}
   )
@@ -87,7 +88,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     QID RVC.decoderDemo
     TARGET_PATH ${__TARGET_PATH__}
     SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+    XCF_SOURCE_PATH ${CONFIG_ROOT}/${CONFIG_PATH}.xcf
     PARTITIONING
   )
 
@@ -148,6 +149,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
         -DFPGA_NAME=${FPGA_NAME}
         -DPLATFORM=${PLATFORM}
         -DMPSOC_CLOCK_ID=${CLK_ID}
+        -DKERNEL_FREQ=${KERNEL_FREQ}
         .. > cmake.xclbin.config.log
       COMMAND make decoderDemo_kernel_xclbin -j
       DEPENDS ${__TARGET__}
@@ -205,7 +207,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     QID RVC.decoderDemo
     TARGET_PATH ${__TARGET_SC_PATH__}
     SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_PATH}.xcf
+    XCF_SOURCE_PATH ${CONFIG_ROOT}/${CONFIG_PATH}.xcf
     
   )
 
@@ -320,6 +322,6 @@ streamblocks(
   rvc-mpeg4sp_SOFTWARE
   PLATFORM multicore
   QID RVC.decoderDemo
-  TARGET_PATH generated/profiling/sw
+  TARGET_PATH ${OUTPUT_PATH}/profiling/sw
   SOURCE_PATH . ../system
 )
