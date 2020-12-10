@@ -15,8 +15,8 @@ import entity ART.art_Display_yuv_width_height;
 
         entities
             source = art_Source_bin(fileName="./foreman_qcif_30.bit", loops=0);
-            decoder = Decoder(); { partition = "hw"; };
-            convert = Convert(); { partition = "hw"; };
+            decoder = Decoder() { partition = "hw"; };
+            convert = Convert() { partition = "hw"; };
             sizesplitter = SizeSplitter();
             display = art_Display_yuv_width_height(title="SB", width=176, height=144);
         structure
