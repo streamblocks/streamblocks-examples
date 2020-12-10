@@ -91,7 +91,7 @@ function (streamblocks TARGET)
   
   # -- xcf input
   if (STREAMBLOCKS_ARGS_XCF_SOURCE_PATH) 
-    message(STATUS "XCF PATH ${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}")
+    # message(STATUS "XCF PATH ${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}")
     string(REPLACE ";" ":" XCF_SOURCE_PATH_STRING "${STREAMBLOCKS_ARGS_XCF_SOURCE_PATH}")
     set(STREAMBLOCKS_XCF_SOURCE_PATH --xcf-path ${XCF_SOURCE_PATH_STRING})
   endif()
@@ -99,7 +99,7 @@ function (streamblocks TARGET)
   # -- xdf source path
   if (STREAMBLOCKS_ARGS_XDF_SOURCE_PATH)
     string(REPLACE ";" ":" XDF_SOURCE_STRING "${STREAMBLOCKS_ARGS_XDF_SOURCE_PATH}")
-    message(STATUS "XDF: ${XDF_SOURCE_STRING}")
+    # message(STATUS "XDF: ${XDF_SOURCE_STRING}")
     set(STREAMBLOCKS_XDF_SOURCE_PATH --xdf-source-path ${XDF_SOURCE_STRING})
   endif()
   
@@ -116,7 +116,7 @@ function (streamblocks TARGET)
   
   string(REPLACE ";" ":" SOURCE_PATH_STRING "${STREAMBLOCKS_ARGS_SOURCE_PATH}")
 
-  message(STATUS "SOURCE_PATH_STRING: ${SOURCE_PATH_STRING}")
+  # message(STATUS "SOURCE_PATH_STRING: ${SOURCE_PATH_STRING}")
 
   
   make_absolute_path_list(TARGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
