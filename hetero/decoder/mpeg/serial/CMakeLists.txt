@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
 
 
-project(XilinxMpeg)
+project(SerialMpeg)
 
-set(NAMESPACE "hetero.decoder.mpeg.xilinx")
-set(NETWORK_NAME "XilinxNetwork")
+set(NAMESPACE "hetero.decoder.mpeg.parallel")
+set(NETWORK_NAME "SerialNetwork")
 
 # Common options
 include(../common.cmake)
 
 
 
-generate_profiliing(${NAMESPACE} ${NETWORK_NAME} XilinxNetwork)
+generate_profiliing(${NAMESPACE} ${NETWORK_NAME})
 
 
 foreach(index ${CONFIGURATIONS})
