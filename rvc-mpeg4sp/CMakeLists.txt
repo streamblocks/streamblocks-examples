@@ -42,7 +42,8 @@ add_custom_target(all_xclbin) # build all xclbins
 add_custom_target(all_bin)    # build all multicore hetero binaries
 add_custom_target(all_sc_bin) # build all sc binaries
 add_custom_target(all_sc_run) # run all sc simulations
-
+add_custom_target(all_multicore)
+add_custom_target(all_hls)
 
 list(LENGTH CLOCK_LIST CLOCKS_COUNT)
 math(EXPR MAX_CLOCK_INDEX "${CLOCKS_COUNT} - 1")
@@ -59,7 +60,10 @@ message(STATUS "Found ${CLOCKS_COUNT} clock configs (max index ${MAX_CLOCK_INDEX
 #   endforeach()
 # endforeach()
 
-
+set(CAL_SOURCE_PATH
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/../system
+)
 macro(rvc_generate CONFIG_PATH CLK_IX)
 
 
@@ -75,8 +79,8 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     PLATFORM vivado-hls
     QID RVC.decoderDemo
     TARGET_PATH ${__TARGET_PATH__}
-    SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_ROOT}/${CONFIG_PATH}.xcf
+    SOURCE_PATH ${CAL_SOURCE_PATH}
+    XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/${CONFIG_ROOT}/${CONFIG_PATH}.xcf
     PARTITIONING
     QUEUE_DEPTH ${FIFO_QUEUE_DEPTH}
   )
@@ -87,12 +91,13 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     PLATFORM multicore
     QID RVC.decoderDemo
     TARGET_PATH ${__TARGET_PATH__}
-    SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_ROOT}/${CONFIG_PATH}.xcf
+    SOURCE_PATH ${CAL_SOURCE_PATH}
+    XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/${CONFIG_ROOT}/${CONFIG_PATH}.xcf
     PARTITIONING
   )
 
-
+  add_dependencies(all_multicore ${__TARGET__}_MULTICORE)
+  add_dependencies(all_hls ${__TARGET__}_HLS)
 
   
   # Make directories
@@ -206,8 +211,8 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     ${__TARGET_SC__}
     QID RVC.decoderDemo
     TARGET_PATH ${__TARGET_SC_PATH__}
-    SOURCE_PATH . ../system
-    XCF_SOURCE_PATH ${CONFIG_ROOT}/${CONFIG_PATH}.xcf
+    SOURCE_PATH ${CAL_SOURCE_PATH}
+    XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/${CONFIG_ROOT}/${CONFIG_PATH}.xcf
     
   )
 
@@ -323,5 +328,27 @@ streamblocks(
   PLATFORM multicore
   QID RVC.decoderDemo
   TARGET_PATH ${OUTPUT_PATH}/profiling/sw
-  SOURCE_PATH . ../system
+  SOURCE_PATH ${CMAKE_SOURCE_DIR}/. ${CMAKE_SOURCE_DIR}/../system
 )
+
+streamblocks(
+  hardware_only_HLS
+  PLATFORM vivado-hls
+  QID RVC.decoderDemo
+  TARGET_PATH ${OUTPUT_PATH}/hardware
+  SOURCE_PATH ${CMAKE_SOURCE_DIR}/. ${CMAKE_SOURCE_DIR}/../system
+  XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/configuration_0.xcf
+  PARTITIONING
+)
+
+streamblocks(
+  hardware_only_multicore
+  PLATFORM multicore
+  QID RVC.decoderDemo
+  TARGET_PATH ${OUTPUT_PATH}/hardware
+  SOURCE_PATH ${CMAKE_SOURCE_DIR}/. ${CMAKE_SOURCE_DIR}/../system
+  XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/configuration_0.xcf
+  PARTITIONING
+)
+
+
