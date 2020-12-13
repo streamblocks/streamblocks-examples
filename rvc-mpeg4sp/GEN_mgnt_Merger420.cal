@@ -7,6 +7,7 @@ namespace RVC:
  actor GEN_mgnt_Merger420 (int PIX_SZ) int(size=9) Y, int(size=9) U, int(size=9) V ==> int(size=32) YUV :
 
  // Select the Y blocks 
+ @loop_merge
  Ya:action Y:[y] repeat 4*64 ==> YUV:[ y ] repeat 256 end
 
  // Select the U blocks 
