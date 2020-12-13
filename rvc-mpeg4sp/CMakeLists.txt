@@ -150,7 +150,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
         -DUSE_SDACCEL=${USE_SDACCEL} 
         -DUSE_VITIS=${USE_VITIS}
         -DTARGET=hw
-        -DIS_MPSOC=${IS_MPSOC}
+        -DMPSOC=${IS_MPSOC}
         -DFPGA_NAME=${FPGA_NAME}
         -DPLATFORM=${PLATFORM}
         -DMPSOC_CLOCK_ID=${CLK_ID}
