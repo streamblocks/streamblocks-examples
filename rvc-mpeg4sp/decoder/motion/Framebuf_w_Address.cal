@@ -219,10 +219,12 @@ import System.bitops.lshift;
   do
     mvx := 0;
     mvy := 0;
-  end
-
+  end 
+ 
 
   // Read one 9x9 block from the frame buffer
+  
+  @sequential(port="RD")
   read_fb: action ==> RD:[rd] repeat 81
   guard outstanding_writes < max_outstanding_writes
   var
@@ -268,11 +270,15 @@ import System.bitops.lshift;
     end
 
     i:=0;
+
+    @loop_tripcount(min=9, max=9) 
     while (i<81) do
       // First clip negative x:es
       if (clip_left!=0) then
         end_i := i + clip_left;
         temp := frameBuffer[start_of_row];
+        
+        @loop_tripcount(min=0, avg=1)
         while (i<end_i) do
           rd[i] := temp;
           i:=i+1;
@@ -282,6 +288,8 @@ import System.bitops.lshift;
       // copy from frame buffer to RD
       addr := start_of_row;
       end_i:= i + 9 - clip_left - clip_right;
+
+      @loop_tripcount(min=9, max=9)
       while (i<end_i) do
         rd[i] := frameBuffer[addr];
         i := i + 1;
@@ -292,6 +300,8 @@ import System.bitops.lshift;
       if (clip_right!=0) then
       	 end_i:= i + clip_right;
          temp := frameBuffer[addr-1];
+         
+         @loop_tripcount(min=0, avg=1)
          while (i<end_i) do
            rd[i] := temp;
            i:=i+1;
@@ -316,6 +326,7 @@ import System.bitops.lshift;
 
   // free-running write to frame buffer is driven by token availability
 
+  @sequential(port="WD")
   action WD:[wd] repeat 64 ==>
   guard outstanding_writes>=1 // not to let *writes* get ahead of reads
                               // which can be caused by "texture only"
@@ -336,8 +347,10 @@ import System.bitops.lshift;
     end
 
     i:=0;
+    @loop_tripcount(min=8, max=8)
     while (i<64) do
       nextRow:=i+8;
+      @loop_tripcount(min=8, max=8)
       while (i<nextRow) do
         frameBuffer[addr] := wd[i];
         addr := addr + 1;

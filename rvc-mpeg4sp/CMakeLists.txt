@@ -10,7 +10,7 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
 
 
-set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13" CACHE STRING "List of ; separated configuration ids")
+set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14" CACHE STRING "List of ; separated configuration ids")
 set(CONFIG_ROOT "." CACHE STRING "Root folder for the configurations name as configuration_N where N is a number")
 set(CLOCK_LIST "3.3;10;5;2.5;1.667;6.667;13.333" CACHE STRING "List of ; seperated HLS clock settings")
 set(CLOCK_IDS "1;3;4;5;6;0;2" CACHE STRING "List of clock ids coresponding to clocks")
@@ -50,7 +50,7 @@ math(EXPR MAX_CLOCK_INDEX "${CLOCKS_COUNT} - 1")
 
 message(STATUS "Found ${CLOCKS_COUNT} clock configs (max index ${MAX_CLOCK_INDEX})")
 
-# foreach(index RANGE 1 13)
+# foreach(index RANGE 1 14)
 #   foreach(CLK_IX RANGE 0 ${MAX_CLOCK_INDEX})
 
 #     list(GET CLOCK_LIST ${CLK_IX} CLOCK_SETTING)

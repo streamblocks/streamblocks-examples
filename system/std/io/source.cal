@@ -3,7 +3,7 @@ namespace std.io.source:
     uint(size=32) NB_TOKEN_TO_SENT = 4096;
 	uint NB_TOKEN_TO_SENT_FB = 524288;
 
-	external procedure source_init(String fileName)
+	external procedure source_init()
     end
 
 	external procedure source_readNBytes(List(type:uint(size=8)) outTable, uint nbTokenToRead)

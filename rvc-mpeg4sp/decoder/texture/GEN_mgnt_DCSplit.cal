@@ -14,10 +14,10 @@
 // Rewrote the actor at block-level
 
 namespace RVC:
-
+	@pipeline(flushing=true)
 	actor GEN_mgnt_DCSplit ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
 
-		action IN:[ x ] repeat 64 ==> DC:[ x[0] ], AC:[ [ x[i] : for int i in 1 .. 63 ] ] repeat 63
+		dcsplit: action IN:[ x ] repeat 64 ==> DC:[ x[0] ], AC:[ [ x[i] : for int i in 1 .. 63 ] ] repeat 63
 		end
 	end
 end

@@ -17,7 +17,7 @@
 
 namespace RVC:
 
-
+ @pipeline(flushing=true)
  actor Clip ( int isz, int osz ) int(size=isz) I, bool SIGNED ==> int(size=osz) O :
 
   bool sflag;

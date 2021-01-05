@@ -20,6 +20,7 @@ import System.bitops.bitor;
 import System.bitops.lshift;
 import System.bitops.rshift;
 
+@latency(min=0, max=0)
 actor MPEG4_algo_Interpolation_halfpel ( int PIX_SZ, int FLAG_SZ ) int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 
   bool _CAL_tokenMonitor := true;

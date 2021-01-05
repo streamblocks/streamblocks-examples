@@ -29,7 +29,8 @@
 namespace RVC:
 
  import System.bitops.rshift;
-
+ 
+ @pipeline(flushing=true)
  actor scaled_1d_idct (int IN_SZ, int OUT_SZ) int (size=IN_SZ) In ==> int (size=OUT_SZ) Out : 
   function pmul_1_0 (int X) --> int
     var int (size=32) Temp1 = rshift(X, 3) - rshift(X, 7):
@@ -64,7 +65,7 @@ namespace RVC:
   end       
 
         
-action In: [xi] repeat 8 ==> Out: [y] repeat 8
+idct1d: action In: [xi] repeat 8 ==> Out: [y] repeat 8
   var 
       int xa,
       int xb,

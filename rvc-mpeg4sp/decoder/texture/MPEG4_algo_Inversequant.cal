@@ -45,6 +45,8 @@ actor MPEG4_algo_Inversequant ( int QUANT_SZ, int SAMPLE_SZ ) int(size=SAMPLE_SZ
     if x < 0 then - x else x end
   end
 
+  @loop_merge
+  @sequential(port="OUT")
   ac: action AC:[i] repeat 63 ==> OUT:[o] repeat 63
   var
     List(type:int(size=SAMPLE_SZ),size=63) v = [( quant * ( lshift( abs(i[j]), 1) + 1) ) - round  : for int j in 0 .. 62 ],

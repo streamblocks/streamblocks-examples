@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) Ericsson AB, 2013
+ * Copyright (c) Ericsson AB, 2013 / EPFL,  2020
  * All rights reserved.
  *
  * License terms:
@@ -36,12 +36,41 @@
 
 namespace RVC:
 
-import System.bitops.rshift;
+import entity RVC.decoder;
 
-actor rightshift () int In ==> int Out :
+  network decoderWithIO() uint(size=8) bits ==> int(size=32) VID, int(size=16) WIDTH, int(size=16) HEIGHT:
+  var 
+    bool LARGE_MEMORY = false;
+    int MAX_WIDTH  = if LARGE_MEMORY then 1920 else 176 end;
+    int MAX_HEIGHT = if LARGE_MEMORY then 1080 else 144 end;
 
-  action In:[ x ] repeat 64 ==> Out: [ [ rshift(x[i], 13) : for int i in 0 .. 63 ] ] repeat 64
+   entities
+    decoder = decoder(ACCODED=2,
+                      ACPRED=1,
+                      ADDR_SZ=24,
+                      BTYPE_SZ=12,
+                      FCODE_MASK=448,
+                      FCODE_SHIFT=6,
+                      FOURMV=4,
+                      INTER=512,
+                      INTRA=1024,
+                      MAXH_IN_MB=MAX_HEIGHT/16+1,
+                      MAXW_IN_MB=MAX_WIDTH/16+1,
+                      MB_COORD_SZ=8,
+                      MOTION=8,
+                      MV_SZ=9,
+                      NEWVOP=2048,
+                      QUANT_MASK=31,
+                      ROUND_TYPE=32,
+                      SAMPLE_COUNT_SZ=8,
+                      SAMPLE_SZ=13);
+
+    structure
+      bits --> decoder.bits;
+      decoder.VID --> VID;
+      decoder.WIDTH --> WIDTH;
+      decoder.HEIGHT --> HEIGHT;
+
   end
 
- end
-end 
+end

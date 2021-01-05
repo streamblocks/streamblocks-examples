@@ -40,11 +40,10 @@ import entity RVC.parser;
 import entity RVC.byte2bit;
 import entity RVC.texture_16x16;
 import entity RVC.texture_8x8;
-//import entity RVC.motion_ext_mem;
 import entity RVC.motion;
 import entity RVC.GEN_mgnt_Merger420;
 
-network decoder(
+network decoderWithoutEntropy(
 		int ACCODED,
 		int ACPRED,
 		int ADDR_SZ,
@@ -65,16 +64,18 @@ network decoder(
 		int SAMPLE_COUNT_SZ,
 		int SAMPLE_SZ)
 	
-		int bits ==> int VID, int WIDTH, int HEIGHT:
+	  int(size=12) BTYPE, int(size=9) MV, int(size=8) RUN, int(size=13) VALUE,
+  bool LAST, int(size=6) QP
+  
+   ==> int(size=32) VID, int(size=16) WIDTH, int(size=16) HEIGHT:
 	
 	var 
 		int PIX_SZ = 9;
 		int QUANT_SZ = 6;
 		
-	entities
-		serialize = byte2bit();
 		
-		parser =     parser(ACCODED = ACCODED, 
+	entities		
+		parser =     parserWithoutEntropy(ACCODED = ACCODED, 
 							ACPRED = ACPRED,
 							BTYPE_SZ = BTYPE_SZ,
 							FCODE_MASK = FCODE_MASK,
@@ -181,8 +182,17 @@ network decoder(
 		GEN_mgnt_Merger420 = GEN_mgnt_Merger420(PIX_SZ = PIX_SZ);
 		
 	structure
-		bits --> serialize.in8;
-		serialize.out --> parser.BITS;
+		 BTYPE --> parser.BTYPE;
+      MV --> parser.MV;
+      RUN --> parser.RUN;  
+      VALUE --> parser.VALUE;
+      LAST --> parser.LAST;
+     
+      QP --> parser.QP;
+
+
+
+
 		parser.MV_Y --> motion_Y.MV;
 		parser.BTYPE_Y --> motion_Y.BTYPE;
 		parser.BTYPE_Y --> texture_Y.BTYPE;
@@ -203,8 +213,7 @@ network decoder(
 		motion_V.VID --> GEN_mgnt_Merger420.V;
 		
 		GEN_mgnt_Merger420.YUV -->VID;
-		parser.WIDTH --> WIDTH;
-		parser.HEIGHT --> HEIGHT; 
+		 
     	parser.QUANT_Y --> texture_Y.QP;
     	parser.QUANT_V --> texture_V.QP;
     	parser.QUANT_U --> texture_U.QP;
