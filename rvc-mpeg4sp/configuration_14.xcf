@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration>
-    <network id="RVC.decoderDemo"/>
+    <network id="RVC.Top_RVC_Decoder"/>
     <partitioning>
         <partition id="0" pe="x86_64" scheduling="ROUND_ROBIN" code-generator="sw" host="true">
             <instance id="source"/>
             <instance id="serialize"/>
 	        <instance id="parseheaders"/>
-            <instance id="blkexp"/>
             <instance id="display"/>
         </partition>
  	    <partition id="1" pe="FPGA" code-generator="hw">
  
+            <instance id="blkexp"/>
  	        <instance id="DCsplit"/>
             <instance id="IS_r"/>
             <instance id="IAP"/>

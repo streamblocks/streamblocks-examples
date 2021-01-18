@@ -10,7 +10,7 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
 
 
-set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14" CACHE STRING "List of ; separated configuration ids")
+set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15" CACHE STRING "List of ; separated configuration ids")
 set(CONFIG_ROOT "." CACHE STRING "Root folder for the configurations name as configuration_N where N is a number")
 set(CLOCK_LIST "3.3;10;5;2.5;1.667;6.667;13.333" CACHE STRING "List of ; seperated HLS clock settings")
 set(CLOCK_IDS "1;3;4;5;6;0;2" CACHE STRING "List of clock ids coresponding to clocks")
@@ -50,7 +50,7 @@ math(EXPR MAX_CLOCK_INDEX "${CLOCKS_COUNT} - 1")
 
 message(STATUS "Found ${CLOCKS_COUNT} clock configs (max index ${MAX_CLOCK_INDEX})")
 
-# foreach(index RANGE 1 14)
+# foreach(index RANGE 1 15)
 #   foreach(CLK_IX RANGE 0 ${MAX_CLOCK_INDEX})
 
 #     list(GET CLOCK_LIST ${CLK_IX} CLOCK_SETTING)
@@ -77,7 +77,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
   streamblocks(
     ${__TARGET__}_HLS
     PLATFORM vivado-hls
-    QID RVC.decoderDemo
+    QID RVC.Top_RVC_Decoder
     TARGET_PATH ${__TARGET_PATH__}
     SOURCE_PATH ${CAL_SOURCE_PATH}
     XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/${CONFIG_ROOT}/${CONFIG_PATH}.xcf
@@ -89,7 +89,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
   streamblocks(
     ${__TARGET__}_MULTICORE
     PLATFORM multicore
-    QID RVC.decoderDemo
+    QID RVC.Top_RVC_Decoder
     TARGET_PATH ${__TARGET_PATH__}
     SOURCE_PATH ${CAL_SOURCE_PATH}
     XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/${CONFIG_ROOT}/${CONFIG_PATH}.xcf
@@ -132,19 +132,19 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 
     # -- remotely copy xclbin
     add_custom_command(
-      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
-      COMMAND scp ${REMOTE_USER}@${REMOTE_IP}:${REMOTE_REPO}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/
+      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/Top_RVC_Decoder_kernel.hw.xclbin
+      COMMAND scp ${REMOTE_USER}@${REMOTE_IP}:${REMOTE_REPO}/${__TARGET_PATH__}/bin/xclbin/Top_RVC_Decoder_kernel.hw.xclbin ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/
       DEPENDS ${__TARGET__}
       COMMENT "Fetching ${__TARGET__} xclbin from ${REMOTE_IP}"
     )
     add_custom_target(
       ${__TARGET__}_xclbin ALL
-      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/Top_RVC_Decoder_kernel.hw.xclbin
     )
   else()
     # -- command to build FPGA binary
     add_custom_command(
-      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
+      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/Top_RVC_Decoder_kernel.hw.xclbin
       COMMAND ${CMAKE_COMMAND} 
         -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} 
         -DUSE_SDACCEL=${USE_SDACCEL} 
@@ -156,7 +156,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
         -DMPSOC_CLOCK_ID=${CLK_ID}
         -DKERNEL_FREQ=${KERNEL_FREQ}
         .. > cmake.xclbin.config.log
-      COMMAND make decoderDemo_kernel_xclbin -j
+      COMMAND make Top_RVC_Decoder_kernel_xclbin -j
       DEPENDS ${__TARGET__}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
       COMMENT "Building FPGA binary for ${__TARGET__}"
@@ -164,23 +164,23 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     )
     add_custom_target(
       ${__TARGET__}_xclbin ALL
-      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/decoderDemo_kernel.hw.xclbin
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/xclbin/Top_RVC_Decoder_kernel.hw.xclbin
     )
 
   endif()
   
   # -- software binary
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/decoderDemo
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/Top_RVC_Decoder
     COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release .. > cmake.bin.config.log
-    COMMAND make decoderDemo -j &> cmake.make.log
+    COMMAND make Top_RVC_Decoder -j &> cmake.make.log
     DEPENDS ${__TARGET__}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
   )
   
   add_custom_target(
     ${__TARGET__}_bin ALL
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/decoderDemo
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/Top_RVC_Decoder
   )
 
   
@@ -192,7 +192,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
   add_custom_command(
     TARGET ${__TARGET__}_run
     PRE_BUILD
-    COMMAND time ./decoderDemo > decoderDemo.out
+    COMMAND time ./Top_RVC_Decoder > Top_RVC_Decoder.out
     DEPENDS ${__TARGET__}_bin
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin
   )
@@ -209,7 +209,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 
   streamblocks_systemc(
     ${__TARGET_SC__}
-    QID RVC.decoderDemo
+    QID RVC.Top_RVC_Decoder
     TARGET_PATH ${__TARGET_SC_PATH__}
     SOURCE_PATH ${CAL_SOURCE_PATH}
     XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/${CONFIG_ROOT}/${CONFIG_PATH}.xcf
@@ -240,9 +240,9 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
   # build the sc binary command
 
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder
     COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DFPGA_NAME=${FPGA_NAME} -DCMAKE_BUILD_TYPE=Release -DHLS_CLOCK_PERIOD=${CLOCK_SETTING} .. &> cmake.sc.config.log
-    COMMAND make decoderDemo -j &> cmake.sc.make.log
+    COMMAND make Top_RVC_Decoder -j &> cmake.sc.make.log
     DEPENDS ${__TARGET_SC__} ${__TARGET_SC__}_DIRS_FILES__
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/build
     COMMENT "Building SystemC binary for ${__TARGET_SC__}"
@@ -250,7 +250,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 
   add_custom_target(
     ${__TARGET_SC__}_bin
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo ${__TARGET_SC__}_DIRS_FILES__
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder ${__TARGET_SC__}_DIRS_FILES__
   )
 
   add_dependencies(all_sc_bin ${__TARGET_SC__}_bin)
@@ -258,8 +258,8 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
   # Run the simulation command
 
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
-    COMMAND ./decoderDemo --hardware-profile=systemc-profile.xml &> decoderDemo.log
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder.log
+    COMMAND ./Top_RVC_Decoder --hardware-profile=systemc-profile.xml &> Top_RVC_Decoder.log
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
     COMMENT "Executing SystemC simulation ${__TARGET_SC__}"
     DEPENDS ${__TARGET_SC__}_bin
@@ -269,7 +269,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     ${__TARGET_SC__}_run
     DEPENDS
       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/systemc-profile.xml 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo.log
+      ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder.log
       ${__TARGET_SC__}_bin
   )
 
@@ -283,17 +283,17 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
   #   add_custom_command(
   #     OUTPUT 
   #       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/profile_${buff_sz}.xml 
-  #       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo_${buff_sz}.log
-  #     COMMAND ./decoderDemo --cfile=${CMAKE_CURRENT_SOURCE_DIR}/configs/${CONFIG_PATH}_${buff_sz}.xml --hardware-profile=profile_${buff_sz}.xml &> decoderDemo_${buff_sz}.log
+  #       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder_${buff_sz}.log
+  #     COMMAND ./Top_RVC_Decoder --cfile=${CMAKE_CURRENT_SOURCE_DIR}/configs/${CONFIG_PATH}_${buff_sz}.xml --hardware-profile=profile_${buff_sz}.xml &> Top_RVC_Decoder_${buff_sz}.log
   #     DEPENDS ${__TARGET_SC__}_bin
   #     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin
-  #     COMMENT "Executing SystemC simulation for ${__TARGET_SC__} see ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo_${buff_sz}.log"
+  #     COMMENT "Executing SystemC simulation for ${__TARGET_SC__} see ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder_${buff_sz}.log"
   #   )
   #   add_custom_target(
   #     ${__TARGET_SC__}_run_${buff_sz}
   #     DEPENDS 
   #       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/profile_${buff_sz}.xml 
-  #       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/decoderDemo_${buff_sz}.log
+  #       ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_SC_PATH__}/bin/Top_RVC_Decoder_${buff_sz}.log
   #   )
 
   #   add_dependencies(
@@ -326,7 +326,7 @@ endforeach()
 streamblocks(
   rvc-mpeg4sp_SOFTWARE
   PLATFORM multicore
-  QID RVC.decoderDemo
+  QID RVC.Top_RVC_Decoder
   TARGET_PATH ${OUTPUT_PATH}/profiling/sw
   SOURCE_PATH ${CMAKE_SOURCE_DIR}/. ${CMAKE_SOURCE_DIR}/../system
 )
@@ -334,7 +334,7 @@ streamblocks(
 streamblocks(
   hardware_only_HLS
   PLATFORM vivado-hls
-  QID RVC.decoderDemo
+  QID RVC.Top_RVC_Decoder
   TARGET_PATH ${OUTPUT_PATH}/hardware
   SOURCE_PATH ${CMAKE_SOURCE_DIR}/. ${CMAKE_SOURCE_DIR}/../system
   XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/configuration_0.xcf
@@ -344,7 +344,7 @@ streamblocks(
 streamblocks(
   hardware_only_multicore
   PLATFORM multicore
-  QID RVC.decoderDemo
+  QID RVC.Top_RVC_Decoder
   TARGET_PATH ${OUTPUT_PATH}/hardware
   SOURCE_PATH ${CMAKE_SOURCE_DIR}/. ${CMAKE_SOURCE_DIR}/../system
   XCF_SOURCE_PATH ${CMAKE_SOURCE_DIR}/configuration_0.xcf

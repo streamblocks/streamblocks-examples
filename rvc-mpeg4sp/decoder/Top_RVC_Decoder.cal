@@ -39,7 +39,7 @@ import entity RVC.decoder;
 
   structure
     source.Out --> decoder.bits;
-    decoder.VID --> display.VID;
+    decoder.VID --> display.In;
     decoder.WIDTH --> display.WIDTH;
     decoder.HEIGHT --> display.HEIGHT; 
   end

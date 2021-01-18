@@ -252,7 +252,11 @@ actor ParseHeaders (
       time_inc_res := rshift( time_inc_res, 1 );
     end
     mylog := if ones > 1 then count else count - 1 end;
-    mylog := if mylog < 1 then 1 else mylog end;
+
+    if mylog < 1 then
+      mylog := 1;
+    end
+
     set_bits_to_read(if bitand( read_result(), 1 ) = 1 then
       // fixed vop rate
       //mylog + MARKER_LENGTH 

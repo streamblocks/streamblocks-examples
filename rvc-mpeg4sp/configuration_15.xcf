@@ -5,19 +5,15 @@
         <partition id="0" pe="x86_64" scheduling="ROUND_ROBIN" code-generator="sw" host="true">
             <instance id="source"/>
             <instance id="display"/>
-
- 	    <instance id="serialize"/>
-            <instance id="parseheaders"/>
+            <instance id="serialize"/>
+            <instance id="GEN_mgnt_Merger420"/>
             <instance id="mvseq"/>
             <instance id="blkexp"/>
             <instance id="mvrecon"/>
             <instance id="splitter_BTYPE"/>
             <instance id="splitter_MV"/>
             <instance id="splitter_420_B"/>
-            <instance id="splitter_Qp"/>           
- 	   
-        </partition>
- 	<partition id="1" pe="FPGA" code-generator="hw">
+            <instance id="splitter_Qp"/>
             <instance id="DCsplit"/>
             <instance id="IS_r"/>
             <instance id="IAP"/>
@@ -66,12 +62,14 @@
             <instance id="framebuf_1"/>
             <instance id="interpolation_1"/>
             <instance id="add_1"/>
- 	    <instance id="GEN_mgnt_Merger420"/>
+        </partition>
+ 	    <partition id="1" pe="FPGA" code-generator="hw">
+            <instance id="parseheaders"/>
         </partition>
     </partitioning>
     <code-generators>
         <code-generator id="sw" platform="multicore"/>
-	<code-generator id="hw" platform="vivado-hls"/>
+	    <code-generator id="hw" platform="vivado-hls"/>
     </code-generators>
     <connections>
         <fifo-connection source="source" source-port="Out" target="serialize" target-port="in8" size="4096"/>

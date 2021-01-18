@@ -1,0 +1,48 @@
+namespace RVC:
+
+import entity RVC.idct2d_23002;
+
+    actor Generator() ==> int(size=16) OUT, bool SIGNED:
+
+        List(type:int(size=16), size= 64) values = [
+            1458, -289, -249, -149, -169, -89, -49, 0,
+            49, 69, 0, 0, -29, -29, -49, 0,
+            89, -69, -29, -29, 49, 0, 0, 0,
+            69, -69, 0, 0, 0, 0, 0, 0,
+            69, 0, 0, -29, -29, 0, 0, 0,
+            0, 0, 0, -29, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0];
+
+        do
+           OUT <-- values repeat 64;
+           SIGNED <-- false;
+        end
+
+    end
+
+    actor Sink() int IN ==> :
+    
+        int Counter := 0;
+
+        action IN:[token] ==>
+        do
+            //println(Counter + " : " + token);
+            Counter := Counter + 1;
+        end
+
+    end
+
+    network TestIDCT() ==> :
+        entities
+            source = Generator();
+            idct2d = idct2d_23002(OUT_SZ = 32, PIX_SZ = 9, SIN_SZ = 13);
+            sink  = Sink();
+        structure
+            source.OUT --> idct2d.IN;
+            source.SIGNED --> idct2d.SIGNED;
+            idct2d.OUT --> sink.IN;
+    end
+
+
+end
