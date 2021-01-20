@@ -21,7 +21,7 @@ import entity RVC.idct2d_23002;
 
     end
 
-    actor Sink() int IN ==> :
+    actor Sink(int PIX_SZ) int(size=PIX_SZ) IN ==> :
     
         int Counter := 0;
 
@@ -37,7 +37,7 @@ import entity RVC.idct2d_23002;
         entities
             source = Generator();
             idct2d = idct2d_23002(OUT_SZ = 32, PIX_SZ = 9, SIN_SZ = 13);
-            sink  = Sink();
+            sink  = Sink(PIX_SZ = 9);
         structure
             source.OUT --> idct2d.IN;
             source.SIGNED --> idct2d.SIGNED;

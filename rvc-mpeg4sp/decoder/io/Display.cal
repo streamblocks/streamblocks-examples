@@ -1,7 +1,6 @@
 namespace RVC:
 
 import all var std.video.display;
-import all var std.io.source;
 
     actor Display()
         int(size=32) In,
@@ -35,13 +34,12 @@ import all var std.io.source;
             nbFrameDecoded := 0;
         end
         
-        action ==>
+        checkTermination: action ==>
         guard
             not isTerminated,
-            source_isMaxLoopsReached() || nbFrameDecoded = displayYUV_getNbFrames()
+            nbFrameDecoded = displayYUV_getNbFrames()
         do
             isTerminated := true;
-            source_exit(0);
         end
 
         getPictureSize: action WIDTH:[WidthValue], HEIGHT:[HeightValue] ==>
@@ -127,9 +125,6 @@ import all var std.io.source;
             displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
             compareYUV_comparePicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
             nbFrameDecoded := nbFrameDecoded + 1;
-            if source_isMaxLoopsReached() then 
-                source_exit(0);
-            end
         end
         
         displayDisable: action ==>
@@ -138,13 +133,11 @@ import all var std.io.source;
         do
             fpsPrintNewPicDecoded();
             nbFrameDecoded := nbFrameDecoded + 1;
-            if source_isMaxLoopsReached() then 
-                source_exit(0);
-            end
         end
 
         schedule fsm GetPictureSize:
             GetPictureSize  (getPictureSize            )--> GetLumaBlock;
+            GetPictureSize  (checkTermination          )--> Termination;
             GetLumaBlock    (getPixValue.launch.Luma   )--> GetChroma1Block;
             GetChroma1Block (getPixValue.launch.Chroma )--> GetChroma2Block;
             GetChroma2Block (getPixValue.launch.Chroma )--> GetLumaBlock;
@@ -154,6 +147,7 @@ import all var std.io.source;
         end
 
         priority
+            checkTermination > getPictureSize;
             getPixValue > displayPicture;
             displayPicture > displayDisable;
         end
