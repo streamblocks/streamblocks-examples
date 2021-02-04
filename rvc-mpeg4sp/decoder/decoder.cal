@@ -65,7 +65,7 @@ network decoder(
 		int SAMPLE_COUNT_SZ,
 		int SAMPLE_SZ)
 	
-		uint(size=8) bits ==> int(size=32) VID, int(size=16) WIDTH, int(size=16) HEIGHT:
+		uint(size=1) bits ==> int(size=32) VID, uint(size=16) WIDTH, uint(size=16) HEIGHT:
 	
 	var 
 		int PIX_SZ = 9;

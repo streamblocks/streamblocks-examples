@@ -17,10 +17,10 @@ import System.bitops.lshift;
 //import system.io.dprint1;
 //import system.io.dprint2;
 
- actor byte2bit () uint(size=8) in8 ==> bool out :
+ actor byte2bit () uint(size=1) in8 ==> bool out :
 
   int(size=4) count := 0;
-  int(size=9) buf;
+  int(size=1) buf;
 
   // Read in an new byte when needed
   reload: action in8:[i] ==>
