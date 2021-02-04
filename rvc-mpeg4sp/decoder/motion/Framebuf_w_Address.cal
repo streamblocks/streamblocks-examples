@@ -346,17 +346,13 @@ import System.bitops.lshift;
       vop_height_write := next_vop_height_write;
     end
 
-    i:=0;
-    @loop_tripcount(min=8, max=8)
-    while (i<64) do
-      nextRow:=i+8;
-      @loop_tripcount(min=8, max=8)
-      while (i<nextRow) do
-        frameBuffer[addr] := wd[i];
-        addr := addr + 1;
-        i := i + 1;
-      end
-      addr := addr + (MAXW_IN_SAMPLES-8);
+    foreach int i in 0 .. 7 do
+    	nextRow:=i*8;
+    	foreach int i in 0 .. 7 do
+    		frameBuffer[addr] := wd[nextRow + i];
+        	addr := addr + 1;
+    	end
+    	 addr := addr + (MAXW_IN_SAMPLES-8);
     end
 
     // Advance component to write
