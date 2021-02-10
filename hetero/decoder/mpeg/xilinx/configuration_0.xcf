@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration>
+    <network id="hetero.decoder.mpeg.xilinx.Top_Xilinx"/>
+    <partitioning>
+        <partition id="0" pe="x86_64" scheduling="ROUND_ROBIN" code-generator="sw" host="true">
+            <instance id="source"/>
+            <instance id="display"/>
+        </partition>
+        <partition id="1" pe="FPGA" code-generator="hw">
+            <instance id="ddr"/>
+            <instance id="merger"/>
+            <instance id="parseheaders"/>
+            <instance id="mvseq"/>
+            <instance id="blkexp"/>
+            <instance id="mvrecon"/>
+            <instance id="serialize"/>
+            <instance id="seq"/>
+            <instance id="dcsplit"/>
+            <instance id="dcpred"/>
+            <instance id="zzaddr"/>
+            <instance id="zigzag"/>
+            <instance id="acpred"/>
+            <instance id="dequant"/>
+            <instance id="rowsort"/>
+            <instance id="fairmerge"/>
+            <instance id="downsample"/>
+            <instance id="sep"/>
+            <instance id="trans"/>
+            <instance id="retrans"/>
+            <instance id="clip"/>
+            <instance id="scale"/>
+            <instance id="combine"/>
+            <instance id="shufflefly"/>
+            <instance id="shuffle"/>
+            <instance id="final_r"/>
+            <instance id="memorymanager"/>
+            <instance id="mbpack"/>
+            <instance id="searchwin"/>
+            <instance id="unpack"/>
+            <instance id="interpolate"/>
+            <instance id="add"/>
+        </partition>
+    </partitioning>
+    <code-generators>
+        <code-generator id="sw" platform="multicore"/>
+        <code-generator id="hw" platform="vivado-hls" />
+    </code-generators>
+    <connections>
+        <connection source="source" source-port="Out" target="serialize" target-port="in8" size="1024"/>
+        <connection source="ddr" source-port="RD" target="searchwin" target-port="DI" size="256"/>
+        <connection source="mbpack" source-port="DO" target="ddr" target-port="WD" size="256"/>
+        <connection source="mbpack" source-port="AO" target="ddr" target-port="WA" size="1"/>
+        <connection source="memorymanager" source-port="RA" target="ddr" target-port="RA" size="512"/>
+        <connection source="add" source-port="VID" target="merger" target-port="YUV_i" size="256"/>
+        <connection source="add" source-port="VID" target="mbpack" target-port="DI" size="32"/>
+        <connection source="parseheaders" source-port="WIDTH" target="display" target-port="WIDTH" size="1"/>
+        <connection source="parseheaders" source-port="HEIGHT" target="display" target-port="HEIGHT" size="1"/>
+        <connection source="merger" source-port="YUV" target="display" target-port="In" size="256"/>
+        <connection source="parseheaders" source-port="BTYPE" target="seq" target-port="BTYPE" size="1"/>
+        <connection source="parseheaders" source-port="BTYPE" target="dcpred" target-port="BTYPE" size="512"/>
+        <connection source="parseheaders" source-port="BTYPE" target="memorymanager" target-port="BTYPE" size="1"/>
+        <connection source="parseheaders" source-port="BTYPE" target="searchwin" target-port="BTYPE" size="1024"/>
+        <connection source="parseheaders" source-port="BTYPE" target="unpack" target-port="BTYPE" size="1024"/>
+        <connection source="parseheaders" source-port="BTYPE" target="add" target-port="BTYPE" size="1024"/>
+        <connection source="parseheaders" source-port="BTYPE" target="mvseq" target-port="BTYPE" size="1"/>
+        <connection source="parseheaders" source-port="BTYPE" target="mvrecon" target-port="BTYPE" size="256"/>
+        <connection source="blkexp" source-port="OUT" target="dcsplit" target-port="IN" size="1024"/>
+        <connection source="mvrecon" source-port="MV" target="searchwin" target-port="MV" size="1024"/>
+        <connection source="mvrecon" source-port="MV" target="unpack" target-port="MV" size="1024"/>
+        <connection source="dequant" source-port="OUT" target="rowsort" target-port="ROW" size="1024"/>
+        <connection source="dcpred" source-port="SIGNED" target="clip" target-port="SIGNED" size="512"/>
+        <connection source="clip" source-port="O" target="add" target-port="TEX" size="256"/>
+        <connection source="parseheaders" source-port="QP" target="dcpred" target-port="QP" size="512"/>
+        <connection source="parseheaders" source-port="MV" target="mvrecon" target-port="MVIN" size="128"/>
+        <connection source="parseheaders" source-port="RUN" target="blkexp" target-port="RUN" size="1024"/>
+        <connection source="parseheaders" source-port="VALUE" target="blkexp" target-port="VALUE" size="1024"/>
+        <connection source="parseheaders" source-port="LAST" target="blkexp" target-port="LAST" size="1024"/>
+        <connection source="mvseq" source-port="A" target="mvrecon" target-port="A" size="128"/>
+        <connection source="serialize" source-port="out" target="parseheaders" target-port="bits" size="1024"/>
+        <connection source="seq" source-port="A" target="dcpred" target-port="A" size="512"/>
+        <connection source="seq" source-port="B" target="dcpred" target-port="B" size="512"/>
+        <connection source="seq" source-port="C" target="dcpred" target-port="C" size="512"/>
+        <connection source="dcsplit" source-port="DC" target="dcpred" target-port="IN" size="16"/>
+        <connection source="dcsplit" source-port="AC" target="zigzag" target-port="AC" size="1024"/>
+        <connection source="dcpred" source-port="QUANT" target="dequant" target-port="QP" size="64"/>
+        <connection source="dcpred" source-port="OUT" target="dequant" target-port="DC" size="64"/>
+        <connection source="dcpred" source-port="PTR" target="acpred" target-port="PTR" size="64"/>
+        <connection source="dcpred" source-port="START" target="zzaddr" target-port="START" size="4"/>
+        <connection source="dcpred" source-port="START" target="zigzag" target-port="START" size="32"/>
+        <connection source="dcpred" source-port="START" target="acpred" target-port="START" size="64"/>
+        <connection source="zzaddr" source-port="ADDR" target="zigzag" target-port="ADDR" size="1024"/>
+        <connection source="zigzag" source-port="OUT" target="acpred" target-port="AC" size="1024"/>
+        <connection source="acpred" source-port="OUT" target="dequant" target-port="AC" size="1024"/>
+        <connection source="rowsort" source-port="Y0" target="fairmerge" target-port="R0" size="1024"/>
+        <connection source="rowsort" source-port="Y1" target="fairmerge" target-port="R1" size="1024"/>
+        <connection source="fairmerge" source-port="Y0" target="scale" target-port="X0" size="1"/>
+        <connection source="fairmerge" source-port="Y1" target="scale" target-port="X1" size="1"/>
+        <connection source="fairmerge" source-port="ROWOUT" target="downsample" target-port="R" size="1024"/>
+        <connection source="fairmerge" source-port="ROWOUT" target="combine" target-port="ROW" size="1"/>
+        <connection source="final_r" source-port="Y0" target="sep" target-port="X0" size="1024"/>
+        <connection source="final_r" source-port="Y1" target="sep" target-port="X1" size="1024"/>
+        <connection source="final_r" source-port="Y2" target="sep" target-port="X2" size="1024"/>
+        <connection source="final_r" source-port="Y3" target="sep" target-port="X3" size="1024"/>
+        <connection source="sep" source-port="R0" target="trans" target-port="X0" size="1024"/>
+        <connection source="sep" source-port="R1" target="trans" target-port="X1" size="1024"/>
+        <connection source="sep" source-port="R2" target="trans" target-port="X2" size="1024"/>
+        <connection source="sep" source-port="R3" target="trans" target-port="X3" size="1024"/>
+        <connection source="sep" source-port="C0" target="retrans" target-port="X0" size="256"/>
+        <connection source="sep" source-port="C1" target="retrans" target-port="X1" size="256"/>
+        <connection source="sep" source-port="C2" target="retrans" target-port="X2" size="256"/>
+        <connection source="sep" source-port="C3" target="retrans" target-port="X3" size="256"/>
+        <connection source="trans" source-port="Y0" target="fairmerge" target-port="C0" size="1024"/>
+        <connection source="trans" source-port="Y1" target="fairmerge" target-port="C1" size="1024"/>
+        <connection source="retrans" source-port="Y" target="clip" target-port="I" size="256"/>
+        <connection source="downsample" source-port="R2" target="sep" target-port="ROW" size="1024"/>
+        <connection source="scale" source-port="Y0" target="combine" target-port="X0" size="1"/>
+        <connection source="scale" source-port="Y1" target="combine" target-port="X1" size="1"/>
+        <connection source="scale" source-port="Y2" target="combine" target-port="X2" size="1"/>
+        <connection source="scale" source-port="Y3" target="combine" target-port="X3" size="1"/>
+        <connection source="combine" source-port="Y0" target="shufflefly" target-port="X0" size="1"/>
+        <connection source="combine" source-port="Y1" target="shufflefly" target-port="X1" size="1"/>
+        <connection source="shufflefly" source-port="Y0" target="shuffle" target-port="X0" size="1"/>
+        <connection source="shufflefly" source-port="Y1" target="shuffle" target-port="X1" size="1"/>
+        <connection source="shufflefly" source-port="Y2" target="shuffle" target-port="X2" size="1"/>
+        <connection source="shufflefly" source-port="Y3" target="shuffle" target-port="X3" size="1"/>
+        <connection source="shuffle" source-port="Y0" target="final_r" target-port="X0" size="512"/>
+        <connection source="shuffle" source-port="Y1" target="final_r" target-port="X1" size="512"/>
+        <connection source="shuffle" source-port="Y2" target="final_r" target-port="X2" size="512"/>
+        <connection source="shuffle" source-port="Y3" target="final_r" target-port="X3" size="512"/>
+        <connection source="memorymanager" source-port="WA" target="mbpack" target-port="AI" size="128"/>
+        <connection source="searchwin" source-port="DO" target="unpack" target-port="DI" size="256"/>
+        <connection source="searchwin" source-port="FLAGS" target="interpolate" target-port="halfpel" size="16"/>
+        <connection source="unpack" source-port="DO" target="interpolate" target-port="RD" size="512"/>
+        <connection source="interpolate" source-port="MOT" target="add" target-port="MOT" size="1024"/>
+    </connections>
+</configuration>

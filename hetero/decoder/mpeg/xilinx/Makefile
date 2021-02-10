@@ -1,6 +1,6 @@
 
 ENTITY_NAMESPACE := hetero.decoder.mpeg.xilinx
-ENTITY_NETWORK := XilinxNetwork
+ENTITY_NETWORK := Top_Xilinx
 ENTITY := $(ENTITY_NAMESPACE).$(ENTITY_NETWORK)
 
 CAL_SOURCE_PATH := $(shell pwd)

@@ -13,7 +13,7 @@ HLS_CLOCK_PERIOD ?= 3.3
 SB_BIN := $(SB_HOME)/streamblocks-platforms/streamblocks
 PARTITIONING_BIN ?= $(SB_HOME)/streamblocks-partitioning/partitioning/partition
 SB_EXAMPLES_PATH := $(SB_HOME)/streamblocks-examples
-ART_SOURCE_PATH := $(SB_HOME)/streamblocks-examples/system/art
+ART_SOURCE_PATH := $(SB_HOME)/streamblocks-examples/system/
 UTILS_PATH := $(SB_EXAMPLES_PATH)/hetero/utils
 
 

@@ -30,7 +30,7 @@ set(XDF_SOURCE_PATH
 
 set(CAL_SOURCE_PATH 
   ${CMAKE_SOURCE_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/../../../system/art
+  ${CMAKE_CURRENT_LIST_DIR}/../../../system/
   ${CMAKE_CURRENT_LIST_DIR}/../../utils
 )
 

@@ -86,6 +86,7 @@ namespace hetero.decoder.mpeg.xilinx:
 
 
     end
+
     network XilinxNetwork() ==> :
         entities
             source  = art_Source_byte(fileName="./foreman_qcif_30.bit", loops=1); 
@@ -99,6 +100,31 @@ namespace hetero.decoder.mpeg.xilinx:
             decoder.HEIGHT --> display.HEIGHT;
             decoder.YUV --> display.In;
         
+    end
+
+    import entity std.actors.io.Source = OrccSource;
+    import entity std.actors.io.Display = OrccDisplay;
+
+    network Top_Xilinx() ==> :
+
+        entities 
+            source = OrccSource();
+            decoder = Decoder() { partition = "hw"; };
+            ddr = DDRModel() { partition = "hw"; };
+            merger = Merger() { partition = "hw"; };
+            display = OrccDisplay();
+        structure
+            source.Out --> decoder.bits;
+            ddr.RD --> decoder.MCD;
+
+            decoder.MBD --> ddr.WD;
+            decoder.MBA --> ddr.WA;
+            decoder.MCA --> ddr.RA;
+            decoder.VIDEO --> merger.YUV_i;
+            decoder.WIDTH --> display.WIDTH;
+            decoder.HEIGHT --> display.HEIGHT;
+
+            merger.YUV --> display.In;
     end
 
 
