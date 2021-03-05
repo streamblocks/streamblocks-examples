@@ -28,5 +28,273 @@ import entity ART.art_Display_yuv_width_height;
             sizesplitter.HEIGHT --> display.HEIGHT;
     end
 
+    network Top_Serial() ==> :
+
+        entities
+            source = Source();
+            decoder = Decoder() { partition = "hw"; };
+            display = Display();
+        structure
+            source.O --> decoder.bits;
+            decoder.VID --> display.Byte;
+            decoder.SIZE --> display.SIZE;
+    end
+
+    import all var std.io.source;
+
+    actor Source () ==> uint(size=1) O :
+
+        List(type:uint(size=8), size=NB_TOKEN_TO_SENT) bytesRead;
+        uint(size=32) iterationLoop := 0;
+        uint(size=32) nbByteLeft;
+        uint(size=13) nbByteToSend := 0;
+        uint(size=13) nbByteSent := 0;
+        uint(size=32) nbIteration;
+        
+        initialize ==>
+        do
+            source_init();
+        end
+        
+        getFileSize: action ==>
+        guard
+            source_sizeOfFile() > 0,
+            not source_isMaxLoopsReached()
+        var
+            uint(size=32) nbBytes
+        do
+            nbBytes := source_sizeOfFile();
+            nbIteration := nbBytes / NB_TOKEN_TO_SENT;
+            nbByteLeft := nbBytes mod NB_TOKEN_TO_SENT;
+        end
+        
+        readNBytes: action ==>
+        guard
+            iterationLoop < nbIteration
+        do
+            source_readNBytes(bytesRead, NB_TOKEN_TO_SENT);
+            nbByteToSend := NB_TOKEN_TO_SENT;
+            nbByteSent := 0;
+            iterationLoop := iterationLoop + 1;
+        end
+        
+        readEndOfFile: action ==>
+        guard
+            nbByteLeft > 0
+        do
+            source_readNBytes(bytesRead, nbByteLeft);
+            nbByteToSend := nbByteLeft;
+            nbByteSent := 0;
+        end
+        
+        readFileDone: action ==>
+        do
+            iterationLoop := 0;
+            source_decrementNbLoops();
+            source_rewind();
+        end
+        
+        sendData.launch: action ==> O:[ Out ] repeat 8
+        guard
+            nbByteToSend > nbByteSent
+        var
+            uint(size=8) byteRead,
+            List(type:uint(size=1), size=8) Out
+        do
+            byteRead := bytesRead[nbByteSent];
+            Out[0] := byteRead >> 7;
+            Out[1] := (byteRead >> 6) & 1;
+            Out[2] := (byteRead >> 5) & 1;
+            Out[3] := (byteRead >> 4) & 1;
+            Out[4] := (byteRead >> 3) & 1;
+            Out[5] := (byteRead >> 2) & 1;
+            Out[6] := (byteRead >> 1) & 1;
+            Out[7] := byteRead & 1;
+            
+            nbByteSent := nbByteSent + 1;
+        end
+        
+        sendData.done: action ==>
+        guard
+            nbByteToSend = nbByteSent
+        end
+        
+        schedule fsm ReadInit :
+            ReadInit (getFileSize) --> ReadFile;
+        
+            ReadFile (readNBytes   ) --> SendData;
+            ReadFile (readEndOfFile) --> SendLastData;
+            ReadFile (readFileDone ) --> ReadFile;
+        
+            SendData (sendData.launch) --> SendData;
+            SendData (sendData.done  ) --> ReadFile;
+        
+            SendLastData (sendData.launch) --> SendLastData;
+            SendLastData (sendData.done  ) --> ReadFileDone;
+        
+            ReadFileDone (readFileDone) --> ReadInit;
+        end
+        
+        priority
+            readNBytes > readEndOfFile > readFileDone;
+            sendData.launch > sendData.done;
+        end
+
+    end
+
+    import all var std.video.display;
+
+    actor Display()
+        uint(size=8) Byte,
+        int(size=16) SIZE
+            ==>
+            :
+
+        List(type:uint(size=8), size=MAX_WIDTH * MAX_HEIGHT) pictureBufferY;
+        List(type:uint(size=8), size=MAX_WIDTH * MAX_HEIGHT / 4) pictureBufferU;
+        List(type:uint(size=8), size=MAX_WIDTH * MAX_HEIGHT / 4) pictureBufferV;
+
+        int (size=32) pictureSizeInMb;
+        int (size=32) nbBlockGot;
+        uint(size=2)  chromaComponent;
+        int (size=16) pictureWidthLuma;
+        int (size=16) pictureHeightLuma;
+        uint(size=12) xIdxLuma;
+        uint(size=32) yOffLuma;
+        uint(size=12) xIdxChroma;
+        uint(size=32) yOffChroma;
+        int (size=32) nbFrameDecoded;
+        bool isTerminated := false;
+
+        initialize ==>
+        do
+            if ((displayYUV_getFlags() & DISP_ENABLE) != 0) then
+                displayYUV_init();
+            end
+            compareYUV_init();
+            fpsPrintInit();
+            nbFrameDecoded := 0;
+        end
+        
+
+        checkTermination: action ==>
+        guard
+            not isTerminated,
+            nbFrameDecoded = displayYUV_getNbFrames()
+        do
+            isTerminated := true;
+        end
+
+        getPictureSize: action SIZE:[WidthValue, HeightValue] ==>
+        do
+            pictureWidthLuma  := WidthValue  * 16;
+            pictureHeightLuma := HeightValue * 16;
+            pictureSizeInMb   := WidthValue * HeightValue;
+            nbBlockGot := 0;
+            xIdxLuma   := 0;
+            xIdxChroma := 0;
+            yOffLuma   := 0;
+            yOffChroma := 0;
+        end
+
+        getPixValue.launch.Luma: action Byte :[Bytes] repeat 256 ==>
+        guard
+            nbBlockGot < pictureSizeInMb
+        var
+            List(type:uint(size=8), size=256) buf,
+            uint(size=32) yOff := yOffLuma,
+            uint(size=9)  idx  := 0
+        do
+            nbBlockGot := nbBlockGot + 1;
+            foreach int j in 0 .. 7 do
+                foreach int i in 0 .. 7 do
+                    buf[i + j * 16] := Bytes[i + j * 8];
+                    buf[i + 8 + j * 16] := Bytes[i + 64 + j * 8];
+                    buf[i + (j + 8) * 16] := Bytes[i + 2 * 64 + j * 8];
+                    buf[i + 8 + (j + 8) * 16] := Bytes[i + 3 * 64 + j * 8];
+                end
+            end
+                
+            foreach int y in 0 .. 15
+            do
+                foreach int x in xIdxLuma .. xIdxLuma + 15
+                do
+                    pictureBufferY[yOff +x] := buf[idx];
+                    idx := idx + 1;
+                end
+                yOff := yOff + pictureWidthLuma;
+            end
+            xIdxLuma := xIdxLuma + MB_SIZE_LUMA;
+            chromaComponent := 0;
+        end
+
+
+        getPixValue.launch.Chroma: action Byte :[Bytes] repeat 64 ==>
+        var
+            uint(size=32) yOff := yOffChroma,
+            uint(size=7)  idx  := 0
+        do
+            foreach int y in 0 .. 7
+            do
+                foreach int x in xIdxChroma .. xIdxChroma + 7
+                do
+                    if(chromaComponent=0)then
+                        pictureBufferU[yOff + x] := Bytes[idx];
+                    else
+                        pictureBufferV[yOff + x] := Bytes[idx];
+                    end
+                    idx := idx + 1;
+                end
+                yOff := yOff + pictureWidthLuma/2;
+            end
+            if(chromaComponent != 0)then
+                xIdxChroma := xIdxChroma + MB_SIZE_CHROMA;
+                if(xIdxLuma = pictureWidthLuma)then
+                    xIdxLuma   := 0;
+                    xIdxChroma := 0;
+                    yOffLuma   := yOffLuma   + MB_SIZE_LUMA   * pictureWidthLuma;
+                    yOffChroma := yOffChroma + MB_SIZE_CHROMA * pictureWidthLuma/2;
+                end
+            end
+            chromaComponent := 1;
+        end
+
+        displayPicture: action ==>
+        guard
+            nbBlockGot >= pictureSizeInMb,
+            (displayYUV_getFlags() & DISP_ENABLE) != 0
+        do
+            fpsPrintNewPicDecoded();
+            displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
+            compareYUV_comparePicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
+            nbFrameDecoded := nbFrameDecoded + 1;
+        end
+        
+        displayDisable: action ==>
+        guard
+            nbBlockGot >= pictureSizeInMb
+        do
+            fpsPrintNewPicDecoded();
+            nbFrameDecoded := nbFrameDecoded + 1;
+            
+        end
+
+        schedule fsm GetPictureSize:
+            GetPictureSize  (getPictureSize            )--> GetLumaBlock;
+            GetPictureSize   (checkTermination          )--> Termination;
+            GetLumaBlock    (getPixValue.launch.Luma   )--> GetChroma1Block;
+            GetChroma1Block (getPixValue.launch.Chroma )--> GetChroma2Block;
+            GetChroma2Block (getPixValue.launch.Chroma )--> GetLumaBlock;
+            
+            GetLumaBlock    (displayPicture            )--> GetPictureSize;
+            GetLumaBlock    (displayDisable            )--> GetPictureSize;
+        end
+
+        priority
+            checkTermination > getPictureSize;
+            getPixValue > displayPicture;
+            displayPicture > displayDisable;
+        end
+    end
 
 end

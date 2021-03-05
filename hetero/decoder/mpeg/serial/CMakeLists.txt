@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(SerialMpeg)
 
 set(NAMESPACE "hetero.decoder.mpeg.serial")
-set(NETWORK_NAME "SerialNetwork")
+set(NETWORK_NAME "Top_Serial")
 
 # Common options
 include(../common.cmake)

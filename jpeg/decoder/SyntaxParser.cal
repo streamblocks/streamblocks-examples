@@ -27,7 +27,7 @@ actor SyntaxParser()
 
 	// Format is 0xFF marker_code length_high length_low : 4 bytes
 	receive_marker:action Byte:[b] repeat 4 ==>
-	guard (b[0] = 0xFF)
+	//guard (b[0] = 0xFF)
 	do
 	    to_read := (b[2] << 8) + b[3] - 2;
 	    cur_marker := b[1];

@@ -1,7 +1,7 @@
 namespace jpeg.decoder:
 
 	actor IDCT()
-		int(size=13) IN ==> uint(size=8) OUT :
+		int(size=13) IN ==> int(size=32) OUT :
 
 		int A = 1024;
 

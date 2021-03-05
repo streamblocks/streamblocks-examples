@@ -1,16 +1,18 @@
-namespace jpeg:
+namespace jpeg.io:
 
-    import all std.video.display;
+import all var std.video.display;
+import var std.io.source.source_exit;
+import var std.io.source.source_isMaxLoopsReached;
 
     actor Display()
-        uint(size=8) Byte,
-        int(size=16) SIZE
+        uint(size=8) In,
+        uint(size=16) SOI
             ==>
             :
         
-        uint(size=8)[MAX_WIDTH * MAX_HEIGHT]  pictureBufferY;
-        uint(size=8)[MAX_WIDTH * MAX_HEIGHT / 4]  pictureBufferU;
-        uint(size=8)[MAX_WIDTH * MAX_HEIGHT / 4]  pictureBufferV;
+        List(type:uint(size=8), size=MAX_WIDTH * MAX_HEIGHT) pictureBufferY;
+        List(type:uint(size=8), size=MAX_WIDTH * MAX_HEIGHT / 4) pictureBufferU;
+        List(type:uint(size=8), size=MAX_WIDTH * MAX_HEIGHT / 4) pictureBufferV;
         int (size=32) pictureSizeInMb;
         int (size=32) nbBlockGot;
         uint(size=2)  chromaComponent;
@@ -20,18 +22,30 @@ namespace jpeg:
         uint(size=32) yOffLuma;
         uint(size=12) xIdxChroma;
         uint(size=32) yOffChroma;
+        int (size=32) nbFrameDecoded;
+        bool isTerminated := false;
 
+        bool ORCC_MAX_LOOPS = true;
 
         initialize ==>
         do
             if ((displayYUV_getFlags() & DISP_ENABLE) != 0) then
                 displayYUV_init();
             end
-        
+            compareYUV_init();
             fpsPrintInit();
+            nbFrameDecoded := 0;
+        end
+        
+        checkTermination: action ==>
+        guard
+            not isTerminated,
+            nbFrameDecoded = displayYUV_getNbFrames()
+        do
+            isTerminated := true;
         end
 
-        getPictureSize: action SIZE:[WidthValue, HeightValue] ==>
+        getPictureSize: action SOI:[WidthValue, HeightValue] ==>
         do
             pictureWidthLuma  := WidthValue  * 16;
             pictureHeightLuma := HeightValue * 16;
@@ -43,21 +57,21 @@ namespace jpeg:
             yOffChroma := 0;
         end
 
-        getPixValue.launch.Luma: action Byte :[Bytes] repeat 256 ==>
+        getPixValue.launch.Luma: action In:[vid] repeat 256 ==>
         guard
             nbBlockGot < pictureSizeInMb
         var
-            uint(size=8)[256]  buf,
+            List(type:uint(size=8), size=256) buf,
             uint(size=32) yOff := yOffLuma,
             uint(size=9)  idx  := 0
         do
             nbBlockGot := nbBlockGot + 1;
             foreach int j in 0 .. 7 do
                 foreach int i in 0 .. 7 do
-                    buf[i + j * 16] := Bytes[i + j * 8];
-                    buf[i + 8 + j * 16] := Bytes[i + 64 + j * 8];
-                    buf[i + (j + 8) * 16] := Bytes[i + 2 * 64 + j * 8];
-                    buf[i + 8 + (j + 8) * 16] := Bytes[i + 3 * 64 + j * 8];
+                    buf[i + j * 16] := vid[i + j * 8];
+                    buf[i + 8 + j * 16] := vid[i + 64 + j * 8];
+                    buf[i + (j + 8) * 16] := vid[i + 2 * 64 + j * 8];
+                    buf[i + 8 + (j + 8) * 16] := vid[i + 3 * 64 + j * 8];
                 end
             end
                 
@@ -75,7 +89,7 @@ namespace jpeg:
         end
 
 
-        getPixValue.launch.Chroma: action Byte :[Bytes] repeat 64 ==>
+        getPixValue.launch.Chroma: action In:[vid] repeat 64 ==>
         var
             uint(size=32) yOff := yOffChroma,
             uint(size=7)  idx  := 0
@@ -85,9 +99,9 @@ namespace jpeg:
                 foreach int x in xIdxChroma .. xIdxChroma + 7
                 do
                     if(chromaComponent=0)then
-                        pictureBufferU[yOff + x] := Bytes[idx];
+                        pictureBufferU[yOff + x] := vid[idx];
                     else
-                        pictureBufferV[yOff + x] := Bytes[idx];
+                        pictureBufferV[yOff + x] := vid[idx];
                     end
                     idx := idx + 1;
                 end
@@ -112,6 +126,13 @@ namespace jpeg:
         do
             fpsPrintNewPicDecoded();
             displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
+            compareYUV_comparePicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
+            nbFrameDecoded := nbFrameDecoded + 1;
+            if(ORCC_MAX_LOOPS) then
+                if source_isMaxLoopsReached() then 
+			        source_exit(0);
+		        end
+            end
         end
         
         displayDisable: action ==>
@@ -119,12 +140,17 @@ namespace jpeg:
             nbBlockGot >= pictureSizeInMb
         do
             fpsPrintNewPicDecoded();
+            nbFrameDecoded := nbFrameDecoded + 1;
+            if(ORCC_MAX_LOOPS) then
+                if source_isMaxLoopsReached() then 
+			        source_exit(0);
+		        end
+            end
         end
-
-        
 
         schedule fsm GetPictureSize:
             GetPictureSize  (getPictureSize            )--> GetLumaBlock;
+            GetPictureSize  (checkTermination          )--> Termination;
             GetLumaBlock    (getPixValue.launch.Luma   )--> GetChroma1Block;
             GetChroma1Block (getPixValue.launch.Chroma )--> GetChroma2Block;
             GetChroma2Block (getPixValue.launch.Chroma )--> GetLumaBlock;
@@ -134,10 +160,10 @@ namespace jpeg:
         end
 
         priority
+            checkTermination > getPictureSize;
             getPixValue > displayPicture;
             displayPicture > displayDisable;
         end
     end
-
 
 end
