@@ -1,0 +1,101 @@
+namespace hetero.stencil.denoise2d:
+
+  import entity hetero.stencil.common.Filter;
+  import entity hetero.stencil.common.Splitter;
+
+
+  @pipeline(flushing=true, ii=1)
+  actor Denoise2DKernel() 
+    int Ref_1_0, 
+    int Ref_0_1, 
+    int Ref_0_0, 
+    int Ref_0_m1, 
+    int Ref_m1_0 
+    ==> int Out:
+
+    kernel:action 
+      Ref_1_0:[t10], 
+      Ref_0_1:[t01], 
+      Ref_0_0:[t00], 
+      Ref_0_m1:[t0m1], 
+      Ref_m1_0:[tm10] ==>
+      Out:[(t00 - t0m1) * (t00 - t0m1) + 
+           (t00 - t01 ) * (t00 - t01 ) + 
+           (t00 - tm10) * (t00 - tm10) + 
+           (t00 - t10 ) * (t00 - t10 )] 
+    end
+  end
+
+  network Denoise2D(uint x_dim, uint y_dim) int In ==> int Out:
+    
+    var 
+      uint X_LB = 1;
+      uint X_UB = x_dim - 2;
+      uint Y_LB = 1;
+      uint Y_UB = y_dim - 2;
+      
+    entities
+      f0 = Filter(
+        x_dim = x_dim, y_dim = y_dim,
+        x_lb = X_LB, y_lb = Y_LB,
+        x_ub = X_UB, y_ub = Y_UB,
+        x_offset = 1, y_offset = 0
+      );
+      f1 = Filter(
+        x_dim = x_dim, y_dim = y_dim,
+        x_lb = X_LB, y_lb = Y_LB,
+        x_ub = X_UB, y_ub = Y_UB,
+        x_offset = 0, y_offset = 1
+      );
+      f2 = Filter(
+        x_dim = x_dim, y_dim = y_dim,
+        x_lb = X_LB, y_lb = Y_LB,
+        x_ub = X_UB, y_ub = Y_UB,
+        x_offset = 0, y_offset = 0
+      );
+      f3 = Filter(
+        x_dim = x_dim, y_dim = y_dim,
+        x_lb = X_LB, y_lb = Y_LB,
+        x_ub = X_UB, y_ub = Y_UB,
+        x_offset = 0, y_offset = -1
+      );
+      f4 = Filter(
+        x_dim = x_dim, y_dim = y_dim,
+        x_lb = X_LB, y_lb = Y_LB,
+        x_ub = X_UB, y_ub = Y_UB,
+        x_offset = -1, y_offset = 0
+      );
+      
+      s0 = Splitter(); s1 = Splitter(); s2 = Splitter(); s3 = Splitter();
+      kernel = Denoise2DKernel();
+
+    structure
+    
+      In --> s0.In;
+      s0.Left --> f0.In;
+      s0.Right --> s1.In;
+      s1.Left --> f1.In;
+      s1.Right --> s2.In;
+      s2.Left --> f2.In;
+      s2.Right --> s3.In;
+      s3.Left --> f3.In;
+      s3.Right --> f4.In;
+      f0.Out --> kernel.Ref_1_0;
+      f1.Out --> kernel.Ref_0_1;
+      f2.Out --> kernel.Ref_0_0;
+      f3.Out --> kernel.Ref_0_m1;
+      f4.Out --> kernel.Ref_m1_0;
+      kernel.Out --> Out;
+
+  end
+
+  network Denoise2D_5x5() int In ==> int Out:
+    entities
+      stencil_network = Denoise2D(x_dim = 5, y_dim = 5);
+    structure
+
+      In --> stencil_network.In;
+      stencil_network.Out --> Out;
+  end
+
+end
