@@ -22,6 +22,8 @@ option(USE_SDACCEL "Build an RTL OpenCL Kernel for SDAccel" OFF)
 option(IS_MPSOC "Vitis Embedded Platform" OFF)
 
 add_custom_target(all_xclbin)
+add_custom_target(all_hls)
+add_custom_target(all_multicore)
 
 # -- software profiling target for the PipelinedNetwork
 streamblocks(
@@ -42,7 +44,7 @@ macro(generate_loopback NUM CLOCK)
     ${TARGET_NAME}_HLS
     QID hetero.simple.loopback.Loopback${NUM}
     PLATFORM vivado-hls
-    SOURCE_PATH .
+    SOURCE_PATH ${CMAKE_SOURCE_DIR}
     TARGET_PATH ${TARGET_PATH}
     PARTITIONING
   )
@@ -51,7 +53,7 @@ macro(generate_loopback NUM CLOCK)
     ${TARGET_NAME}_MULTICORE
     QID hetero.simple.loopback.Loopback${NUM}
     PLATFORM multicore
-    SOURCE_PATH .
+    SOURCE_PATH ${CMAKE_SOURCE_DIR}
     TARGET_PATH ${TARGET_PATH}
     PARTITIONING
   )
@@ -79,7 +81,8 @@ macro(generate_loopback NUM CLOCK)
   )
   
   add_dependencies(all_xclbin ${TARGET_NAME}_xclbin)
-
+  add_dependencies(all_hls ${TARGET_NAME}_HLS)
+  add_dependencies(all_multicore ${TARGET_NAME}_MULTICORE)
 
 endmacro()
 

@@ -1,224 +1,431 @@
-#include "device-handle.h"
-#include <iostream>
+#include "device-port.h"
+#include <boost/program_options.hpp>
+#include <fstream>
 #include <memory>
+#include <random>
 #include <sstream>
-#include <vector>
 
-class BandwidthTester {
+// -- utility functions
+int randint(int min, int max) {
 
-public:
-  BandwidthTester(const int num, const std::string kernel_name,
-                  const std::string dir, std::string result_file)
-      : num(num) {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  std::uniform_int_distribution<> distrib(min, max);
+  return distrib(gen);
+}
 
-    dev = std::make_unique<ocl_device::DeviceHandle>(num, num, 0, kernel_name,
-                                                     dir);
-    os.open(result_file, std::ios::out);
+template <typename T> struct LoopbackTester {
 
-    if (!os.is_open()) {
-      OCL_ERR("Could not open file %s\n", result_file.c_str());
-      std::exit(-1);
-    }
+  cl::Context context;
+  cl::Platform platform;
+  cl::Device device;
+  cl::CommandQueue command_queue;
+  cl::Program program;
+  cl::Kernel kernel;
 
-    os << "<bandwidth>" << std::endl;
-    for (int ix = 0; ix < num; ix++) {
+  std::vector<cl::Event> kernel_event;
+  ocl_device::EventInfo kernel_event_info;
+
+  std::vector<cl::Event> kernel_wait_events;
+
+  std::size_t call_index;
+
+  std::vector<ocl_device::DevicePort> input_ports;
+  std::vector<ocl_device::DevicePort> output_ports;
+
+  std::size_t payload_size;
+
+  std::vector<ocl_device::EventProfile> kernel_stats;
+
+  LoopbackTester(const int width, const std::size_t payload_size,
+                 const std::string kernel_name, const std::string dir)
+      : payload_size(payload_size) {
+
+    cl_int error;
+    OCL_MSG("Initializing the device\n");
+
+    // get all devices
+    std::vector<cl::Device> devices = xcl::get_xil_devices();
+    cl::Device device = devices[0];
+
+    // Creating Context and Command Queue for selected Device
+    context = cl::Context(device);
+    OCL_CHECK(error, command_queue = cl::CommandQueue(
+                         context, device,
+                         CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &error));
+    std::string device_name = device.getInfo<CL_DEVICE_NAME>();
+
+    std::string xclbin_name;
+    {
       std::stringstream builder;
-      builder << "input_" << ix;
-      input_ports.emplace_back(builder.str());
-    }
-    for (int ix = 0; ix < num; ix++) {
-      std::stringstream builder;
-      builder << "output_" << ix;
-      output_ports.emplace_back(builder.str());
+
+      builder << dir << "/" << kernel_name;
+      auto emu_mode = std::getenv("XCL_EMULATION_MODE");
+      if (emu_mode == NULL)
+        builder << ".hw";
+      else {
+        if (strcmp(emu_mode, "hw_emu") == 0)
+          builder << ".hw_emu";
+        else
+          OCL_ERR("Unsupported emulation mode %s\n", emu_mode);
+      }
+
+      builder << ".xclbin";
+
+      xclbin_name = builder.str();
     }
 
-    dev->buildPorts(input_ports, output_ports);
+    auto bins = xcl::import_binary_file(xclbin_name);
+    devices.resize(1);
+    OCL_CHECK(error,
+              program = cl::Program(context, devices, bins, NULL, &error));
+
+    // -- creat the kernel
+    kernel = cl::Kernel(program, kernel_name.c_str());
+
+    // -- init kernel event
+    kernel_event_info.init(std::string("kernel event"));
+    kernel_event.emplace_back();
+
+    OCL_MSG("LoopbackTester::Building input and output ports\n");
+
+    for (int ix = 0; ix < width; ix++) {
+      std::stringstream input_name_string;
+      input_name_string << "input_" << ix;
+      std::string input_name = input_name_string.str();
+      input_ports.emplace_back(
+          ocl_device::PortAddress(input_name), // name of the port
+          ocl_device::PortType(ocl_device::IOType::INPUT,
+                               sizeof(T)), // port type
+          true                             // enable stat collection
+      );
+      std::stringstream output_name_string;
+      output_name_string << "output_" << ix;
+      std::string output_name = output_name_string.str();
+      output_ports.emplace_back(
+          ocl_device::PortAddress(output_name), // name of the port
+          ocl_device::PortType(ocl_device::IOType::OUTPUT,
+                               sizeof(T)), // port type
+          true                             // enable stat collection
+      );
+    }
+
+    OCL_MSG("LoopbackTester::Allocating input and output ports\n");
+
+    const cl_int banks[4] = {XCL_MEM_DDR_BANK0, XCL_MEM_DDR_BANK1,
+                             XCL_MEM_DDR_BANK2, XCL_MEM_DDR_BANK3};
+    cl_int bank = banks[0];
+
+    for (cl_int ix = 0; ix < width; ix++) {
+      bank = banks[ix % 4];
+      input_ports[ix].allocate(context, payload_size * sizeof(T), bank);
+      bank = banks[(ix + width) % 4];
+      output_ports[ix].allocate(context, payload_size * sizeof(T), bank);
+    }
+
+    OCL_MSG("LoopbackTester::Constructed with xclbin %s\n",
+            xclbin_name.c_str());
+
+    call_index = 0;
   }
 
-  void runTest(const int buffer_size, const int repeats) {
+  bool eventComplete(const cl::Event &event) const {
+    cl_int state = 0;
+    cl_int err = 0;
+    OCL_CHECK(err, err = event.getInfo<cl_int>(
+                       CL_EVENT_COMMAND_EXECUTION_STATUS, &state));
+    return state == CL_COMPLETE;
+  }
 
-    os << "\t<test size=\"" << buffer_size << "\" num=\"" << num << "\">"
-       << std::endl;
+  bool checkKernelFinished() const {
 
-    std::cout << "Allocating buffers (" << buffer_size << " bytes)"
-              << std::endl;
-
-    int num_tokens = buffer_size / sizeof(int);
-
-    cl_int banks[4] = {XCL_MEM_DDR_BANK0, XCL_MEM_DDR_BANK1, 
-      XCL_MEM_DDR_BANK2, XCL_MEM_DDR_BANK3};
-    int bank_index = 0;
     for (auto &input : input_ports) {
-      cl_int bank = banks[bank_index];
-      dev->allocateInputBuffer(input, buffer_size, bank);
-      dev->setUsableInput<int>(input, buffer_size / sizeof(int));
-      bank_index = (bank_index + 1) % 4;
+      if (input.size_event_info.active == true) {
+        if (!eventComplete(input.buffer_size_event))
+          return false;
+      }
     }
 
     for (auto &output : output_ports) {
-      cl_int bank = banks[bank_index];
-      dev->allocateOutputBuffer(output, buffer_size, bank);
-      dev->setUsableOutput<int>(output, buffer_size / sizeof(int));
-      bank_index = (bank_index + 1) % 4;
+      if (output.size_event_info.active == true) {
+        if (!eventComplete(output.buffer_size_event))
+          return false;
+      }
     }
 
-    for (int r = 0; r < repeats; r++) {
-      os << "\t\t<experiment index=\"" << r << "\">" << std::endl;
+    return true;
+  }
 
-      // std::cout << "Testing " << buffer_size << " (" << r << ")" <<
-      // std::endl;
-      dev->enqueueWriteBuffers();
-      dev->setArgs();
-      dev->enqueueExecution();
-      dev->enqueueReadSize();
-      dev->waitForSize();
-      dev->enqueueReadBuffers();
-      dev->waitForReadBuffers();
+  bool checkReadFinished() const {
 
-      for (int ix = 0; ix < num; ix++) {
-        auto produced = dev->getUsedOutput<int>(output_ports[ix]);
-        auto consumed = dev->getUsedInput<int>(input_ports[ix]);
-        OCL_ASSERT(produced == consumed,
-                   "invalid prodcution consumption pair\n");
+    for (auto &output : output_ports) {
+      if (output.buffer_event_info[0].active == true) {
+        if (!eventComplete(output.buffer_event[0]))
+          return false;
       }
-
-      auto kernel_time = dev->getKernelTime();
-      auto kernel_diff = std::get<1>(kernel_time) - std::get<0>(kernel_time);
-
-      // std::cout << "\tKernel time: " << kernel_diff << " ns" << std::endl;
-
-      os << "\t\t\t<kernel start=\"" << std::get<0>(kernel_time) << "\" end=\""
-         << std::get<1>(kernel_time) << "\"/>" << std::endl;
-
-      int ix = 0;
-      cl_ulong start_min = -1;
-      cl_ulong end_max = 0;
-
-      cl_ulong start_size_min = -1;
-      cl_ulong end_size_max = 0;
-      for (auto &input : input_ports) {
-        auto write_time = dev->getWriteTime(input);
-        auto write_diff = std::get<1>(write_time) - std::get<0>(write_time);
-        // std::cout << "\t" << input.toString() << " write time " << write_diff
-        // << " ns"
-        //           << std::endl;
-        if (start_min > std::get<0>(write_time))
-          start_min = std::get<0>(write_time);
-        if (end_max < std::get<1>(write_time))
-          end_max = std::get<1>(write_time);
-        os << "\t\t\t<write id=\"" << ix << "\" ";
-        os << "start=\"" << std::get<0>(write_time) << "\" ";
-        os << "end=\"" << std::get<1>(write_time) << "\"/>" << std::endl;
-
-        auto write_size_time = dev->getReadSizeTime(input, true);
-        auto write_size_diff = write_size_time.second - write_size_time.first;
-
-        if (start_size_min > write_size_time.first)
-          start_size_min = write_size_time.first;
-        
-        if (end_size_max < write_size_time.second)
-          end_size_max = write_size_time.second;
-
-        // os << "\t\t\t<read-size id=\"" << ix << "\"";
-        // os << "start=\"" << write_size_time.first << "\" ";
-        // os << "end=\"" << std::write_size_time.second << "\"/>" << std::endl;
-
-        ix++;
+      if (output.buffer_event_info[1].active == true) {
+        if (!eventComplete(output.buffer_event[1]))
+          return false;
       }
-
-      os << "\t\t\t<write-summary start=\"" << start_min << "\" ";
-      os << "end=\"" << end_max << "\" />" << std::endl;
-
-
-      start_min = -1;
-      end_max = 0;
-      ix = 0;
-      for (auto &output : output_ports) {
-        auto read_time = dev->getReadTime(output);
-        auto read_diff = std::get<1>(read_time) - std::get<0>(read_time);
-        // std::cout << "\t" << output.toString() << "read time " << read_diff
-        // << " ns"
-        //           << std::endl;
-
-        if (start_min > std::get<0>(read_time))
-          start_min = std::get<0>(read_time);
-        if (end_max < std::get<1>(read_time))
-          end_max = std::get<1>(read_time);
-        os << "\t\t\t<read id=\"" << ix << "\" ";
-        os << "start=\"" << std::get<0>(read_time) << "\" ";
-        os << "end=\"" << std::get<1>(read_time) << "\"/>" << std::endl;
-
-        auto read_size_time = dev->getReadSizeTime(output, false);
-        auto read_size_diff = read_size_time.second - read_size_time.first;
-
-        if (start_size_min > read_size_time.first)
-          start_size_min = read_size_time.first;
-        
-        if (end_size_max < read_size_time.second)
-          end_size_max = read_size_time.second;
-
-        ix++;
-      }
-      os << "\t\t\t<read-summary start=\"" << start_min << "\" ";
-      os << "end=\"" << end_max << "\" />" << std::endl;
-
-      os << "\t\t\t<read-size-summary start=\"" << start_size_min << "\" ";
-      os << "end=\"" << end_size_max << "\" />" << std::endl;
-
-      dev->releaseEvents();
-      os << "\t\t</experiment>" << std::endl;
     }
-    os << "\t</test>" << std::endl;
+
+    return true;
   }
-  ~BandwidthTester() {
-    os << "</bandwidth>" << std::endl;
-    os.close();
+  void test(bool randomize = false) {
+
+    kernel_wait_events.clear();
+
+    // -- write a bunch inputs, the write size is always payload_size - 1
+    int arg_ix = 0;
+    for (auto &input : input_ports) {
+      input.device_buffer.tail = 0;
+      input.device_buffer.head = payload_size - 1;
+      if (randomize) {
+        input.device_buffer.tail = randint(0, payload_size - 1);
+        input.device_buffer.head =
+            (input.device_buffer.tail + payload_size - 1) % payload_size;
+      }
+      input.writeToDeviceBuffer(command_queue, input.device_buffer.tail,
+                                input.device_buffer.head);
+      if (input.buffer_event_info[0].active == true)
+        kernel_wait_events.push_back(input.buffer_event[0]);
+      if (input.buffer_event_info[1].active == true)
+        kernel_wait_events.push_back(input.buffer_event[1]);
+
+      kernel.setArg(arg_ix++, input.device_buffer.data_buffer);
+      kernel.setArg(arg_ix++, input.device_buffer.meta_buffer);
+      kernel.setArg(arg_ix++, input.device_buffer.user_alloc_size);
+      kernel.setArg(arg_ix++, input.device_buffer.head);
+      kernel.setArg(arg_ix++, input.device_buffer.tail);
+    }
+
+    for (auto &output : output_ports) {
+      output.device_buffer.tail = 0;
+      output.device_buffer.head = 0;
+      if (randomize) {
+        output.device_buffer.tail = randint(0, payload_size - 1);
+        output.device_buffer.head = output.device_buffer.tail;
+      }
+      kernel.setArg(arg_ix++, output.device_buffer.data_buffer);
+      kernel.setArg(arg_ix++, output.device_buffer.meta_buffer);
+      kernel.setArg(arg_ix++, output.device_buffer.user_alloc_size);
+      kernel.setArg(arg_ix++, output.device_buffer.head);
+      kernel.setArg(arg_ix++, output.device_buffer.tail);
+    }
+
+    cl_int err;
+    OCL_CHECK(err, err = command_queue.enqueueTask(kernel, &kernel_wait_events,
+                                                   &kernel_event[0]));
+
+    for (auto &input : input_ports) {
+      input.enqueueReadMeta(command_queue, &kernel_event);
+    }
+
+    for (auto &output : output_ports) {
+      output.enqueueReadMeta(command_queue, &kernel_event);
+    }
+
+    OCL_MSG("LoopbackTester::kernel enqueued\n");
+    call_index++;
+
+    // now wait for the hardware
+    while (checkKernelFinished() == false)
+      ;
+
+    // now enqueue the reading the output buffers
+    for (auto &output : output_ports) {
+
+      int new_head = output.host_buffer.meta_buffer[0];
+      int old_head = output.device_buffer.head;
+
+      auto produced =
+          output.readFromDeviceBuffer(command_queue, old_head, new_head);
+      output.device_buffer.head = new_head;
+    }
+
+    // wait for the reads to finish
+    while (checkReadFinished() == false)
+      ;
+
+    // now clean up
+    for (auto &input : input_ports) {
+      input.releaseEvents(call_index);
+    }
+    for (auto &output : output_ports) {
+      output.releaseEvents(call_index);
+    }
+
+    ocl_device::EventProfile kernel_profile;
+    kernel_profile.getTiming(kernel_event[0]);
+    kernel_profile.call_index = call_index;
+    kernel_stats.push_back(kernel_profile);
+
+    OCL_MSG("LoopbackTest::call finished\n");
+    
   }
 
-private:
-  std::unique_ptr<ocl_device::DeviceHandle> dev;
-  std::vector<ocl_device::PortAddress> input_ports;
-  std::vector<ocl_device::PortAddress> output_ports;
-  std::ofstream os;
-  const int num;
+  void dumpStats(const std::string &file_name) {
+    std::ofstream ofs(file_name, std::ios::out);
+    std::stringstream ss;
+    ss << "{" << std::endl;
+    {
+      ss << "\t"
+         << "\"input_ports\": [" << std::endl;
+      {
+        for (auto input_it = input_ports.begin(); input_it != input_ports.end();
+             input_it++) {
+          ss << input_it->serializedStats(2);
+          if (input_it != input_ports.end() - 1)
+            ss << ",";
+          ss << std::endl;
+        }
+      }
+      ss << "\t"
+         << "]," << std::endl;
+
+      ss << "\t"
+         << "\"kernel\": [" << std::endl;
+      {
+        for (auto it = this->kernel_stats.begin();
+             it != this->kernel_stats.end(); it++) {
+          ss << it->serialized(2);
+          if (it != this->kernel_stats.end() - 1) {
+            ss << ",";
+          }
+          ss << std::endl;
+        }
+      }
+      ss << "\t"
+         << "], " << std::endl;
+      ss << "\t"
+         << "\"output_ports\": [" << std::endl;
+      {
+        for (auto output_it = output_ports.begin();
+             output_it != output_ports.end(); output_it++) {
+          ss << output_it->serializedStats(2);
+          if (output_it != output_ports.end() - 1)
+            ss << ",";
+          ss << std::endl;
+        }
+      }
+      ss << "\t"
+         << "]" << std::endl;
+    }
+    ss << "}";
+
+    ofs << ss.str();
+    ofs.close();
+  }
 };
+
+struct TestOptions {
+  bool success, randomize;
+  int min_buffer, max_buffer, repeats, width;
+  std::string prefix;
+  void print() {
+    std::cout << "=================== Options ================================="
+     << std::endl;
+    std::cout << "randomize: " << randomize << std::endl;
+    std::cout << "width: " << width << std::endl;
+    std::cout << "min_buffer: " << min_buffer << std::endl;
+    std::cout << "max_buffer: " << max_buffer << std::endl;
+    std::cout << "prefix: " << prefix << std::endl;
+    std::cout << "repeats: " << repeats << std::endl;
+    std::cout << "-------------------------------------------------------------"
+     << std::endl;
+  }
+};
+
+void progressBar(float new_progress, int barwidth) {
+  std::cout << "[";
+  int pos = new_progress * barwidth;
+  for (int i = 0; i < barwidth; i++) {
+    if (i < pos)
+      std::cout << "=";
+    else if (i == pos)
+      std::cout << ">";
+    else 
+      std::cout << " ";
+  }  
+  std::cout << "] " << int(new_progress * 100) << " %\r";
+  std::cout.flush();
+}
+TestOptions parseArguments(int argc, char *argv[]) {
+  TestOptions options;
+  options.success = true;
+  try {
+    // -- parse options
+    namespace po = boost::program_options;
+    int min_buffer = 0, max_buffer = 0;
+    
+    po::options_description desc("Allowed options");
+    desc.add_options()("help", "produce help message")(
+        "repeats,r", po::value<int>(&options.repeats)->default_value(1),
+        "number of repeated experiments per buffer size configuration")(
+        "min-buffer,m",
+        po::value<int>(&options.min_buffer)->default_value(4096),
+        "minimum buffer size (should be a power of two)")(
+        "max-buffer,M",
+        po::value<int>(&options.max_buffer)->default_value(4096),
+        "maximum buffer size (should be a power of two)")(
+        "prefix,p", po::value<std::string>(&options.prefix)->default_value("stats_"),
+        "statistics json file prefix for each buffer size between min and "
+        "max.")
+        ("randomize,R", po::value<bool>(&options.randomize)->default_value(true), "randomize the head and tail pointers in each transfer")
+        ("width,w", po::value<int>(&options.width)->default_value(1), "number of input and outputs to the hardware");
+    po::variables_map arg_vmap;
+    po::store(po::parse_command_line(argc, argv, desc), arg_vmap);
+
+    if (arg_vmap.count("help")) {
+      std::cout << desc << std::endl;
+      options.success = false;
+      return options;
+    }
+
+    po::notify(arg_vmap);
+
+  } catch (std::exception &e) {
+    std::cerr << "Error parsing command line arguments:\n" << e.what() << "\n";
+    options.success = false;
+  }
+  return options;
+}
 int main(int argc, char *argv[]) {
 
-  int num_repeats = 1 << 10;
-  const int buffer_size_min = sizeof(int);
-  const int buffer_size_max = sizeof(int) * (1 << 25);
-  if (argc != 3) {
-    std::cout << "usage " << argv[0] << " NUM_INPUTS NUM_REPEATS" << std::endl;
-    std::exit(-1);
-  }
-  int num_inputs = 1;
-  std::stringstream kernelname_builder;
-  kernelname_builder << "Loopback" << argv[1] << "_kernel";
-  std::stringstream res_builder;
-  res_builder << "res" << argv[1] << ".xml";
-  std::stringstream num_builder;
-  num_builder << argv[1];
-  num_builder >> num_inputs;
+  // -- parse options
+  auto options = parseArguments(argc, argv);
 
-  std::stringstream reps_builder;
-  reps_builder << argv[2];
-  reps_builder >> num_repeats;
-
-  if (num_inputs == 0) {
-    std::cerr << "invalid number of inputs" << std::endl;
-    std::exit(-1);
+  if (options.success == false) {
+    std::cout << "exiting" << std::endl;
+    return 1;
   }
-  if (num_repeats <= 0) {
-    std::cerr << "invalid num repeats " << num_repeats << std::endl;
-    std::exit(-1);
+  options.print();
+  int barwidth = 40;
+  std::stringstream kernel_name_builder;
+  kernel_name_builder << "Loopback" << options.width << "_kernel";
+  std::string kernel_name = kernel_name_builder.str();
+  for (int buffer = options.min_buffer; buffer <= options.max_buffer; buffer <<= 1) {
+    LoopbackTester<uint32_t> tester(options.width, buffer, kernel_name, "xclbin");
+    std::cout << "Starting the test with buffer size " << buffer << " for " << kernel_name << std::endl;
+    std::stringstream file_name;
+    file_name << options.prefix << kernel_name << "_" << buffer << ".json";
+    float progress = 0.0;
+    for (int c = 0; c < options.repeats; c++) {
+      tester.test(options.randomize);
+      
+      
+      float new_progress = float(c) / float(options.repeats);
+    
+      if (new_progress - progress >= 0.05) {
+        progressBar(new_progress, barwidth); 
+        tester.dumpStats(file_name.str());
+        progress = new_progress;
+      } 
+    }
+    progressBar(1.0, barwidth);
+    tester.dumpStats(file_name.str());
+    std::cout << std::endl;
+    
   }
-  BandwidthTester tester(num_inputs, kernelname_builder.str(), "xclbin",
-                         res_builder.str());
-  for (int buffer_size = buffer_size_min; buffer_size <= buffer_size_max;
-       buffer_size <<= 1) {
-
-    tester.runTest(buffer_size, num_repeats);
-    if (num_repeats >= 1024)
-      num_repeats = num_repeats >> 1;
-  }
+  
 }
