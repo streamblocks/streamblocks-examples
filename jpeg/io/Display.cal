@@ -25,7 +25,7 @@ import var std.io.source.source_isMaxLoopsReached;
         int (size=32) nbFrameDecoded;
         bool isTerminated := false;
 
-        bool ORCC_MAX_LOOPS = true;
+        bool ORCC_MAX_LOOPS = false;
 
         initialize ==>
         do

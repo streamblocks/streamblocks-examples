@@ -6,7 +6,7 @@ actor SyntaxParser()
 		uint(size=8) Bits, 
 		uint(size=8) QT, 
 		uint(size=8) HT, 
-		int(size=16) SOI:
+		uint(size=16) SOI:
 
 	// current offset in file
 	int offset;

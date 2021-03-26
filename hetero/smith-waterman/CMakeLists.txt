@@ -5,9 +5,9 @@ project(Smith-Waterman)
 include(../../Streamblocks.cmake)
 
 set(CAL_SOURCE_PATH 
-  .
-  ../../system
-  ../../smith-waterman
+  ../
+  ../../../system
+  ../../../smith-waterman
 )
 
 

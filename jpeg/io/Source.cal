@@ -29,6 +29,11 @@ import all var std.io.source;
             nbByteLeft := nbBytes mod NB_TOKEN_TO_SENT;
         end
         
+        termination: action ==>
+        guard
+            source_isMaxLoopsReached()
+        end
+
         readNBytes: action ==>
         guard
             iterationLoop < nbIteration
@@ -72,6 +77,7 @@ import all var std.io.source;
         
         schedule fsm ReadInit :
             ReadInit (getFileSize) --> ReadFile;
+            ReadInit (termination) --> Termination;
         
             ReadFile (readNBytes   ) --> SendData;
             ReadFile (readEndOfFile) --> SendLastData;
@@ -87,6 +93,7 @@ import all var std.io.source;
         end
         
         priority
+            termination > getFileSize;
             readNBytes > readEndOfFile > readFileDone;
             sendData.launch > sendData.done;
         end

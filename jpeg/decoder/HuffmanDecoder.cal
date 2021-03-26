@@ -3,7 +3,7 @@ namespace jpeg.decoder:
 
 actor HuffmanDecoder() 
 	uint(size=8) Bit, 
-	uint(size=8) HT, int(size=16) SOI
+	uint(size=8) HT, uint(size=16) SOI
 		==> 
 			int(size=24) Block :
 
