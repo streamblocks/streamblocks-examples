@@ -2,9 +2,17 @@ rvc-mpeg4sp/cmake/configuration_*
 rvc-mpeg4sp/genx
 rvc-mpeg4sp/configurations
 rvc-mpeg4sp/build
+hetero/decoder/jpeg/serial/build
+hetero/decoder/jpeg/serial/configs
+hetero/decoder/jpeg/serial/generated
+hetero/decoder/jpeg/parallel/build
+hetero/decoder/jpeg/parallel/configs
+hetero/decoder/jpeg/parallel/generated
 hetero/decoder/mpeg/xilinx/build
 hetero/decoder/mpeg/xilinx/genx
 hetero/decoder/mpeg/serial/build
 hetero/decoder/mpeg/serial/genx
 hetero/decoder/mpeg/parallel/build
 hetero/decoder/mpeg/parallel/genx
+hetero/smith-waterman/build
+hetero/smith-waterman/generated
