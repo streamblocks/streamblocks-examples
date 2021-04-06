@@ -8,7 +8,8 @@ namespace hetero.stencil.utils.formats:
             int(size=dynamic_size) Cb
             :
         
-            function tap(a,b): rshift(a,1)+rshift(b,1) end
+            function tap(int(size=dynamic_size+1) a, 
+                int(size=dynamic_size+1) b) --> int(size=dynamic_size+1): rshift(a,1)+rshift(b,1) end
         
             bool convention:=true;
         

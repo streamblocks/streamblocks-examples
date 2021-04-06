@@ -8,7 +8,7 @@ namespace hetero.stencil.utils.formats:
     int(size = 8) Red, 
     int(size = 8) Green, 
     int(size = 8) Blue ==>
-    int(size = 8) MacroBlock:
+    uint(size = 8) MacroBlock:
 
     var picture_width = 176;
     

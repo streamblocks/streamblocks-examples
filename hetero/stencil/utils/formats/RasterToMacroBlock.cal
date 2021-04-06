@@ -8,7 +8,7 @@ namespace hetero.stencil.utils.formats:
     int(size=dynamic_size) Y,
     int(size=dynamic_size) CrCb
     ==>
-    int(size=dynamic_size) MB
+    uint(size=dynamic_size) MB
     :
     
     int(size=dynamic_size) nb_Macb_W:=15;//for 16 macro block
@@ -32,16 +32,14 @@ namespace hetero.stencil.utils.formats:
     
     bool start:=true;
     
-    function Integers(int _start, int _end): [i : for int i in _start .. _end] end
+    
 
-    List( type: List( type: List( type: List( type:int(size=dynamic_size),size=16),size=rshift(picture_width,4)),size=16),size=2) memY := 
-      [[[[0 : for _W in Integers(1, 16)]:for _X in Integers(1, 16)]:for _Y in Integers(1, rshift(picture_width,4))]:for _Z in Integers(1, 2)];
+    List( type: List( type: List( type: List( type:int(size=dynamic_size),size=16),size=rshift(picture_width,4)),size=16),size=2) memY;
     
-    List( type:	List( type: List( type:	List( type:int(size=dynamic_size),size=8),size=rshift(picture_width,4)),size=8),size=2) memCr := 
-      [[[[0 : for _W in Integers(1, 8)]:for _X in Integers(1, 8)]: for _Y in Integers(1, rshift(picture_width,4))]: for _Z in Integers(1, 2)];
-    
-    List( type:	List( type:	List( type:	List( type:int(size=dynamic_size),size=8),size=rshift(picture_width,4)),size=8),size=2) memCb := 
-      [[[[0 : for _W in Integers(1, 8)] :	for _X in Integers(1, 8)]: for _Y in Integers(1, rshift(picture_width,4))]: for _Z in Integers(1, 2)];
+    List( type:	List( type: List( type:	List( type:int(size=dynamic_size),size=8),size=rshift(picture_width,4)),size=8),size=2) memCr;
+
+    List( type:	List( type:	List( type:	List( type:int(size=dynamic_size),size=8),size=rshift(picture_width,4)),size=8),size=2) memCb;
+
     
     
     /*init: action iW:[w],iR:[r] ==>
@@ -55,7 +53,6 @@ namespace hetero.stencil.utils.formats:
     lateness.Y: action Y:[y] ==>
     guard not isCrCb,Bank_R=Bank_W,start
     do
-      println("late_Y");
       //Write data
       memY[Bank_W][Macb_W][Line_W][Data_W]:=y;
       //next write and goto CrCb acquisition if both=true 

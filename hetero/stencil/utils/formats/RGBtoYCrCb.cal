@@ -22,7 +22,7 @@ namespace hetero.stencil.utils.formats:
 		int(size=18) vg = 527;
 		int(size=18) vb = 102;
 			
-			function mul(int(size=18)a,int(size=18)b) : a*b end
+			function mul(int(size=18)a,int(size=18)b) --> int(size=36): a*b end
 			
 			action
 			R:[r],G:[g],B:[b]

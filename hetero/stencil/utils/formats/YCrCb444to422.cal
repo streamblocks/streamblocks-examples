@@ -9,7 +9,10 @@ namespace hetero.stencil.utils.formats:
             int(size=dynamic_size) CrCb422
             :
         
-            function tap(a,b,c): rshift(a,2)+rshift(b,1)+rshift(c,2) end
+            function tap(int(size=dynamic_size+1) a,int(size=dynamic_size+1) b,int(size=dynamic_size+1) c) 
+                --> int(size=dynamic_size+1): 
+                rshift(a,2)+rshift(b,1)+rshift(c,2) 
+            end
         
             bool convention;
         

@@ -8,42 +8,40 @@ namespace hetero.stencil.utils.formats:
          int(size=dynamic_size) CrCb422
          :
          
-         function initList(int v, int _sz): [v : for int i in 0..(_sz - 1)] end
-         function mul(int(size=18)a,int(size=18)b): a*b end 
-         function tap(a,b): [rshift(mul(b[k],3)+a[k],2):for k in 0..(picture_width - 1)] end
          
-            
-               
-            List(type: int(size = dynamic_size), size=picture_width) qLines0;
-            List(type: int(size = dynamic_size), size=picture_width) qLines1;
+         function mul(int(size=18)a,int(size=18)b) --> int(size=36): a*b end 
+         
+                  
+         List(type: int(size = dynamic_size), size=picture_width) qLines0;
+         List(type: int(size = dynamic_size), size=picture_width) qLines1;
          
 
             
-            lateness:action
-               CrCb420:[q]  repeat picture_width
-               ==>
-            do
+         lateness:action
+            CrCb420:[q]  repeat picture_width
+            ==>
+         do
+         qLines1:=q;
+         end
+         
+         fire_phase1:action
+            CrCb420:[q] repeat picture_width
+            ==>
+            CrCb422:[[rshift(mul(qLines0[k],3)+q[k],2) : for int k in 0..(picture_width - 1)]]  repeat picture_width
+         do
+            qLines0:=qLines1;
             qLines1:=q;
-            end
-            
-            fire_phase1:action
-               CrCb420:[q] repeat picture_width
-               ==>
-               CrCb422:[tap(q,qLines0)] repeat picture_width
-            do
-               qLines0:=qLines1;
-               qLines1:=q;
-            end
-            
-            fire_phase2:action
-               ==>
-               CrCb422:[tap(qLines0,qLines1)] repeat picture_width
-            end
-            
-            schedule fsm A:
-            A(lateness)	  --> B;
-            B(fire_phase1)--> C;
-            C(fire_phase2)--> B;
-         endschedule
+         end
+         
+         fire_phase2:action
+            ==>
+            CrCb422:[[rshift(mul(qLines1[k],3)+qLines0[k],2):for int k in 0..(picture_width - 1)]]  repeat picture_width
+         end
+         
+         schedule fsm A:
+         A(lateness)	  --> B;
+         B(fire_phase1)--> C;
+         C(fire_phase2)--> B;
+      endschedule
    end
 end

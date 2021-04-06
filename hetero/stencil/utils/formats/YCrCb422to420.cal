@@ -8,9 +8,10 @@ namespace hetero.stencil.utils.formats:
 					int(size=dynamic_size) CrCb420
 					:
 				
-			function initList(int v, int _sz): [v : for i in 0..(_sz - 1)] end
-			function mul(int(size=18) a,int(size=18) b): a*b end 
-			function tap(a,b,c,d): [rshift(a[k]+mul(b[k],3)+mul(c[k],3)+d[k],3):for k in 0 .. (picture_width - 1)] end
+			
+			function mul(int(size=18) a,int(size=18) b) --> int(size=18): a*b end 
+			
+
 				
 			List(type: int(size=dynamic_size), size=picture_width) crcbLines0;
 			List(type: int(size=dynamic_size), size=picture_width) crcbLines1;
@@ -28,7 +29,7 @@ namespace hetero.stencil.utils.formats:
 			fire:action
 				CrCb422:[crcb] repeat picture_width
 				==>
-				CrCb420:[tap(crcbLines0,crcbLines1,crcbLines2,crcb)] repeat picture_width
+				CrCb420:[[rshift(crcbLines0[k]+mul(crcbLines1[k],3)+mul(crcbLines2[k],3)+crcb[k],3): for int k in 0 .. (picture_width - 1)]] repeat picture_width 
 			do
 				crcbLines0:=crcbLines1;
 				crcbLines1:=crcbLines2;
