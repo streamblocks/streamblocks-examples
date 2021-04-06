@@ -12,7 +12,7 @@ namespace hetero.stencil.utils.formats:
 
     var picture_width = 176;
     entities
-      conv_mb_raster = MacroBlockToRaster(dynamic_size = dynamic_size, 
+      conv_mb_raster = MacroBlockToRaster(dynamic_size = 8, 
                                           picture_width = picture_width);
       conv_420_422 = YCrCb420to422(dynamic_size = 8, 
                                    picture_width = picture_width);

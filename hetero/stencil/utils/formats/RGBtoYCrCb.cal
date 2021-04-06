@@ -1,8 +1,8 @@
 namespace hetero.stencil.utils.formats:
 
-  import all System.art.bitops;
+  import all System.bitops;
 
-	actor RGBtoYCrCb(dynamic_size)
+	actor RGBtoYCrCb(int dynamic_size)
 		int(size=8) R,
 		int(size=8) G,
 		int(size=8) B

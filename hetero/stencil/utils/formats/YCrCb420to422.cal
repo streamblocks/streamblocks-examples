@@ -1,6 +1,6 @@
 namespace hetero.stencil.utils.formats:
 
-   import all System.art.bitops;
+   import all System.bitops;
 
    actor YCrCb420to422(int dynamic_size, int picture_width)
          int(size=dynamic_size) CrCb420
@@ -8,14 +8,14 @@ namespace hetero.stencil.utils.formats:
          int(size=dynamic_size) CrCb422
          :
          
-         function initList(v,size): [v:for i in Integers(1,size)] end
+         function initList(int v, int _sz): [v : for int i in 0..(_sz - 1)] end
          function mul(int(size=18)a,int(size=18)b): a*b end 
-         function tap(a,b): [rshift(mul(b[k],3)+a[k],2):for k in Integers(0,picture_width-1)] end
+         function tap(a,b): [rshift(mul(b[k],3)+a[k],2):for k in 0..(picture_width - 1)] end
          
             
                
-            list[int(size=dynamic_size)] qLines0:=initList(0,picture_width);
-            list[int(size=dynamic_size)] qLines1:=initList(0,picture_width);
+            List(type: int(size = dynamic_size), size=picture_width) qLines0;
+            List(type: int(size = dynamic_size), size=picture_width) qLines1;
          
 
             

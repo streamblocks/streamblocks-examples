@@ -1,6 +1,6 @@
 namespace hetero.stencil.utils.formats:
 
-   import all System.art.bitops;
+   import all System.bitops;
 
     actor YCrCb444to422(int dynamic_size)
             int(size=dynamic_size) Cr,
