@@ -1,0 +1,38 @@
+namespace hetero.stencil.utils.formats:
+
+
+  /**
+   * Converst a stream of YCrCb420 macro blocks into a stream of rasterized RGB
+   */
+  network YCrCb420ToRGBRaster()
+    int(size = 8) MacroBlock ==> 
+    int(size = 8) Red, 
+    int(size = 8) Green, 
+    int(size = 8) Blue:
+
+    var picture_width = 176;
+    entities
+      conv_mb_raster = MacroBlockToRaster(dynamic_size = dynamic_size, 
+                                          picture_width = picture_width);
+      conv_420_422 = YCrCb420to422(dynamic_size = 8, 
+                                   picture_width = picture_width);
+      conv_422_444 = YCrCb422to444(dynamic_size = 8);
+      conv_444_rgb = YCrCbtoRGB(dynamic_size = 8);
+    structure 
+
+      MacroBlock --> conv_mb_raster.MB;
+      conv_mb_raster.CrCb --> conv_420_422.CrCb420;
+      conv_420_422.CrCb422 --> conv_422_444.CrCb422;
+
+      conv_mb_raster.Y --> conv_444_rgb.Y;
+      conv_422_444.Cr --> conv_444_rgb.Cr;
+      conv_422_444.Cb --> conv_444_rgb.Cb;
+
+      conv_444_rgb.R --> Red;
+      conv_444_rgb.G --> Green;
+      conv_444_rgb.B --> Blue;
+
+  end
+
+
+end

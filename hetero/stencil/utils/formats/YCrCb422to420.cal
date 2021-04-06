@@ -1,0 +1,43 @@
+namespace hetero.stencil.utils.formats:
+
+  import all System.art.bitops;
+
+	actor YCrCb422to420(int dynamic_size, int picture_width)
+					int(size=dynamic_size) CrCb422
+					==>
+					int(size=dynamic_size) CrCb420
+					:
+				
+			function initList(v,size): [v:for i in Integers(1,size)] end
+			function mul(int(size=18) a,int(size=18) b): a*b end 
+			function tap(a,b,c,d): [rshift(a[k]+mul(b[k],3)+mul(c[k],3)+d[k],3):for k in Integers(0,picture_width-1)] end
+				
+			list[int(size=dynamic_size)] crcbLines0;
+			list[int(size=dynamic_size)] crcbLines1:=initList(0,picture_width);
+			list[int(size=dynamic_size)] crcbLines2:=initList(0,picture_width);
+			
+			lateness:action
+				CrCb422:[crcb] repeat picture_width
+				==>
+			do
+				crcbLines0:=crcbLines1;
+				crcbLines1:=crcbLines2;
+				crcbLines2:=crcb;
+			end
+					
+			fire:action
+				CrCb422:[crcb] repeat picture_width
+				==>
+				CrCb420:[tap(crcbLines0,crcbLines1,crcbLines2,crcb)] repeat picture_width
+			do
+				crcbLines0:=crcbLines1;
+				crcbLines1:=crcbLines2;
+				crcbLines2:=crcb;
+			end
+					
+			schedule fsm A:
+					A(lateness)	--> B;
+					B(fire)		--> A;
+			endschedule
+	end
+end

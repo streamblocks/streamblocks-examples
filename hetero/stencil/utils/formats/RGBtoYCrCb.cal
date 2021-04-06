@@ -1,0 +1,36 @@
+namespace hetero.stencil.utils.formats:
+
+  import all System.art.bitops;
+
+	actor RGBtoYCrCb(dynamic_size)
+		int(size=8) R,
+		int(size=8) G,
+		int(size=8) B
+		==>
+		int(size=dynamic_size) Y,
+		int(size=dynamic_size) Cr,
+		int(size=dynamic_size) Cb
+		:
+		
+		int(size=18) yr = 306;
+		int(size=18) yg = 601;
+		int(size=18) yb = 117;
+		int(size=18) ur = 151;
+		int(size=18) ug = 296;
+		int(size=18) ub = 446;
+		int(size=18) vr = 630;
+		int(size=18) vg = 527;
+		int(size=18) vb = 102;
+			
+			function mul(int(size=18)a,int(size=18)b) : a*b end
+			
+			action
+			R:[r],G:[g],B:[b]
+			==>
+			Y :[rshift( 16384  + mul(r,yr) + mul(g,yg) + mul(b,yb) ,18-dynamic_size)],
+			Cr:[rshift( 131072 + mul(r,vr) - mul(g,vg) - mul(b,vb) ,18-dynamic_size)],
+			Cb:[rshift( 131072 - mul(r,ur) - mul(g,ug) + mul(b,ub) ,18-dynamic_size)]
+		end
+		
+	end
+end

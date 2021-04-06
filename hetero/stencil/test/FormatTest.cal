@@ -1,0 +1,32 @@
+namespace hetero.stencil.test:
+
+  import entity jpeg.decoder.JpegDecoder;
+  import entity jpeg.io.Source;
+  import entity jpeg.io.Display;
+
+  import entity hetero.stencil.utils.formats.YCrCb420ToRGBRaster;
+  import entity hetero.stencil.utils.formats.RGBRasterToYCrCb420;
+
+  network FormatIdentityTest() ==>:
+  
+
+    entities
+      source = Source();
+      decoder = JpegDecoder();
+      
+      to_rgb = YCrCb420ToRGBRaster();
+      to_yuv = RGBRasterToYCrCb420();
+      display = Display();
+    
+    structure
+      source.Out --> decoder.BYTE;
+      decoder.YCbCr --> to_rgb.MacroBlock;
+      to_rgb.Red --> to_yuv.Red;
+      to_rgb.Green --> to_yuv.Green;
+      to_rgb.Blue --> to_yuv.Blue;
+      to_yuv.MacroBlock --> display.In;
+      decoder.SOI --> display.SOI;
+
+  end
+
+end
