@@ -1,0 +1,196 @@
+namespace hetero.stencil.kernels:
+
+  import hetero.stencil.kernels.utils.DynamicFilter;
+  import hetero.stencil.kernels.utils.Splitter;
+  import hetero.bitmap.streamers.BitMapSimpleStreamer;
+  import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
+
+  import entity ART.art_Source_byte;
+
+
+  @pipeline(flushing=true, ii=1)
+  actor BlurCompute(type DTYPE) 
+    DTYPE Ref_p0_p1, // Ref(x = 0, y = 1)
+    DTYPE Ref_p1_p0, // Ref(x = 1, y = 0)
+    DTYPE Ref_p0_p0, // Ref(x = 0, y = 0)
+    DTYPE Ref_n1_p0, // Ref(x = -1, y = 0)
+    DTYPE Ref_p0_n1 // Ref(x = 0, y = -1)
+    ==> DTYPE Out:
+
+    compute:action 
+      Ref_p0_p1:[t0],
+      Ref_p1_p0:[t1],
+      Ref_p0_p0:[t2],
+      Ref_n1_p0:[t3],
+      Ref_p0_n1:[t4] ==>
+      Out:[
+        (t0 + t1 + t2 + t3 + t4) / 5
+      ]
+    end
+  end
+
+
+
+
+  network BlurNetworkSingle(type DTYPE) 
+    DTYPE In,
+    uint Width, uint Height ==> DTYPE Out:
+  
+    var 
+      int X_UB = -2;
+      int Y_UB = -2;
+      int X_LB = 1;
+      int Y_LB = 1;
+    entities
+
+      f0 = DynamicFilter(
+        DTYPE=DTYPE,
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 0,
+        y_offset = 1);
+      f1 = DynamicFilter(
+        DTYPE=DTYPE,
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 1,
+        y_offset = 0);
+      f2 = DynamicFilter(
+        DTYPE=DTYPE,
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 0,
+        y_offset = 0);
+      f3 = DynamicFilter(
+        DTYPE=DTYPE,
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = -1,
+        y_offset = 0);
+      f4 = DynamicFilter(
+        DTYPE=DTYPE,
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 0,
+        y_offset = -1);
+
+      s0 = Splitter(DTYPE=DTYPE);
+      s1 = Splitter(DTYPE=DTYPE);
+      s2 = Splitter(DTYPE=DTYPE);
+      s3 = Splitter(DTYPE=DTYPE);
+
+      compute = BlurCompute(DTYPE=DTYPE);
+
+
+    structure
+
+      Width --> f0.Width; 
+      Height --> f0.Height; 
+      Width --> f1.Width; 
+      Height --> f1.Height; 
+      Width --> f2.Width; 
+      Height --> f2.Height; 
+      Width --> f3.Width; 
+      Height --> f3.Height; 
+      Width --> f4.Width; 
+      Height --> f4.Height; 
+
+
+      In --> s0.In;
+      
+      s0.Left --> f0.In;
+      s0.Right --> s1.In;
+      
+      s1.Left --> f1.In;
+      s1.Right --> s2.In;
+
+      s2.Left --> f2.In;
+      s2.Right --> s3.In;
+
+      s3.Left --> f3.In;
+      s3.Right --> f4.In;
+
+      f0.OUt --> compute.Ref_p0_p1;
+      f1.OUt --> compute.Ref_p1_p0;
+      f2.OUt --> compute.Ref_p0_p0;
+      f3.OUt --> compute.Ref_n1_p0;
+      f4.OUt --> compute.Ref_p0_n1;
+
+      comput.Out --> Out;
+
+  end
+
+
+  network BitmapBlurNetworkSingle() 
+    uint(size = 8) PixelStream,
+    uint(size = 32) Width,
+    uint(size = 32) Height ==>
+    uint(size = 8) Out:
+
+    entities
+
+      /**Pad the borders of the image so that the output image
+       will have the same size as the input image
+       */
+      padding = KernelStreamer(
+        stencil_x_neg = -1, stencil_x_pos = 1,
+        stencil_y_neg = -1, stencil_y_pos = 1,
+        pad_value = 0
+      );
+
+      kernel = BlurNetworkSingle(DTYPE=uint(size = 8));
+
+
+    structure
+
+      PixelStream --> padding.PixelStream;
+      Width --> padding.Width;
+      Height --> padding.Height;
+
+      padding.PaddedStream --> kernel.In;
+      padding.PaddedHeight --> kernel.Height;
+      padding.PaddedWidth --> kernel.Width;
+      
+      kernel.OUt --> Out;
+
+  end
+
+  network BitmapBlurNetwork() ==> :
+
+    entities
+      file_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric_64.bmp");
+      streamer = BitMapSimpleStreamer();
+      kernel_r = BlurNetworkSingle();
+      kernel_g = BlurNetworkSingle();
+      kernel_b = BlurNetworkSingle();
+      kernel_a = BlurNetworkSingle();
+
+      encoder = SimpleBitmapEncoder();
+      file_writer = art_Sink_bin(fileName="out.bmp");
+
+    structure 
+
+      file_reader.Out --> streamer.ByteStream;
+      streamer.Red --> kernel_r.PixelStream;
+      streamer.Green --> kernel_g.PixelStream;
+      streamer.Blue --> kernel_b.PixelStream;
+      streamer.Alpha --> kernel_a.PixelStream;
+
+      streamer.Width --> enocder.Width;
+      streamer.Height --> encoder.Height;
+      streamer.BitsPerPixel --> encoder.BitsPerPixel;
+      encoder.ByteStream --> file_writer.In;
+
+  end
+
+end

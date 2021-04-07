@@ -1,0 +1,38 @@
+namespace hetero.stencil.bitmap.streamers:
+  
+  import entity hetero.stencil.bitmap.parsers.HeaderParser;
+  import entity hetero.stencil.bitmap.parsers.InfoHeaderParser;
+  import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
+  import entity hetero.stencil.bitmap.streamers.PixelStreamStripper;
+
+  network BitMapSimpleStreamer() uint(size = 8) ByteStream ==>
+    uint(size = 8) Red,
+    uint(size = 8) Green,
+    uint(size = 8) Blue,
+    uint(size = 8) Alpha,
+    uint(size = 32) Height,
+    uint(size = 32) Width,
+    uint(size = 32) BitsPerPixel:
+      entities
+        header_parser = HeaderParser();
+        info_parser = InfoHeaderParser();
+        pixel_stripper = PixelStreamStripper();
+        
+      structure
+        header_parser.InfoStream --> info_parser.InputStream;
+        header_parser.PixelStream --> pixel_stripper.RawPixelStream;
+        info_parser.Width --> pixel_stripper.Width;
+        info_parser.Height --> pixel_stripper.Height;
+        info_parser.BitsPerPixel --> pixel_stripper.BitsPerPixel;
+        pixel_stripper.Red --> Red;
+        pixel_stripper.Green --> Green;
+        pixel_stripper.Blue --> Blue;
+        pixel_stripper.Alpha --> Alpha;
+
+        info_parser.Width --> Width;
+        info_parser.Height --> Height;
+        info_parser.BitsPerPixel --> BitsPerPixel;
+
+  end
+
+end

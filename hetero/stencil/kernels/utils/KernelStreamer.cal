@@ -11,6 +11,8 @@ namespace hetero.stencil.kernels.utils:
     uint(size = 32) Width, 
     uint(size = 32) Height
     ==>
+    uint(size = 32) PaddedHeight,
+    uint(size = 32) PaddedWidth,
     uint(size = 8) PaddedStream:
     
     int (size = 32) orig_w := 0;
@@ -29,7 +31,9 @@ namespace hetero.stencil.kernels.utils:
       end
     end
 
-    read_h_w: action Width:[w], Height:[h] ==>
+    read_h_w: action Width:[w], Height:[h] ==> 
+      PaddedWidth:[w + ((stencil_x_pos - stencil_x_neg) as uint(size = 32))],
+      PaddedHeight:[h + ((stencil_y_pos - stencil_x_neg) as unit(size = 32))]
     guard y_index = (orig_h + stencil_y_pos) and x_index = (orig_w + stencil_x_pos)
     do 
       orig_h := h;

@@ -36,6 +36,8 @@ namespace hetero.stencil.bitmap.parsers:
     int NUM_IMPORTANT_COLORS_ADDR       = NUM_COLORS_ADDR + 4;
 
 
+    int left_over_header := 0;
+
     parse_info_size: action InputStream:[bytes] repeat 40 ==> 
       Width:[w], Height:[h], BitsPerPixel:[bpp]
     var 
@@ -43,11 +45,18 @@ namespace hetero.stencil.bitmap.parsers:
       uint(size = 32) h := bytesToWord(bytes, HEIGHT_ADDR),
       uint(size = 32) bpp := bytesToWord(bytes, BITS_PER_PIXEL_ADDR)
     do
+      left_over_header := bytesToWord(bytes, NUM_BYTES_ADDR) - 40;
     end
 
-  end
+    discard_unsupported_features: action InputStream:[b] ==>
+    guard left_over_header != 0
+    do
+      left_over_header := left_over_header - 1;
+    end
 
-  
-  
+    priority 
+      parse_info_size > discard_unsupported_features;
+    end
+  end
 
 end

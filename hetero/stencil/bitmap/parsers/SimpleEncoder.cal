@@ -42,7 +42,7 @@ namespace hetero.stencil.bitmap.encoders:
     uint(size = 32) w := 0;
     uint(size = 32) h := 0;
     uint(size = 32) bpp := 0;
-    
+    bool emit_bitmask := false;
 
     procedure inc_index()
     begin
@@ -57,6 +57,8 @@ namespace hetero.stencil.bitmap.encoders:
         x_count := x_count + 1;
       end
     end
+
+    
     encode_header: action Width:[_w], Height:[_h], BitsPerPixel:[_bpp] 
       ==> ByteStream:[bytes] repeat 14
     var 
@@ -148,18 +150,40 @@ namespace hetero.stencil.bitmap.encoders:
       x_count := 0;
       y_count := 0;
       pixel_type := RGB_PIXEL;
+      if bpp = 32 then
+        emit_bitmask := true;
+      else
+        emit_bitmask := false;
+      end
+    end
+
+    encode_bitmask: action ==> 
+      ByteStream:[bytes] repeat 16 
+    guard emit_bitmask = true
+    var 
+      List(type:uint(size = 8), size=16) bytes
+    do
+      foreach int i in 0 .. 15 do
+        bytes[i] := 0;
+      end
+      
+      bytes[2] := 0xFF; // Red
+      bytes[5] := 0xFF; // Green
+      bytes[8] := 0xFF; // Blue
+      bytes[15] := 0xFF; // Alpha
+      emit_bitmask := false;
     end
 
     stream_pixel_rgb: action Red:[r], Green:[g], Blue:[b] ==> 
       ByteStream:[b, g, r]
-    guard pixel_type = RGB_PIXEL and y_count < h
+    guard bpp = 24 and pixel_type = RGB_PIXEL and y_count < h
     do
      inc_index();
     end
 
     stream_pixel_rgba: action Red:[r], Green:[g], Blue:[b], Alpha:[a] ==> 
       ByteStream:[b, g, r, a]
-    guard pixel_type = RGB_PIXEL and y_count < h
+    guard bpp = 32 and pixel_type = RGB_PIXEL and y_count < h
     do
      inc_index();
     end
@@ -183,9 +207,15 @@ namespace hetero.stencil.bitmap.encoders:
       row_size := 0;
     end
 
+    priority
+      emit_bitmask > stream_pixel_rgba;
+      stream_pixel_rgba > stream_pixel_rgb;
+    end
+
     schedule fsm s_init:
       s_init(encode_header) --> s_encode_info;
       s_encode_info(encode_info_header) --> s_pixels;
+      s_pixels(encode_bitmask) --> s_pixels;
       s_pixels(stream_pixel_rgb) --> s_pixels;
       s_pixels(stream_pixel_rgba) --> s_pixels;
       s_pixels(stream_padding) --> s_pixels;

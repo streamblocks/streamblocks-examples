@@ -1,0 +1,154 @@
+namespace hetero.stencil.kernels.utils:
+
+  /**
+    A dynamic filter actor for stencil kernels,
+    The filter actor filters out tokens that are not used in
+    the kernel computation. All of the input ports can have a buffer size
+    of 1.
+   */
+  @pipeline(flushing=true)
+  actor DynamicFilter(
+    type DTYPE,
+    int x_lb_offset, int x_ub_offset, 
+    int y_lb_offset, int y_ub_offset, 
+    int x_offset, int y_offset) 
+
+    DTYPE In, 
+    uint  XDim,
+    uint  YDim
+    ==> DTYPE Out:
+
+    int x_index := 0;
+    int y_index := 0;
+
+    int x_dim := 0;
+    int y_dim := 0;
+    int x_lb := 0;
+    int x_ub := 0;
+    int y_lb := 0;
+    int y_ub := 0;
+    int  x_offset := 0;
+    int  y_offset := 0;
+
+    bool idle := true;
+    /**
+      icrement the y and x indices and wrap around if necessary
+    */
+    procedure increment_index() 
+    begin
+
+      if ((x_index = (x_offset + x_ub)) and (y_index = (y_offset + y_ub))) then
+        idle := true;
+      end
+      if (x_index = x_dim - 1) then
+        x_index := 0;
+        y_index := y_index + 1;
+      else
+        x_index := x_index + 1;
+      end
+    end
+
+    /**
+      Drop the input token
+     */
+    drop: action In:[t] ==> 
+    guard idle = false
+    do 
+      increment_index();
+    end
+
+    /**
+      Pass the input token to the output
+     */
+    pass: action In:[t] ==> Out:[t]
+    guard x_index >= x_offset + x_lb and x_index <= x_offset + x_ub and 
+          y_index >= y_offset + y_lb and y_index <= y_offset + y_ub and 
+          idle = false
+    do
+      
+      increment_index();
+    end
+    
+    init: action  XDim:[_x_dim],
+                  YDim:[_y_dim] ==>
+    guard idle = true
+    do
+      x_dim := _x_dim as int;
+      y_dim := _y_dim as int;
+      x_lb := x_lb_offset + 0;
+      x_ub := x_ub_offset + x_dim;
+      y_lb := y_lb_offset + 0;
+      y_ub := y_ub_offset + y_dim;
+      
+      idle := false;
+
+      x_index := 0;
+      y_index := 0;
+
+    end
+    priority
+      init > pass;
+      pass > drop;
+    end
+
+  end 
+
+
+  @pipeline(flushing=true)
+  actor Filter(
+    uint x_dim, uint y_dim,
+    uint x_lb, uint x_ub, 
+    uint y_lb, uint y_ub, 
+    int x_offset, 
+    int y_offset
+    ) 
+    int In ==> int Out:
+    uint x_index := 0; 
+    uint y_index := 0;
+    /**
+      icrement the y and x indices and wrap around if necessary
+    */
+    procedure increment_index() 
+    begin
+      if y_index = y_dim - 1 then
+        y_index := 0;
+        if x_index = x_dim - 1 then
+          x_index := 0;
+        else
+          x_index := x_index + 1;
+        end
+      else
+        y_index := y_index + 1;
+      end 
+    end
+
+    /**
+      Drop the input token
+     */
+    drop: action In:[t] ==> 
+    do
+      increment_index();
+    end
+
+    /**
+      Pass the input token to the output
+     */
+    pass: action In:[t] ==> Out:[t]
+    guard x_index >= x_offset + x_lb and x_index <= x_offset + x_ub and 
+          y_index >= y_offset + y_lb and y_index <= y_offset + y_ub
+    do
+      increment_index();
+    end
+    
+
+    priority
+      pass > drop;
+    end
+
+  end
+
+
+
+
+
+end
