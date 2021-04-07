@@ -1,5 +1,5 @@
 namespace hetero.stencil.bitmap.parsers:
-  import var system.io.dprint1;
+  
 
   /** 
    * A simple bitmap header parser, a bit map header is 14 bytes
@@ -44,7 +44,7 @@ namespace hetero.stencil.bitmap.parsers:
     size_read: action ByteStream:[bytes] repeat 4 ==>
     do
       bmp_size := bytesToWord(bytes);
-      dprint1("bmp size: ", bmp_size);
+      
       addr := addr + 4;
     end
 
@@ -57,7 +57,7 @@ namespace hetero.stencil.bitmap.parsers:
     do
       addr := addr + 4;
       pixel_offset := bytesToWord(bytes);
-      dprint1("Offset: ", pixel_offset);
+      
     end
 
     info_stream: action ByteStream:[b] ==> InfoStream:[b]

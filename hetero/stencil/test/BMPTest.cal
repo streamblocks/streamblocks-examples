@@ -1,0 +1,97 @@
+namespace hetero.stencil.bitmap.test:
+
+  import entity hetero.stencil.bitmap.parsers.HeaderParser;
+  import entity hetero.stencil.bitmap.parsers.InfoHeaderParser;
+  import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
+  import entity hetero.stencil.bitmap.streamers.PixelStreamStripper;
+  import entity ART.art_Sink_8bit_txt;
+  import entity ART.art_Sink_bin;
+  import entity ART.art_Source_byte;
+  
+
+  network BitMapHeaderFileParser(String fileName) ==> 
+    uint(size = 8) InfoStream, 
+    uint(size = 8) PixelStream:
+
+    entities
+      byte_source = art_Source_byte(fileName=fileName, loops=0);
+      parser = HeaderParser();
+    structure
+      byte_source.Out --> parser.ByteStream;
+      parser.InfoStream --> InfoStream;
+      parser.PixelStream --> PixelStream;
+  end
+
+
+  network BitMapHeaderParserTest() ==>:
+
+    entities
+
+      parser = BitMapHeaderFileParser(fileName="concentric.bmp");
+      info_sink = art_Sink_8bit_txt(fileName="info_bytes.txt");
+      pixel_sink = art_Sink_8bit_txt(fileName="pixel_bytes.txt");
+      
+    structure
+
+      parser.InfoStream --> info_sink.In;
+      parser.PixelStream --> pixel_sink.In;
+
+  end
+
+
+  network BitMapInfoHeaderParserTest() ==>:
+    entities
+      header_parser = BitMapHeaderFileParser(fileName="concentric.bmp");
+      info_parser = InfoHeaderParser();
+      pixel_stripper = PixelStreamStripper();
+      sink_red = art_Sink_8bit_txt(fileName="pixel_red.txt");
+      sink_blue = art_Sink_8bit_txt(fileName="pixel_blue.txt");
+      sink_green = art_Sink_8bit_txt(fileName="pixel_green.txt");
+      sink_alpha = art_Sink_8bit_txt(fileName="pixel_alpha.txt");
+    structure
+      header_parser.InfoStream --> info_parser.InputStream;
+      header_parser.PixelStream --> pixel_stripper.RawPixelStream;
+      info_parser.Width --> pixel_stripper.Width;
+      info_parser.Height --> pixel_stripper.Height;
+      info_parser.BitsPerPixel --> pixel_stripper.BitsPerPixel;
+      pixel_stripper.Red --> sink_red.In;
+      pixel_stripper.Green --> sink_green.In;
+      pixel_stripper.Blue --> sink_blue.In;
+      pixel_stripper.Alpha --> sink_alpha.In;
+  end
+
+
+  actor ByteToWord() uint(size = 8) ByteStream ==> uint(size = 32) WordStream:
+
+    action ByteStream:[b0, b1, b2, b3] ==> WordStream:[w]
+    var uint(size = 32) w
+    do 
+      w := b3;
+      w := (w << 8) + b2;
+      w := (w << 8) + b1;
+      w := (w << 8) + b0;
+    end
+  end
+  network BitMapDecodeEncodeTest() ==>:
+    entities
+      header_parser = BitMapHeaderFileParser(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric.bmp");
+      info_parser = InfoHeaderParser();
+      pixel_stripper = PixelStreamStripper();
+      encoder = SimpleBitmapEncoder();
+      sink = art_Sink_bin(fileName="out.bmp");
+    structure
+      header_parser.InfoStream --> info_parser.InputStream;
+      header_parser.PixelStream --> pixel_stripper.RawPixelStream;
+      info_parser.Width --> pixel_stripper.Width;
+      info_parser.Height --> pixel_stripper.Height;
+      info_parser.BitsPerPixel --> pixel_stripper.BitsPerPixel;
+      pixel_stripper.Red --> encoder.Red;
+      pixel_stripper.Green --> encoder.Green;
+      pixel_stripper.Blue --> encoder.Blue;
+      pixel_stripper.Alpha --> encoder.Alpha;
+      info_parser.Width --> encoder.Width;
+      info_parser.Height --> encoder.Height;
+      info_parser.BitsPerPixel --> encoder.BitsPerPixel;
+      encoder.ByteStream --> sink.In;
+  end
+end

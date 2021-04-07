@@ -71,3 +71,12 @@ streamblocks(
   SOURCE_PATH ${BitmapTest_SOURCES}
   TARGET_PATH generated/test/BitMapInfoHeaderParserTest
 )
+
+
+streamblocks(
+  BitMapDecodeEncodeTest_MC
+  PLATFORM multicore
+  QID hetero.stencil.bitmap.test.BitMapDecodeEncodeTest
+  SOURCE_PATH ${BitmapTest_SOURCES}
+  TARGET_PATH generated/test/BitMapDecodeEncodeTest
+)

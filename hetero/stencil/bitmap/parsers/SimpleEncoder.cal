@@ -4,9 +4,11 @@ namespace hetero.stencil.bitmap.encoders:
     uint(size = 8)  Red,
     uint(size = 8)  Green,
     uint(size = 8)  Blue,
+    uint(size = 8)  Alpha,
     uint(size = 32) Width, 
-    uint(size = 32) Height ==>
-    uint(size = 32) ByteStream:
+    uint(size = 32) Height,
+    uint(size = 32) BitsPerPixel ==>
+    uint(size = 8) ByteStream:
 
     uint NUM_BYTES_ADDR                  = 0;
     uint WIDTH_ADDR                      = NUM_BYTES_ADDR + 4;
@@ -14,7 +16,7 @@ namespace hetero.stencil.bitmap.encoders:
     uint COLOR_PLANE_ADDR                = HEIGHT_ADDR + 4;
     uint BITS_PER_PIXEL_ADDR             = COLOR_PLANE_ADDR + 2;
     uint PIXEL_ARRAY_COMP_ADDR           = BITS_PER_PIXEL_ADDR + 2;
-    uint RAW_SIZE_ADDR                   = COMP_ADDR + 4;
+    uint RAW_SIZE_ADDR                   = PIXEL_ARRAY_COMP_ADDR + 4;
     uint HORIZ_PRINT_RES_ADDR            = RAW_SIZE_ADDR + 4;
     uint VERT_PRINT_RES_ADDR             = HORIZ_PRINT_RES_ADDR + 4;
     uint NUM_COLORS_ADDR                 = VERT_PRINT_RES_ADDR + 4;
@@ -22,7 +24,7 @@ namespace hetero.stencil.bitmap.encoders:
 
     uint(size = 8) RGB_PIXEL = 1;
     uint(size = 8) PADDING_PIXEL = 2;
-    uint(size = 8) PADDING_PIXEL = 2;
+    
 
     uint(size = 8) pixel_type := RGB_PIXEL;
     
@@ -39,12 +41,29 @@ namespace hetero.stencil.bitmap.encoders:
     uint(size = 32) img_size := 0;
     uint(size = 32) w := 0;
     uint(size = 32) h := 0;
+    uint(size = 32) bpp := 0;
     
 
-
-    encode_header: action Width:[w], Height:[h] ==> ByteStream:[bytes] repeat 14
-    var uint(size = 32) bmp_size
+    procedure inc_index()
+    begin
+      if (x_count = w - 1) then
+        x_count := 0;
+        y_count := y_count + 1;
+        if (padding != 0) then 
+          padding_count := padding;
+          pixel_type := PADDING_PIXEL;
+        end
+      else
+        x_count := x_count + 1;
+      end
+    end
+    encode_header: action Width:[_w], Height:[_h], BitsPerPixel:[_bpp] 
+      ==> ByteStream:[bytes] repeat 14
+    var 
+      uint(size = 32) bmp_size,
+      List(type: uint(size = 8), size=14) bytes
     do
+      h := _h; w := _w; bpp := _bpp;
       row_size := (24 * w + 31) / 32 * 4;
       img_size := row_size * h;
       bmp_size := img_size + 54;
@@ -70,7 +89,7 @@ namespace hetero.stencil.bitmap.encoders:
     var 
       List(type:uint(size = 8), size=40) bytes
     do
-      padding := img_size - w * h;
+      padding := row_size - w * (bpp / 8);
 
       bytes[NUM_BYTES_ADDR] := 40;
       bytes[NUM_BYTES_ADDR + 1] := 0;
@@ -131,41 +150,31 @@ namespace hetero.stencil.bitmap.encoders:
       pixel_type := RGB_PIXEL;
     end
 
-    stream_pixel_row: action Red:[r], Green:[g], Blue:[b] ==> 
+    stream_pixel_rgb: action Red:[r], Green:[g], Blue:[b] ==> 
       ByteStream:[b, g, r]
     guard pixel_type = RGB_PIXEL and y_count < h
     do
-      if (x_count = w - 1) then
-        x_count := 0;
-        y_count := y + 1;
-        if (padding) then 
-          padding_count := padding;
-          pixel_type := PADDING_PIXEL;
-        else
-          if (y_count = h) then
-            pixel_type := DONE_PIXEL;
-          end
-        end
-      else
-        x_count := x_count + 1;
-      end
+     inc_index();
+    end
+
+    stream_pixel_rgba: action Red:[r], Green:[g], Blue:[b], Alpha:[a] ==> 
+      ByteStream:[b, g, r, a]
+    guard pixel_type = RGB_PIXEL and y_count < h
+    do
+     inc_index();
     end
 
     stream_padding: action ==> ByteStream:[0]
-    guard pixel_type = PADDING_PIXEL and padding_count > 0
+    guard pixel_type = PADDING_PIXEL and y_count <= h
     do
       if (padding_count = 1) then
-        if (y_count = h) then
-          pixel_type := DONE_PIXEL;
-        else
-          pixel_type := RGB_PIXEL;
-        end
+        pixel_type := RGB_PIXEL;
       end
       padding_count := padding_count - 1;
     end
 
     reset: action ==>
-    guard pixel_type = DONE_PIXEL and y_count = h and padding_count = 0
+    guard pixel_type = RGB_PIXEL and y_count = h
     do
       w := 0;
       h := 0;
@@ -177,7 +186,8 @@ namespace hetero.stencil.bitmap.encoders:
     schedule fsm s_init:
       s_init(encode_header) --> s_encode_info;
       s_encode_info(encode_info_header) --> s_pixels;
-      s_pixels(stream_pixel_row) --> s_pixels;
+      s_pixels(stream_pixel_rgb) --> s_pixels;
+      s_pixels(stream_pixel_rgba) --> s_pixels;
       s_pixels(stream_padding) --> s_pixels;
       s_pixels(reset) --> s_init;
     end

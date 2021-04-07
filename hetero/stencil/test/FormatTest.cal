@@ -12,8 +12,7 @@ namespace hetero.stencil.test:
 
     entities
       source = Source();
-      decoder = JpegDecoder();
-      
+      decoder = JpegDecoder(); 
       to_rgb = YCrCb420ToRGBRaster();
       to_yuv = RGBRasterToYCrCb420();
       display = Display();
