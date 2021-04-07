@@ -1,10 +1,13 @@
 namespace hetero.stencil.kernels:
 
-  import hetero.stencil.kernels.utils.DynamicFilter;
-  import hetero.stencil.kernels.utils.Splitter;
-  import hetero.bitmap.streamers.BitMapSimpleStreamer;
+  import entity hetero.stencil.kernels.utils.KernelStreamer;
+  import entity hetero.stencil.kernels.utils.DynamicFilter;
+  import entity hetero.stencil.kernels.utils.Splitter;
+  import entity hetero.stencil.bitmap.streamers.BitMapSimpleStreamer;
   import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
 
+
+  import entity ART.art_Sink_bin;
   import entity ART.art_Source_byte;
 
 
@@ -31,10 +34,10 @@ namespace hetero.stencil.kernels:
 
 
 
-
-  network BlurNetworkSingle(type DTYPE) 
-    DTYPE In,
-    uint Width, uint Height ==> DTYPE Out:
+  
+  network BlurNetworkSingle() 
+    uint(size=8) In,
+    uint Width, uint Height ==> uint(size=8) Out:
   
     var 
       int X_UB = -2;
@@ -44,7 +47,7 @@ namespace hetero.stencil.kernels:
     entities
 
       f0 = DynamicFilter(
-        DTYPE=DTYPE,
+        DTYPE: uint(size=8),
         x_lb_offset = X_LB, 
         x_ub_offset = X_UB,
         y_lb_offset = Y_LB,
@@ -52,7 +55,7 @@ namespace hetero.stencil.kernels:
         x_offset = 0,
         y_offset = 1);
       f1 = DynamicFilter(
-        DTYPE=DTYPE,
+        DTYPE: uint(size=8),
         x_lb_offset = X_LB, 
         x_ub_offset = X_UB,
         y_lb_offset = Y_LB,
@@ -60,7 +63,7 @@ namespace hetero.stencil.kernels:
         x_offset = 1,
         y_offset = 0);
       f2 = DynamicFilter(
-        DTYPE=DTYPE,
+        DTYPE: uint(size=8),
         x_lb_offset = X_LB, 
         x_ub_offset = X_UB,
         y_lb_offset = Y_LB,
@@ -68,7 +71,7 @@ namespace hetero.stencil.kernels:
         x_offset = 0,
         y_offset = 0);
       f3 = DynamicFilter(
-        DTYPE=DTYPE,
+        DTYPE: uint(size=8),
         x_lb_offset = X_LB, 
         x_ub_offset = X_UB,
         y_lb_offset = Y_LB,
@@ -76,7 +79,7 @@ namespace hetero.stencil.kernels:
         x_offset = -1,
         y_offset = 0);
       f4 = DynamicFilter(
-        DTYPE=DTYPE,
+        DTYPE: uint(size=8),
         x_lb_offset = X_LB, 
         x_ub_offset = X_UB,
         y_lb_offset = Y_LB,
@@ -84,12 +87,12 @@ namespace hetero.stencil.kernels:
         x_offset = 0,
         y_offset = -1);
 
-      s0 = Splitter(DTYPE=DTYPE);
-      s1 = Splitter(DTYPE=DTYPE);
-      s2 = Splitter(DTYPE=DTYPE);
-      s3 = Splitter(DTYPE=DTYPE);
+      s0 = Splitter(DTYPE: uint(size=8));
+      s1 = Splitter(DTYPE: uint(size=8));
+      s2 = Splitter(DTYPE: uint(size=8));
+      s3 = Splitter(DTYPE: uint(size=8));
 
-      compute = BlurCompute(DTYPE=DTYPE);
+      compute = BlurCompute(DTYPE: uint(size=8));
 
 
     structure
@@ -120,13 +123,13 @@ namespace hetero.stencil.kernels:
       s3.Left --> f3.In;
       s3.Right --> f4.In;
 
-      f0.OUt --> compute.Ref_p0_p1;
-      f1.OUt --> compute.Ref_p1_p0;
-      f2.OUt --> compute.Ref_p0_p0;
-      f3.OUt --> compute.Ref_n1_p0;
-      f4.OUt --> compute.Ref_p0_n1;
+      f0.Out --> compute.Ref_p0_p1;
+      f1.Out --> compute.Ref_p1_p0;
+      f2.Out --> compute.Ref_p0_p0;
+      f3.Out --> compute.Ref_n1_p0;
+      f4.Out --> compute.Ref_p0_n1;
 
-      comput.Out --> Out;
+      compute.Out --> Out;
 
   end
 
@@ -148,7 +151,7 @@ namespace hetero.stencil.kernels:
         pad_value = 0
       );
 
-      kernel = BlurNetworkSingle(DTYPE=uint(size = 8));
+      kernel = BlurNetworkSingle();
 
 
     structure
@@ -160,20 +163,22 @@ namespace hetero.stencil.kernels:
       padding.PaddedStream --> kernel.In;
       padding.PaddedHeight --> kernel.Height;
       padding.PaddedWidth --> kernel.Width;
+
+
       
-      kernel.OUt --> Out;
+      kernel.Out --> Out;
 
   end
 
   network BitmapBlurNetwork() ==> :
 
     entities
-      file_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric_64.bmp");
+      file_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric_3.bmp", loops=0);
       streamer = BitMapSimpleStreamer();
-      kernel_r = BlurNetworkSingle();
-      kernel_g = BlurNetworkSingle();
-      kernel_b = BlurNetworkSingle();
-      kernel_a = BlurNetworkSingle();
+      kernel_r = BitmapBlurNetworkSingle();
+      kernel_g = BitmapBlurNetworkSingle();
+      kernel_b = BitmapBlurNetworkSingle();
+      kernel_a = BitmapBlurNetworkSingle();
 
       encoder = SimpleBitmapEncoder();
       file_writer = art_Sink_bin(fileName="out.bmp");
@@ -182,15 +187,32 @@ namespace hetero.stencil.kernels:
 
       file_reader.Out --> streamer.ByteStream;
       streamer.Red --> kernel_r.PixelStream;
-      streamer.Green --> kernel_g.PixelStream;
-      streamer.Blue --> kernel_b.PixelStream;
-      streamer.Alpha --> kernel_a.PixelStream;
+      streamer.Width --> kernel_r.Width;
+      streamer.Height --> kernel_r.Height;
 
-      streamer.Width --> enocder.Width;
+      streamer.Green --> kernel_g.PixelStream;
+      streamer.Width --> kernel_g.Width;
+      streamer.Height --> kernel_g.Height;
+
+      streamer.Blue --> kernel_b.PixelStream;
+      streamer.Width --> kernel_b.Width;
+      streamer.Height --> kernel_b.Height;
+
+      streamer.Alpha --> kernel_a.PixelStream;
+      streamer.Width --> kernel_a.Width;
+      streamer.Height --> kernel_a.Height;
+
+      streamer.Width --> encoder.Width;
       streamer.Height --> encoder.Height;
       streamer.BitsPerPixel --> encoder.BitsPerPixel;
+      kernel_r.Out --> encoder.Red;
+      kernel_g.Out --> encoder.Green;
+      kernel_b.Out --> encoder.Blue;
+      kernel_a.Out --> encoder.Alpha;
+
       encoder.ByteStream --> file_writer.In;
 
   end
+  
 
 end

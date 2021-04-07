@@ -19,6 +19,7 @@ namespace hetero.stencil.bitmap.streamers:
         pixel_stripper = PixelStreamStripper();
         
       structure
+        ByteStream --> header_parser.ByteStream;
         header_parser.InfoStream --> info_parser.InputStream;
         header_parser.PixelStream --> pixel_stripper.RawPixelStream;
         info_parser.Width --> pixel_stripper.Width;

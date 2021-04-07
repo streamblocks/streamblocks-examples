@@ -17,13 +17,14 @@ namespace hetero.stencil.kernels.utils:
     
     int (size = 32) orig_w := 0;
     int (size = 32) orig_h := 0;
-    int (size = 32) x_index := orig_w + stencil_x_pos;
-    int (size = 32) y_index := orig_h + stencil_y_pos;
+    int (size = 32) x_index := 0;
+    int (size = 32) y_index := 0;
 
+    bool idle := true;
     
     procedure inc_index()
     begin
-      if (x_index = orig_w + stencil_x_pos - 1)
+      if (x_index = orig_w + stencil_x_pos - 1) then
         x_index := stencil_x_neg;
         y_index := y_index + 1;
       else 
@@ -32,30 +33,52 @@ namespace hetero.stencil.kernels.utils:
     end
 
     read_h_w: action Width:[w], Height:[h] ==> 
-      PaddedWidth:[w + ((stencil_x_pos - stencil_x_neg) as uint(size = 32))],
-      PaddedHeight:[h + ((stencil_y_pos - stencil_x_neg) as unit(size = 32))]
-    guard y_index = (orig_h + stencil_y_pos) and x_index = (orig_w + stencil_x_pos)
+      PaddedWidth:[w + ((stencil_x_pos - stencil_x_neg))],
+      PaddedHeight:[h + ((stencil_y_pos - stencil_x_neg))]
+    guard idle
     do 
       orig_h := h;
       orig_w := w;
       x_index := stencil_x_neg;
       y_index := stencil_y_neg;
+      idle := false;
+    end
+
+    pixel_stream: action PixelStream:[pixel] ==> PaddedStream:[pixel]
+    guard x_index >= 0 and x_index < orig_w and y_index >= 0 and y_index < orig_h and idle = false
+    do
+      inc_index();
     end
 
     pad_stream: action ==> PaddedStream:[pad_value]
-    guard y_index < (orig_h + stencil_y_pos) and x_index < (orig_w + stencil_x_pos)
+    guard 
+      (
+        (y_index < 0 and y_index >= stencil_y_neg and x_index >= stencil_x_neg and x_index < (orig_w + stencil_x_pos)) or // lower band
+        (y_index >= orig_h and y_index < (orig_h + stencil_y_pos) and x_index >= stencil_x_neg and x_index < (orig_w + stencil_x_pos)) or // upper band
+        (x_index >= stencil_x_neg and x_index < 0 and y_index >= stencil_y_neg and y_index < (orig_h + stencil_y_pos)) or // left band
+        (x_index >= orig_w and x_index < (orig_w + stencil_x_pos) and y_index >= stencil_y_neg and y_index < (orig_h + stencil_y_pos))   // right band
+      ) and idle = false
+      
+    do
       inc_index();
     end
-    pixel_stream: action PixelStream:[pixel] ==> PaddedStream:[pixel]
-    guard x_index >= 0 and x_index < orig_w and y_index >= 0 and y_index < orig_h
-      inc_index();
+    
+    reset: action ==>
+    guard x_index = (orig_w + stencil_x_pos) and y_index = (orig_h + stencil_y_pos) and idle = false
+    do
+      orig_w := 0;
+      orig_h := 0;
+      x_index := 0;
+      y_index := 0;
+      idle := true;
     end
 
     priority 
       read_h_w > pixel_stream;
       pixel_stream > pad_stream;
+      pad_stream > reset;
     end
-    
+  
   end
 end
 
