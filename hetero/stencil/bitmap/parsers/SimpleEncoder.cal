@@ -1,0 +1,186 @@
+namespace hetero.stencil.bitmap.encoders:
+
+  actor SimpleBitmapEncoder() 
+    uint(size = 8)  Red,
+    uint(size = 8)  Green,
+    uint(size = 8)  Blue,
+    uint(size = 32) Width, 
+    uint(size = 32) Height ==>
+    uint(size = 32) ByteStream:
+
+    uint NUM_BYTES_ADDR                  = 0;
+    uint WIDTH_ADDR                      = NUM_BYTES_ADDR + 4;
+    uint HEIGHT_ADDR                     = WIDTH_ADDR + 4;
+    uint COLOR_PLANE_ADDR                = HEIGHT_ADDR + 4;
+    uint BITS_PER_PIXEL_ADDR             = COLOR_PLANE_ADDR + 2;
+    uint PIXEL_ARRAY_COMP_ADDR           = BITS_PER_PIXEL_ADDR + 2;
+    uint RAW_SIZE_ADDR                   = COMP_ADDR + 4;
+    uint HORIZ_PRINT_RES_ADDR            = RAW_SIZE_ADDR + 4;
+    uint VERT_PRINT_RES_ADDR             = HORIZ_PRINT_RES_ADDR + 4;
+    uint NUM_COLORS_ADDR                 = VERT_PRINT_RES_ADDR + 4;
+    uint NUM_IMPORTANT_COLORS_ADDR       = NUM_COLORS_ADDR + 4;
+
+    uint(size = 8) RGB_PIXEL = 1;
+    uint(size = 8) PADDING_PIXEL = 2;
+    uint(size = 8) PADDING_PIXEL = 2;
+
+    uint(size = 8) pixel_type := RGB_PIXEL;
+    
+    
+    uint padding := 0;
+
+    uint padding_count := 0;
+    uint x_count := 0;
+    uint y_count := 0;
+    
+
+    
+    uint(size = 32) row_size := 0;
+    uint(size = 32) img_size := 0;
+    uint(size = 32) w := 0;
+    uint(size = 32) h := 0;
+    
+
+
+    encode_header: action Width:[w], Height:[h] ==> ByteStream:[bytes] repeat 14
+    var uint(size = 32) bmp_size
+    do
+      row_size := (24 * w + 31) / 32 * 4;
+      img_size := row_size * h;
+      bmp_size := img_size + 54;
+
+      bytes[0] := 0x42;
+      bytes[1] := 0x4D;
+      bytes[2] := bmp_size;
+      bytes[3] := bmp_size >> 8;
+      bytes[4] := bmp_size >> 16;
+      bytes[5] := bmp_size >> 24;
+      bytes[6] := 0x00;
+      bytes[7] := 0x00;
+      bytes[8] := 0x00;
+      bytes[9] := 0x00;
+      bytes[10] := 54;
+      bytes[11] := 0;
+      bytes[12] := 0;
+      bytes[13] := 0;
+
+    end
+    encode_info_header: action ==> 
+      ByteStream:[bytes] repeat 40 
+    var 
+      List(type:uint(size = 8), size=40) bytes
+    do
+      padding := img_size - w * h;
+
+      bytes[NUM_BYTES_ADDR] := 40;
+      bytes[NUM_BYTES_ADDR + 1] := 0;
+      bytes[NUM_BYTES_ADDR + 2] := 0;
+      bytes[NUM_BYTES_ADDR + 3] := 0;
+
+      bytes[WIDTH_ADDR] := w;
+      bytes[WIDTH_ADDR + 1] := w >> 8;
+      bytes[WIDTH_ADDR + 2] := w >> 16;
+      bytes[WIDTH_ADDR + 3] := w >> 24;
+
+      bytes[HEIGHT_ADDR] := h;
+      bytes[HEIGHT_ADDR + 1] := h >> 8;
+      bytes[HEIGHT_ADDR + 2] := h >> 16;
+      bytes[HEIGHT_ADDR + 3] := h >> 24;
+
+      bytes[COLOR_PLANE_ADDR] := 1;
+      bytes[COLOR_PLANE_ADDR + 1] := 0;
+      bytes[COLOR_PLANE_ADDR + 2] := 0;
+      bytes[COLOR_PLANE_ADDR + 3] := 0;
+
+      bytes[BITS_PER_PIXEL_ADDR] := bpp;
+      bytes[BITS_PER_PIXEL_ADDR + 1] := bpp >> 8;
+      bytes[BITS_PER_PIXEL_ADDR + 2] := bpp >> 16;
+      bytes[BITS_PER_PIXEL_ADDR + 3] := bpp >> 24;
+
+      bytes[PIXEL_ARRAY_COMP_ADDR] := 0; 
+      bytes[PIXEL_ARRAY_COMP_ADDR + 1] := 0; 
+
+      bytes[RAW_SIZE_ADDR] := img_size;
+      bytes[RAW_SIZE_ADDR + 1] := img_size >> 8;
+      bytes[RAW_SIZE_ADDR + 2] := img_size >> 16;
+      bytes[RAW_SIZE_ADDR + 3] := img_size >> 24;
+
+      // 72 DPI = 2835 (256 * 11 + 19)
+      bytes[HORIZ_PRINT_RES_ADDR] := 19;
+      bytes[HORIZ_PRINT_RES_ADDR + 1] := 11;
+      bytes[HORIZ_PRINT_RES_ADDR + 2] := 0;
+      bytes[HORIZ_PRINT_RES_ADDR + 3] := 0;
+      
+      bytes[VERT_PRINT_RES_ADDR] := 19;
+      bytes[VERT_PRINT_RES_ADDR + 1] := 11;
+      bytes[VERT_PRINT_RES_ADDR + 2] := 0;
+      bytes[VERT_PRINT_RES_ADDR + 3] := 0;
+
+      bytes[NUM_COLORS_ADDR] := 0;
+      bytes[NUM_COLORS_ADDR + 1] := 0;
+      bytes[NUM_COLORS_ADDR + 2] := 0;
+      bytes[NUM_COLORS_ADDR + 3] := 0;
+
+
+      bytes[NUM_IMPORTANT_COLORS_ADDR] := 0;
+      bytes[NUM_IMPORTANT_COLORS_ADDR + 1] := 0;
+
+
+      x_count := 0;
+      y_count := 0;
+      pixel_type := RGB_PIXEL;
+    end
+
+    stream_pixel_row: action Red:[r], Green:[g], Blue:[b] ==> 
+      ByteStream:[b, g, r]
+    guard pixel_type = RGB_PIXEL and y_count < h
+    do
+      if (x_count = w - 1) then
+        x_count := 0;
+        y_count := y + 1;
+        if (padding) then 
+          padding_count := padding;
+          pixel_type := PADDING_PIXEL;
+        else
+          if (y_count = h) then
+            pixel_type := DONE_PIXEL;
+          end
+        end
+      else
+        x_count := x_count + 1;
+      end
+    end
+
+    stream_padding: action ==> ByteStream:[0]
+    guard pixel_type = PADDING_PIXEL and padding_count > 0
+    do
+      if (padding_count = 1) then
+        if (y_count = h) then
+          pixel_type := DONE_PIXEL;
+        else
+          pixel_type := RGB_PIXEL;
+        end
+      end
+      padding_count := padding_count - 1;
+    end
+
+    reset: action ==>
+    guard pixel_type = DONE_PIXEL and y_count = h and padding_count = 0
+    do
+      w := 0;
+      h := 0;
+      padding := 0;
+      img_size := 0;
+      row_size := 0;
+    end
+
+    schedule fsm s_init:
+      s_init(encode_header) --> s_encode_info;
+      s_encode_info(encode_info_header) --> s_pixels;
+      s_pixels(stream_pixel_row) --> s_pixels;
+      s_pixels(stream_padding) --> s_pixels;
+      s_pixels(reset) --> s_init;
+    end
+
+  end
+end

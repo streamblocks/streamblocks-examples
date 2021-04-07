@@ -1,0 +1,53 @@
+namespace hetero.stencil.bitmap.parsers:
+
+  /** 
+   * A simple bitmap BTIMAPINFOHEADER (40 bytes) info header parser
+   */
+
+  actor InfoHeaderParser() 
+    uint(size = 8) InputStream 
+    ==> 
+    uint(size = 32) Width,
+    uint(size = 32) Height,
+    uint(size = 16) BitsPerPixel:
+
+    function bytesToWord(
+      List(type:uint(size = 8), size = 40) bytes, int offset) --> uint(size = 32)
+      var uint(size = 32) b0 := bytes[offset + 0], 
+          uint(size = 32) b1 := bytes[offset + 1],
+          uint(size = 32) b2 := bytes[offset + 2],
+          uint(size = 32) b3 := bytes[offset + 3]:
+        (b3  << 24) | 
+        (b2  << 16) | 
+        (b1  <<  8) | 
+        (b0       )     
+    end
+
+    int NUM_BYTES_ADDR                  = 0;
+    int WIDTH_ADDR                      = NUM_BYTES_ADDR + 4;
+    int HEIGHT_ADDR                     = WIDTH_ADDR + 4;
+    int COLOR_PLANE_ADDR                = HEIGHT_ADDR + 4;
+    int BITS_PER_PIXEL_ADDR             = COLOR_PLANE_ADDR + 2;
+    int PIXEL_ARRAY_COMP_ADDR           = BITS_PER_PIXEL_ADDR + 2;
+    int RAW_SIZE_ADDR                   = PIXEL_ARRAY_COMP_ADDR + 4;
+    int HORIZ_PRINT_RES_ADDR            = RAW_SIZE_ADDR + 4;
+    int VERT_PRINT_RES_ADDR             = HORIZ_PRINT_RES_ADDR + 4;
+    int NUM_COLORS_ADDR                 = VERT_PRINT_RES_ADDR + 4;
+    int NUM_IMPORTANT_COLORS_ADDR       = NUM_COLORS_ADDR + 4;
+
+
+    parse_info_size: action InputStream:[bytes] repeat 40 ==> 
+      Width:[w], Height:[h], BitsPerPixel:[bpp]
+    var 
+      uint(size = 32) w := bytesToWord(bytes, WIDTH_ADDR),
+      uint(size = 32) h := bytesToWord(bytes, HEIGHT_ADDR),
+      uint(size = 32) bpp := bytesToWord(bytes, BITS_PER_PIXEL_ADDR)
+    do
+    end
+
+  end
+
+  
+  
+
+end

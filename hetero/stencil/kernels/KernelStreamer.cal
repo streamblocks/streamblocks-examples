@@ -1,0 +1,58 @@
+namespace hetero.stencil.kernels.utils:
+
+
+  /* pads a pixel stream for stencil computation, for instance, if some
+   * stencil kernel accesses indices [0, -1], [0, -2], [2, 0], [1, 0] then
+   * the pixel stream is padded 
+   */
+  actor KernelStreamer(int stencil_x_neg, int stencil_x_pos, 
+    int stencil_y_neg, int stencil_y_pos, uint(size = 8) pad_value)
+    uint(size = 8) PixelStream, // either R, G, B, or Alpha
+    uint(size = 32) Width, 
+    uint(size = 32) Height
+    ==>
+    uint(size = 8) PaddedStream:
+    
+    int (size = 32) orig_w := 0;
+    int (size = 32) orig_h := 0;
+    int (size = 32) x_index := orig_w + stencil_x_pos;
+    int (size = 32) y_index := orig_h + stencil_y_pos;
+
+    
+    procedure inc_index()
+    begin
+      if (x_index = orig_w + stencil_x_pos - 1)
+        x_index := stencil_x_neg;
+        y_index := y_index + 1;
+      else 
+        x_index := x_index + 1;
+      end
+    end
+
+    read_h_w: action Width:[w], Height:[h] ==>
+    guard y_index = (orig_h + stencil_y_pos) and x_index = (orig_w + stencil_x_pos)
+    do 
+      orig_h := h;
+      orig_w := w;
+      x_index := stencil_x_neg;
+      y_index := stencil_y_neg;
+    end
+
+    pad_stream: action ==> PaddedStream:[pad_value]
+    guard y_index < (orig_h + stencil_y_pos) and x_index < (orig_w + stencil_x_pos)
+      inc_index();
+    end
+    pixel_stream: action PixelStream:[pixel] ==> PaddedStream:[pixel]
+    guard x_index >= 0 and x_index < orig_w and y_index >= 0 and y_index < orig_h
+      inc_index();
+    end
+
+    priority 
+      read_h_w > pixel_stream;
+      pixel_stream > pad_stream;
+    end
+    
+  end
+end
+
+

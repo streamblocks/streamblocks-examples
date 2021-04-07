@@ -1,0 +1,96 @@
+namespace hetero.stencil.bitmap.parsers:
+  import var system.io.dprint1;
+
+  /** 
+   * A simple bitmap header parser, a bit map header is 14 bytes
+   * Offset |  Number of bytes |  Hex value     | comment
+   * 0x00   |         2        |  0x42 0x4D     | Always BM
+   * 0x02   |         4        |                | total size of the bmp file
+   * 0x06   |         2        |                | Reserved1
+   * 0x08   |         2        |                | Reserved1
+   * 0x0A   |         4        |                | Pixel offset
+   */
+  actor HeaderParser() 
+    uint(size = 8) ByteStream // byte stream from file
+    ==>
+    uint(size = 8) InfoStream, 
+    uint(size = 8) PixelStream:
+
+    int BM_ADDR             = 0;
+    int SIZE_ADDR           = 2;
+    int PIXEL_OFFSET_ADDR   = 10;
+    int DIB_ADDR            = 14;
+
+    int addr := 0;
+    int bmp_size := 0;
+    int pixel_offset := 0;
+    function bytesToWord(
+      List(type:uint(size = 8), size = 4) bytes) --> uint(size = 32)
+      var uint(size = 32) b0 := bytes[0], 
+          uint(size = 32) b1 := bytes[1],
+          uint(size = 32) b2 := bytes[2],
+          uint(size = 32) b3 := bytes[3]:
+        (b3  << 24) | 
+        (b2  << 16) | 
+        (b1  <<  8) | 
+        (b0       )     
+    end
+    
+    bm_read: action ByteStream:[b0, b1] ==> 
+    do
+      addr := addr + 2;
+    end
+    
+    size_read: action ByteStream:[bytes] repeat 4 ==>
+    do
+      bmp_size := bytesToWord(bytes);
+      dprint1("bmp size: ", bmp_size);
+      addr := addr + 4;
+    end
+
+    reserved_read: action ByteStream:[bytes] repeat 4 ==>
+    do
+      addr := addr + 4;
+    end
+
+    offset_read: action ByteStream:[bytes] repeat 4 ==>
+    do
+      addr := addr + 4;
+      pixel_offset := bytesToWord(bytes);
+      dprint1("Offset: ", pixel_offset);
+    end
+
+    info_stream: action ByteStream:[b] ==> InfoStream:[b]
+    guard addr < pixel_offset and addr >= 14
+    do
+      addr := addr + 1;
+    end
+
+    pixel_stream: action ByteStream:[b] ==> PixelStream:[b]
+    guard addr < bmp_size and addr >= pixel_offset
+    do
+      addr := addr + 1;
+    end
+
+    reset: action ==>
+    guard addr = bmp_size
+    do
+      addr := 0;
+      bmp_size := 0;
+      pixel_offset := 0;
+    end
+    
+    schedule fsm s_init:
+
+      s_init(bm_read) --> s_size_read;
+      s_size_read(size_read) --> s_reserved_read;
+      s_reserved_read(reserved_read) --> s_offset_read;
+      s_offset_read(offset_read) --> s_info_or_pixel;
+      s_info_or_pixel(info_stream) --> s_info_or_pixel;
+      s_info_or_pixel(pixel_stream) --> s_info_or_pixel;
+      s_info_or_pixel(reset) --> s_init;
+
+    end
+  end
+
+end

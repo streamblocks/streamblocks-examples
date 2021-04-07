@@ -48,4 +48,26 @@ streamblocks(
 )
 
 
+set(BitmapTest_SOURCES
+  ${EXAMPLES_HOME}/hetero/stencil/bitmap
+  ${EXAMPLES_HOME}/hetero/stencil/test
+  ${EXAMPLES_HOME}/system/art
+  ${EXAMPLES_HOME}/system/std
+)
 
+streamblocks(
+  BitMapHeaderParserTest_MC
+  PLATFORM multicore
+  QID hetero.stencil.bitmap.test.BitMapHeaderParserTest
+  SOURCE_PATH ${BitmapTest_SOURCES}
+  TARGET_PATH generated/test/BitMapHeaderParserTest
+)
+
+
+streamblocks(
+  BitMapInfoHeaderParserTest_MC
+  PLATFORM multicore
+  QID hetero.stencil.bitmap.test.BitMapInfoHeaderParserTest
+  SOURCE_PATH ${BitmapTest_SOURCES}
+  TARGET_PATH generated/test/BitMapInfoHeaderParserTest
+)

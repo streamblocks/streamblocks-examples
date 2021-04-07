@@ -1,0 +1,106 @@
+namespace hetero.stencil.bitmap.streamers:
+
+
+  /** Strips the padding from a bitmap pixel stream
+   */
+  actor PixelStreamStripper()
+    uint(size = 8) RawPixelStream,
+    uint(size = 32) Width, 
+    uint(size = 32) Height, uint(size = 32) BitsPerPixel
+    ==>
+    uint(size = 8) Red, 
+    uint(size = 8) Green, 
+    uint(size = 8) Blue, 
+    uint(size = 8) Alpha:
+  
+
+    uint row_size := 0;
+    uint padding := 0;
+    uint w := 0;
+    uint h := 0;
+    uint bpp := 0;
+
+    uint x_count := 0;
+    uint y_count := 0;
+    uint padding_count := 0;
+
+    uint(size = 8) PIXEL_STREAM = 0;
+    uint(size = 8) PADDING_THROW = 1;
+    
+
+
+    uint(size = 8) stream_state := PIXEL_STREAM;
+    procedure inc_index()
+    begin
+      if (x_count = w - 1) then
+        x_count := 0;
+        y_count := y_count + 1;
+        if (padding != 0) then
+          padding_count := padding;
+          stream_state := PADDING_THROW;
+        end
+      else
+        x_count := x_count + 1;
+      end
+    end
+    read_h_w: action Width:[_w], Height:[_h], BitsPerPixel:[_bpp] ==>
+    do
+      w := _w;
+      h := _h;
+      bpp := _bpp;
+      row_size := ((bpp * w + 31) / 32) * 4;
+      padding := row_size - w * (bpp / 8);
+      stream_state := PIXEL_STREAM;
+      x_count := 0;
+      y_count := 0;
+      padding_count := padding;
+    end
+
+    read_rgba: action RawPixelStream:[b, g, r, a] ==>
+      Red:[r], Blue:[b], Green:[g], Alpha:[a]
+    guard bpp = 32 and y_count < h and stream_state = PIXEL_STREAM
+    do
+      inc_index();
+    end
+    
+    read_rgb: action RawPixelStream:[b, g, r] ==> Red:[r], Blue:[b], Green:[g]
+    guard bpp = 24 and y_count < h and stream_state = PIXEL_STREAM
+    do
+      inc_index();
+    end
+    
+    read_padding: action RawPixelStream:[p] ==>
+    guard y_count <= h and stream_state = PADDING_THROW
+    do
+      if (padding_count = 1) then
+        stream_state := PIXEL_STREAM;
+      end
+      padding_count := padding_count - 1;
+    end
+
+    reset: action ==>
+    guard y_count = h and stream_state = PIXEL_STREAM
+    do
+      row_size := 0;
+      padding := 0;
+      w := 0;
+      h := 0;
+      bpp := 0;
+      x_count := 0;
+      y_count := 0;
+      padding_count := 0;
+      stream_state := PIXEL_STREAM;
+    end
+
+    schedule fsm s_init:
+      s_init(read_h_w) --> s_stream;
+      s_stream(read_rgba) --> s_stream;
+      s_stream(read_rgb) --> s_stream;
+      s_stream(read_padding) --> s_stream;
+      s_stream(reset) --> s_init;
+    end
+  end
+
+  
+
+end
