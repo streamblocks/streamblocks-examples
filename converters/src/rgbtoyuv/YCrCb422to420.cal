@@ -1,0 +1,147 @@
+namespace converters.rgbtoyuv:
+
+    actor YCrCb422to420()
+        uint(size=16) SOI,
+        uint(size=8) CrCb422
+            ==>
+                uint(size=8) CrCb420:
+            
+        //Parameters
+        int WidthMAX = 1024;
+        
+        //function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
+        //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+        function tap(int(size=10) a,int(size=10) b,int(size=10) c,int(size=10) d) --> int(size=10):
+            (a + (b << 1) + b + (c << 1) + c + d)  >> 3 //=(a+3*b+3*c+d)/8
+        end
+    
+        
+        int(size=32) width := 0;
+        int(size=32) height := 0; 
+        
+        int(size=16) i := 0;
+        int(size=16) j := 0; 
+        
+        bool waitStart := false;
+        bool nextStart := false;
+        bool next2Start := false;
+        bool fireStart := false;
+        
+        int crcbOut := 0;
+        
+        int count := 0;
+        List(type:int(size=10), size = WidthMAX) Line0 := [0 : for int k in 1 .. WidthMAX];
+        List(type:int(size=10), size = WidthMAX) Line1 := [0 : for int k in 1 .. WidthMAX];
+        List(type:int(size=10), size = WidthMAX) Line2 := [0 : for int k in 1 .. WidthMAX];
+
+        
+        getw : action SOI:[w] ==>
+        do
+            width := w;
+            i := 0;
+            j := 0;
+        end
+        
+        geth: action SOI:[h] ==>
+        do
+            height := h;
+            i := 0;
+            j := 0;
+            waitStart := true;
+        end
+        
+        process.next : action ==>
+        guard 
+            nextStart = true
+        do
+            i := 0;
+            j := j + 1;
+            nextStart := false;
+            fireStart := true;
+        end
+        
+        process.next2 : action ==>
+        guard 
+            next2Start = true
+        do
+            i := 0;
+            j := j + 1;
+            next2Start := false;
+            waitStart := true;
+        end
+
+        process.wait : action CrCb422:[ChromaX] ==>
+        guard 
+            waitStart = true
+        do	
+            
+            if (j = 0) then
+                Line2[i] := ChromaX;
+                Line1[i] := ChromaX;
+                Line0[i] := ChromaX;
+            else 
+                Line2[i] := Line1[i];
+                Line1[i] := Line0[i];
+                Line0[i] := ChromaX;
+            end
+            i := i + 1;
+            if i >= width then
+                waitStart := false;
+                nextStart := true;
+            end
+        end
+        
+        process.fire : action CrCb422:[ChromaX] ==> CrCb420:[crcbOut]
+        guard 
+            fireStart = true
+        var 
+            int(size=10) CoefA, 
+            int(size=10) CoefB,
+            int(size=10) CoefC, 
+            int(size=10) CoefD
+        do
+            CoefA := Line2[i];
+            CoefB := Line1[i];
+            CoefC := Line0[i];
+            CoefD := ChromaX;
+            
+            Line2[i] := Line1[i];
+            Line1[i] := Line0[i];
+            Line0[i] := ChromaX;
+            
+            crcbOut := tap(CoefA,CoefB,CoefC,CoefD);
+
+            i := i + 1;
+            if i >= width then
+                fireStart := false;
+                next2Start := true;
+            end
+            
+            count := count + 1;
+        end
+        
+
+        done:action ==>
+        guard 
+            count = ((width * height) >> 1)
+        do
+            count := 0;
+            waitStart := false;
+            nextStart := false;
+            next2Start := false;
+            fireStart := false;
+        end
+
+        schedule fsm getw:
+            getw(getw)-->geth;
+            geth(geth)-->process;
+            process(process)-->process;
+            process(done)-->getw;
+        end
+
+        priority
+            done > process;
+        end
+    end
+
+end

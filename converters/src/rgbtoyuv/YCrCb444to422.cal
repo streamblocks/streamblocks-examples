@@ -1,0 +1,149 @@
+namespace converters.rgbtoyuv:
+
+    actor YCrCb444to422()
+        uint(size=16) SOI,
+        uint(size=8) Cr,
+        uint(size=8) Cb
+            ==>
+                uint(size=8) CrCb422:
+            
+        //image width is imgSize(15 downto 0) and height is 31 downto 16)
+        //	int(size=32) SizeOfImage,
+        //function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
+        //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+        function tap(int(size=10) a, int(size=10) b, int(size=10) c) --> int(size=10): 
+            (a + (b << 1) + c) >> 2 
+        end
+        
+        bool StartOfLine;
+        bool EndOfLine;
+        
+        int(size=11) cr0 := 0;
+        int(size=11) cr1 := 0;
+        int(size=11) cb0 := 0;
+        int(size=11) cb1 := 0;
+        
+        int count := 0;
+        
+        int(size=32) width := 0;
+        int(size=32) height := 0; 
+        
+        int(size=16) i := 0;
+        int(size=16) j := 0; 
+        
+        int CrOut := 0;
+        int CbOut := 0;
+        int i_CbOut := 0;
+        
+        getw: action SOI:[w] ==>
+        do
+            width := w;
+            
+            i := 0;
+            j := 0;
+        end
+        
+        geth: action SOI:[h] ==>
+        do
+            height := h;
+            
+            i := 0;
+            j := 0;
+        end
+        
+        wait : action Cr:[cr], Cb:[cb] ==>
+        do
+            cr1 := cr0;
+            cr0 := cr;
+            cb1 := cb0;
+            cb0 := cb;
+
+            if i = 0 then
+                StartOfLine := true;
+            else if i = width-2 then
+                EndOfLine := true;
+            else
+                StartOfLine := false;
+                EndOfLine := false;
+            end end
+            
+            count := count + 1;
+            
+        end
+        
+        firecr : action Cr:[cr], Cb:[cb] ==> CrCb422:[CrOut]
+        var 
+            int(size=10) Cr_CoefA, 
+            int(size=10) Cr_CoefB, 
+            int(size=10) Cr_CoefC,
+            int(size=10) Cb_CoefA, 
+            int(size=10) Cb_CoefB, 
+            int(size=10) Cb_CoefC
+        do	
+            if StartOfLine then
+                Cr_CoefA := cr0;
+                Cr_CoefB := cr0;
+                Cr_CoefC := cr;
+                Cb_CoefA := cb0;
+                Cb_CoefB := cb0;
+                Cb_CoefC := cb;
+            else if EndOfLine then
+                Cr_CoefA := cr0;
+                Cr_CoefB := cr;
+                Cr_CoefC := cr;
+                Cb_CoefA := cb0;
+                Cb_CoefB := cb;
+                Cb_CoefC := cb;
+            else
+                Cr_CoefA := cr1;
+                Cr_CoefB := cr0;
+                Cr_CoefC := cr;
+                Cb_CoefA := cb1;
+                Cb_CoefB := cb0;
+                Cb_CoefC := cb;
+            end end
+            CrOut := tap(Cr_CoefA,Cr_CoefB,Cr_CoefC);
+            i_CbOut := tap(Cb_CoefA,Cb_CoefB,Cb_CoefC);
+
+            cr1 := cr0;
+            cr0 := cr;
+            cb1 := cb0;
+            cb0 := cb;
+            
+            i := i + 2;
+            if i >= width then
+                i := 0;
+                j := j + 1;
+            end
+            count := count + 1;
+        end
+        
+        firecb : action ==>  CrCb422:[CbOut]
+        do
+            CbOut := i_CbOut;
+        end
+        
+        
+        done: action ==>
+        guard 
+            count = width * height
+        do
+            count := 0;
+        end
+        
+        schedule fsm getw :
+            getw(getw)-->geth;
+            geth(geth) --> wait;
+            
+            wait(done)-->getw;
+            wait(wait )-->firecr;
+            firecr(firecr)-->firecb;
+            firecb(firecb)-->wait;    
+        end
+
+        priority
+            done > wait;
+        end
+    end
+
+end

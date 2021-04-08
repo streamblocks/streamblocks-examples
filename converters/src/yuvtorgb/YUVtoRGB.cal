@@ -1,0 +1,32 @@
+namespace converters.yuvtorgb:
+
+import entity converters.yuvtorgb.YCrCb420to422;
+import entity converters.yuvtorgb.YCrCb422to444;
+import entity converters.yuvtorgb.YCrCbtoRGB;
+
+
+    network YUVtoRGB() 
+        uint(size=16) SOI, uint(size=8) Y, uint(size=8) CrCb 
+        ==>
+        uint(size=8) R, uint(size=8) G, uint(size=8) B :
+    entities
+        conv_420_422 = YCrCb420to422();
+        conv_422_444 = YCrCb422to444();
+        ycrcb_to_rgb = YCrCbtoRGB();
+    structure
+        SOI --> conv_420_422.SOI;
+        SOI --> conv_422_444.SOI;
+
+        Y --> ycrcb_to_rgb.Y;
+        CrCb --> conv_420_422.CrCb420;
+        
+        conv_420_422.CrCb422 --> conv_422_444.CrCb422;
+        conv_422_444.Cr --> ycrcb_to_rgb.Cr;
+        conv_422_444.Cb --> ycrcb_to_rgb.Cb;
+
+        ycrcb_to_rgb.R --> R;
+        ycrcb_to_rgb.G --> G;
+        ycrcb_to_rgb.B --> B;
+    end
+
+end

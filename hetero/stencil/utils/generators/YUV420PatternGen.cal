@@ -1,0 +1,97 @@
+namespace hetero.stencil.utils.formats:
+
+	actor YUV420PatternGenerator(int WIDTH, int HEIGHT)
+		==>
+			uint(size=16) SOI,
+			uint(size=8) Y,
+			uint(size=8) CbCr:
+			
+		int count := 0;
+
+		int state := 0;
+		
+		int countPix := 0;
+		//int WIDTH = 176;
+		//int HEIGHT = 144;
+		int Image_Counter := 0;
+		
+		SendPattern.even: action ==> Y:[v]
+		guard (count & 1) = 0
+		var
+			int v := 0
+		do
+			if(state = 0) then
+				v := count;
+			else
+				v := 255-count;
+			end
+			count := count + 1;
+			if(count >= 256)then
+				count := 0;
+			end
+			
+			countPix := countPix + 1;
+			if(countPix >= (WIDTH*HEIGHT))then
+				countPix := 0;
+				if(state = 0)then
+					state := 1;
+				else
+					state := 0;
+				end
+			end
+			Image_Counter := Image_Counter + 1;
+		end
+
+		SendPattern.odd: action ==> Y:[v], CbCr:[128]
+		guard (count & 1) = 1
+		var
+			int v := 0
+		do
+			if(state = 0) then
+				v := count;
+			else
+				v := 255-count;
+			end
+			count := count + 1;
+			if(count >= 256)then
+				count := 0;
+			end
+			
+			countPix := countPix + 1;
+			if(countPix >= (WIDTH*HEIGHT))then
+				countPix := 0;
+				if(state = 0)then
+					state := 1;
+				else
+					state := 0;
+				end
+			end
+			Image_Counter := Image_Counter + 1;
+		end
+		
+		SendNewImage: action ==>
+		guard
+			Image_Counter = HEIGHT * WIDTH
+		do
+			Image_Counter := 0;
+		end
+		
+		SentW: action ==> SOI:[WIDTH/16]
+		end
+		
+		SentH: action ==> SOI:[HEIGHT/16]
+		end
+		
+		schedule fsm s0:
+			s0	(SentW) --> s1;
+			s1	(SentH) --> s2;	
+			s2	(SendPattern) --> s2;
+			s2	(SendNewImage) --> s0;
+		end
+		
+		priority
+			SendNewImage > SendPattern;
+		end
+
+	end
+end

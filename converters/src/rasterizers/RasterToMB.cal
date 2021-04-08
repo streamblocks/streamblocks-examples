@@ -1,0 +1,207 @@
+namespace converters.rasterizers:
+
+    actor RasterToMB()
+        uint(size=16) SOI,
+        uint(size=8) Y,
+        uint(size=8) CbCr
+            ==>
+                uint(size=8) YCbCr:
+        // hack waiting for list-size parametrization
+        
+        int maxw_in_mb = 64;
+        
+        int(size=6) currentYLine := 0;
+
+        int(size=6) currentCbCrLine := 0;
+
+        int(size=8) mbCount := 0;
+
+        int(size=16) mbTotalCount := 0;
+
+        int(size=3) lineType := 0;
+
+        int(size=8) mbwidth := 0;
+        int(size=8) mbheight := 0;
+
+        int(size=10) Counter := 0;
+            
+        int(size=10) cb_count := 0;
+        int(size=10) cr_count := 0;
+            
+        int(size=16) totalMB;
+        
+        
+        // one line of MB in the worst case
+        List(type: List(type: uint(size=8), size=maxw_in_mb * 16), size=16) yTab;
+
+        List(type: List(type: uint(size=8), size=maxw_in_mb * 8), size=8) cbTab;
+
+        List(type: List(type: uint(size=8), size=maxw_in_mb * 8), size=8) crTab;
+        
+        List(type: uint(size=8), size=384) ycbcr;
+        
+        getSzW: action SOI:[soi] ==> 
+        do
+            mbwidth := (soi + 15) >> 4;
+        end
+        
+        getSzH: action SOI:[soi] ==> 
+        do
+            mbheight := (soi + 15) >> 4;
+            totalMB := mbwidth * mbheight;
+        end
+
+        done: action ==> 
+        guard
+            currentYLine = 16
+        do
+            currentYLine := 0;
+            currentCbCrLine := 0;
+        end
+        
+        storeY.start: action ==> 
+        guard
+            lineType = 0 or lineType = 2
+        end
+        
+        storeY.save: action Y:[ y ] ==> 
+        do
+            yTab[currentYLine][mbCount * 16 + Counter] := y;
+            Counter := Counter + 1;
+        end
+
+        storeY.finish: action ==>
+        guard
+            Counter = 16
+        do	
+            mbCount := mbCount + 1;
+            if mbCount = mbwidth then
+                mbCount := 0;
+                currentYLine := currentYLine + 1;
+                if lineType = 0 then
+                    lineType := 1;
+                else
+                    lineType := 0;
+                end
+            end
+            Counter := 0;
+        end
+
+        storeCbCr.start: action ==>
+        guard
+            lineType = 1
+        end
+
+        storeCbCr.save: action CbCr:[ cbcr ] ==> 
+        do
+            if (Counter & 1)  =  1 then
+                cbTab[currentCbCrLine][mbCount * 8 + cb_count] := cbcr;
+                cb_count := cb_count+ 1;
+            else
+                crTab[currentCbCrLine][mbCount * 8 + cr_count] := cbcr;
+                cr_count := cr_count + 1;
+            end
+            Counter := Counter + 1;
+        end
+        
+        storeCbCr.finish: action ==>
+        guard
+            Counter = 16
+        do	
+            mbCount := mbCount + 1;
+            if mbCount = mbwidth then
+                currentCbCrLine := currentCbCrLine + 1;
+                mbCount := 0;
+                lineType := 2;
+            end
+            cr_count := 0;
+            cb_count := 0;
+            Counter := 0;
+        end
+
+        doneSend.EOI: action ==>
+        guard
+            mbTotalCount = totalMB
+        do
+            mbTotalCount := 0;
+            mbCount := 0;
+            
+            currentYLine := 0;
+            currentCbCrLine := 0;
+            lineType := 0;
+        end
+
+        doneSend.Line: action ==>
+        guard
+            mbCount = mbwidth
+        do
+            mbCount := 0;
+        end
+
+        send.start: action ==>
+        do
+            foreach int i in 0 .. 7 do
+                foreach int j in 0 .. 7 do
+                    ycbcr[8 * i + j]       := yTab[i][j + 16 * mbCount];
+                    ycbcr[8 * i + j + 64]  := yTab[i][(j + 8) + 16 * mbCount];
+                    ycbcr[8 * i + j + 128] := yTab[i + 8][j + 16 * mbCount];
+                    ycbcr[8 * i + j + 192] := yTab[i + 8][j + 8 + 16 * mbCount];
+                    ycbcr[8 * i + j + 256] := crTab[i][j + (8 * mbCount)];
+                    ycbcr[8 * i + j + 320] := cbTab[i][j + (8 * mbCount)];
+                end
+            end
+        end
+        
+        send_send: action ==> YCbCr:[token]
+        var
+            uint(size=8) token
+        do
+            token := ycbcr[Counter];
+            Counter := Counter + 1;
+        end 
+        
+        send.stop: action ==>
+        guard
+            Counter = 384
+        do
+            mbCount := mbCount + 1;
+            mbTotalCount := mbTotalCount + 1;
+            Counter := 0;
+        end
+        
+
+        schedule fsm s0 :
+            s0 		(getSzW )				--> s1;
+            s1		(getSzH )				--> s2;
+            
+            s2		(storeY.start)			--> s21;
+            s21		(storeY.save)			--> s21;
+            s21		(storeY.finish)			--> s2;
+            
+            s2		(storeCbCr.start)		--> s22;
+            s22		(storeCbCr.save)		--> s22;
+            s22		(storeCbCr.finish)		--> s2;
+            
+            s2		(done)					--> s3;
+            
+            s3		(send.start)			--> s31;
+            s31		(send_send)				--> s31;
+            s31		(send.stop)				--> s3;
+            
+            s3 		(doneSend.Line)			--> s2;
+            s3 		(doneSend.EOI)			--> s0;
+        end
+
+        priority
+            storeY.finish > storeY.save;
+            storeCbCr.finish > storeCbCr.save;
+            
+            done > storeY.start;
+            done > storeCbCr.start;
+            
+            send.stop > send_send;
+            doneSend.EOI > doneSend.Line > send.start;
+        end
+    end
+    
+end

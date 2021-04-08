@@ -1,0 +1,10 @@
+namespace converters.size:
+
+    actor SoiMB() uint(size=16) SOI_IN ==> uint(size=16) SOI_OUT:
+
+        action SOI_IN:[w, h] ==> SOI_OUT:[(w + 15)/16, (h + 15)/16]
+	    end
+        
+    end
+
+end
