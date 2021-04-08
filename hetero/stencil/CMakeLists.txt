@@ -32,8 +32,9 @@ streamblocks(
 
 
 set(FormatIdentityTest_SOURCES
-  ${EXAMPLES_HOME}/hetero/stencil/utils/formats
+  ${EXAMPLES_HOME}/hetero/stencil/utils/generators
   ${EXAMPLES_HOME}/hetero/stencil/test
+  ${EXAMPLES_HOME}/converters/src
   ${EXAMPLES_HOME}/system/art
   ${EXAMPLES_HOME}/system/std
   ${EXAMPLES_HOME}/jpeg/decoder/serial

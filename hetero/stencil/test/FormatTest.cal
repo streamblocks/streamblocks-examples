@@ -1,31 +1,52 @@
 namespace hetero.stencil.test:
 
-  import entity jpeg.decoder.JpegDecoder;
-  import entity jpeg.io.Source;
-  import entity jpeg.io.Display;
+import entity jpeg.decoder.JpegDecoder;
+import entity jpeg.io.Source;
+import entity jpeg.io.Display;
 
-  import entity hetero.stencil.utils.formats.YCrCb420ToRGBRaster;
-  import entity hetero.stencil.utils.formats.RGBRasterToYCrCb420;
+import entity converters.yuvtorgb.YUVtoRGB;
+import entity converters.rgbtoyuv.RGBtoYUV;
+
+import entity converters.rasterizers.MBToRaster;
+import entity converters.rasterizers.RasterToMB;
+import entity converters.size.SoiUpscale;
+
 
   network FormatIdentityTest() ==>:
   
-
     entities
       source = Source();
       decoder = JpegDecoder(); 
-      to_rgb = YCrCb420ToRGBRaster();
-      to_yuv = RGBRasterToYCrCb420();
+      to_rgb = YUVtoRGB();
+      to_yuv = RGBtoYUV();
       display = Display();
+      soi_up = SoiUpscale();
+      raster_to_mb = RasterToMB();
+      mb_to_raster = MBToRaster();
     
     structure
-      source.Out --> decoder.BYTE;
-      decoder.YCbCr --> to_rgb.MacroBlock;
-      to_rgb.Red --> to_yuv.Red;
-      to_rgb.Green --> to_yuv.Green;
-      to_rgb.Blue --> to_yuv.Blue;
-      to_yuv.MacroBlock --> display.In;
-      decoder.SOI --> display.SOI;
-
+    	source.Out --> decoder.BYTE;
+    	decoder.SOI --> soi_up.SOI_IN;
+    	decoder.SOI --> display.SOI;
+    	
+    	soi_up.SOI_OUT --> raster_to_mb.SOI;
+    	soi_up.SOI_OUT --> mb_to_raster.SOI;
+    	soi_up.SOI_OUT --> to_rgb.SOI;
+    	soi_up.SOI_OUT --> to_yuv.SOI;
+    	
+    	decoder.YCbCr --> mb_to_raster.YCbCr;
+    	
+    	mb_to_raster.Y --> to_rgb.Y;
+    	mb_to_raster.CbCr --> to_rgb.CrCb;
+    	
+    	to_rgb.R --> to_yuv.R;
+    	to_rgb.G --> to_yuv.G;
+    	to_rgb.B --> to_yuv.B;
+    	
+    	to_yuv.Y --> raster_to_mb.Y;
+    	to_yuv.CrCb --> raster_to_mb.CbCr;
+    	
+     	raster_to_mb.YCbCr --> display.In;
   end
 
 end

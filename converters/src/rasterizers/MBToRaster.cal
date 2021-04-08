@@ -1,0 +1,196 @@
+namespace converters.rasterizers:
+
+    actor MBToRaster() 
+        uint(size=16) SOI,
+        uint(size=8) YCbCr 
+        ==>
+        uint(size=8) Y,
+        uint(size=8) CbCr:
+
+        int maxw_in_mb = 64;
+        
+        int(size=6) currentYLine := 0;
+
+        int(size=6) currentCbCrLine := 0;
+
+        int(size=8) mbCount := 0;
+
+        int(size=16) mbTotalCount := 0;
+
+        int(size=3) lineType := 0;
+
+        int(size=8) mbwidth := 0;
+        int(size=8) mbheight := 0;
+
+        int(size=10) Counter := 0;
+            
+        int(size=10) cb_count := 0;
+        int(size=10) cr_count := 0;
+            
+        int(size=16) totalMB;
+        
+        
+        List(type: List(type: uint(size=8), size=maxw_in_mb * 16), size=16) yTab;
+
+        List(type: List(type: uint(size=8), size=maxw_in_mb * 8), size=8) cbTab;
+
+        List(type: List(type: uint(size=8), size=maxw_in_mb * 8), size=8) crTab;
+        
+
+        getSOI: action SOI:[w,h] ==> 
+        do
+            mbwidth := (w + 15) >> 4;
+            mbheight := (h + 15) >> 4;
+            totalMB := mbwidth * mbheight;
+        end
+        
+        getMB: action YCbCr:[ycbcr] repeat 384 ==>
+        do
+            foreach int i in 0 .. 7 do
+                foreach int j in 0 .. 7 do
+                    yTab[i][j + 16 * mbCount]         := ycbcr[8 * i + j];
+                    yTab[i][(j + 8) + 16 * mbCount]   := ycbcr[8 * i + j + 64];
+                    yTab[i + 8][j + 16 * mbCount]     := ycbcr[8 * i + j + 128];
+                    yTab[i + 8][j + 8 + 16 * mbCount] := ycbcr[8 * i + j + 192];
+                    
+                    crTab[i][j + (8 * mbCount)]       := ycbcr[8 * i + j + 256];
+                    
+                    cbTab[i][j + (8 * mbCount)]       := ycbcr[8 * i + j + 320];
+                end
+            end
+            
+            mbCount := mbCount + 1;
+            mbTotalCount := mbTotalCount + 1;
+        end
+        
+        stopMB:action ==>
+        guard
+            mbCount = mbwidth
+        do
+            mbCount := 0;
+        end
+        
+
+        done: action ==> 
+        guard
+            currentYLine = 16
+        do
+            currentYLine := 0;
+            currentCbCrLine := 0;
+        end
+        
+        sendY.start: action ==> 
+        guard
+            lineType = 0 or lineType = 2
+        end
+        
+        sendY.send: action ==>  Y:[ y ] 
+        var
+            uint(size=8) y
+        do
+            y := yTab[currentYLine][mbCount * 16 + Counter];
+            Counter := Counter + 1;
+        end
+
+        sendY.finish: action ==>
+        guard
+            Counter = 16
+        do	
+            mbCount := mbCount + 1;
+            if mbCount = mbwidth then
+                mbCount := 0;
+                currentYLine := currentYLine + 1;
+                if lineType = 0 then
+                    lineType := 1;
+                else
+                    lineType := 0;
+                end
+            end
+            Counter := 0;
+        end
+        
+        sendCbCr.start: action ==>
+        guard
+            lineType = 1
+        end
+
+        sendCbCr.send: action ==>  CbCr:[ cbcr ] 
+        var
+            uint(size=8) cbcr
+        do
+            if (Counter & 1)  =  1 then
+                cbcr := cbTab[currentCbCrLine][mbCount * 8 + cb_count];
+                cb_count := cb_count+ 1;
+            else
+                cbcr := crTab[currentCbCrLine][mbCount * 8 + cr_count];
+                cr_count := cr_count + 1;
+            end
+            Counter := Counter + 1;
+        end
+        
+        sendCbCr.finish: action ==>
+        guard
+            Counter = 16
+        do	
+            mbCount := mbCount + 1;
+            if mbCount = mbwidth then
+                currentCbCrLine := currentCbCrLine + 1;
+                mbCount := 0;
+                lineType := 2;
+            end
+            cr_count := 0;
+            cb_count := 0;
+            Counter := 0;
+        end
+
+        doneSend.Line: action ==>
+        guard
+            mbTotalCount != totalMB
+        end
+        
+        doneSend.EOI: action ==>
+        guard
+            mbTotalCount = totalMB
+        do
+            mbTotalCount := 0;
+            mbCount := 0;
+            
+            currentYLine := 0;
+            currentCbCrLine := 0;
+            lineType := 0;
+        end
+        
+        schedule fsm s0:
+            s0		(getSOI) 				--> s1;
+            s1		(getMB)  				--> s1;
+            s1		(stopMB)  				--> s2;
+            
+            s2		(sendY.start)			--> s21;
+            s21		(sendY.send)			--> s21;
+            s21		(sendY.finish)			--> s2;
+            
+            s2		(sendCbCr.start)		--> s22;
+            s22		(sendCbCr.send)			--> s22;
+            s22		(sendCbCr.finish)		--> s2;
+            
+            s2		(done)					--> s3;
+            
+            s3 		(doneSend.EOI)			--> s0;
+            s3		(doneSend.Line)			--> s1;
+            
+        end
+        
+        priority
+            sendY.finish > sendY.send;
+            sendCbCr.finish > sendCbCr.send;
+            
+            done > sendY.start;
+            done > sendCbCr.start;
+            
+            
+            stopMB > getMB;
+        end
+
+    end
+
+end

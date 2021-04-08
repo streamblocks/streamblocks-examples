@@ -1,0 +1,121 @@
+namespace converters.yuvtorgb:
+
+    actor YCrCb422to444()
+        uint(size=8) CrCb422,
+        uint(size=16) SOI
+            ==>
+                uint(size=8) Cr,
+                uint(size=8) Cb:
+                
+        
+        //function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
+        //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+        function tap(int(size=10) a,int(size=10) b) --> int(size=10) : (a + b)/2 end
+    
+        int(size=11) ChromaR0 := 0;
+        int(size=11) ChromaB0 := 0;
+        int(size=11) ChromaR1 := 0;
+        int(size=11) ChromaB1 := 0;
+        
+        uint(size=16) width := 0;
+        uint(size=16) height := 0;
+        
+        int(size=16) i := 0;
+        int(size=16) j := 0; 
+        
+        int CrOut := 0;
+        int CbOut := 0;
+        
+    
+        int Cr_CoefA := 0;
+        int Cr_CoefB := 0;
+        int Cb_CoefA := 0;
+        int Cb_CoefB := 0;
+        
+        int count;
+        bool t := false;
+    
+        getSOI: action SOI:[w, h] ==>
+        do
+            width  := w;
+            height := h;
+            i := 0;
+            j := 0;
+            count := 0;
+            t:=true;
+        end
+        
+        action SOI:[w, h] ==>
+        guard
+        	t
+        end
+        
+
+        Cr1Start : action CrCb422:[ChromaR] ==>
+        do
+            ChromaR0 := ChromaR;
+        end
+
+        CbStart: action CrCb422:[ChromaB] ==> Cr:[CrOut], Cb:[CbOut]
+        do
+            ChromaB0 := ChromaB;
+            if (i = 0) then
+                Cr_CoefA := ChromaR0;
+                Cr_CoefB := ChromaR0;
+                Cb_CoefA := ChromaB;
+                Cb_CoefB := ChromaB;
+            else
+                Cr_CoefA := ChromaR0;
+                Cr_CoefB := ChromaR1;
+                Cb_CoefA := ChromaB0;
+                Cb_CoefB := ChromaB1; 
+            end 
+            
+            CrOut := tap(Cr_CoefA,Cr_CoefB);
+            CbOut := tap(Cb_CoefA,Cb_CoefB);
+            
+        
+            ChromaR1 := ChromaR0;
+            ChromaB1 := ChromaB0;
+            count := count + 1;
+        end	
+
+
+        Cr2Start: action ==> Cr:[CrOut], Cb:[CbOut]
+        do
+            
+            CrOut := ChromaR1;
+            CbOut := ChromaB1;
+            //println("ChromaROut "+CrOut);
+            //println("ChromaBOut "+CbOut);
+            i := i + 2;
+            if i >= width then
+                i := 0;
+                j := j + 1;
+            end
+            count := count + 1;
+        end
+        /* 
+        eoi: action ==>
+        guard
+            count = height*width
+        end*/
+        
+        schedule fsm s0:
+            s0	(getSOI) 	--> s1;
+            s1	(Cr1Start)	--> s2;
+            //s2	(eoi)		--> s0;
+            s2	(CbStart)	--> s3;
+            s3	(Cr1Start)	--> s4;
+            s4	(Cr2Start)	--> s2;
+        end
+        /*
+        priority
+            eoi	> CbStart;
+            
+        end */
+
+    end
+
+
+end

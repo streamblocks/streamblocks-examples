@@ -1,0 +1,10 @@
+namespace converters.size:
+
+    actor SoiUpscale() uint(size=16) SOI_IN ==> uint(size=16) SOI_OUT:
+
+        action SOI_IN:[w, h] ==> SOI_OUT:[w << 4 , h << 4]
+        end
+        
+    end
+
+end

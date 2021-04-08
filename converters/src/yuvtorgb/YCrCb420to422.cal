@@ -1,0 +1,89 @@
+namespace converters.yuvtorgb:
+
+    actor YCrCb420to422()
+        uint(size=8) CrCb420,
+        uint(size=16) SOI
+            ==>
+                uint(size=8) CrCb422 :
+        
+        //Parameters
+        int WidthMAX = 1024; //change to set max length 128
+                
+        function tap(int(size=10) a, int(size=10) b) --> int(size=10) : 
+            ((a << 1) + a + b )>> 2//(3*a+b)/4
+        end 
+        
+        bool beginning := true;		
+        uint(size=16) width;
+        uint(size=16) height;
+        
+        uint(size=16) i := 0;
+        uint(size=16) j := 0; 
+        
+        List(type:uint(size=8), size = WidthMAX) Line1;
+        List(type:uint(size=8), size = WidthMAX) Line0;
+        
+        
+        getSOI: action SOI:[w, h] ==>
+        do
+            width := w;
+            height := h;
+            i := 0;
+            j := 0;
+        end
+        
+        PhaseA: action CrCb420:[ChromaX] ==> CrCb422:[q]
+        var 
+            uint(size=8) q 
+        do
+            if beginning then
+                Line1[i] := ChromaX;       	
+            end
+            q := tap(Line1[i], ChromaX);
+            Line0[i] := ChromaX;
+            i := i + 1;
+        end
+
+        PhaseB : action ==> CrCb422:[q]
+        var 
+            uint(size=8) q
+        do
+            beginning := false;
+            q := tap(Line0[i], Line1[i]);
+            Line1[i] := Line0[i];
+            i := i + 1;
+        end
+        
+        stop: action ==>
+        guard
+            i = width
+        do
+            i := 0;
+            j := j + 1;
+        end     
+        
+        eoi : action ==>
+        guard
+            j = height
+        end
+        
+        schedule fsm s0:
+            s0	(getSOI) --> s1;
+            
+            s1	(eoi   ) --> s0;
+            s1	(PhaseA) --> s1;
+            s1	(stop  ) --> s2;
+            
+            s2	(eoi) --> s0;
+            s2	(PhaseB) --> s2;
+            s2	(stop  ) --> s1;
+            
+        end
+        
+        priority
+            eoi  > stop > PhaseA;
+            eoi  > stop > PhaseB;
+        end
+    end
+
+end

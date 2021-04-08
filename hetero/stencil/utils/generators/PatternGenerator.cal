@@ -1,0 +1,76 @@
+namespace hetero.stencil.utils.formats:
+
+    actor PatternGenerator(int WIDTH, int HEIGHT)
+        ==>
+            uint(size=16) SOI,
+            uint(size=8) R,
+            uint(size=8) G,
+            uint(size=8) B:
+            
+        int count := 0;
+
+        int state := 0;
+        
+        int countPix := 0;
+        
+        int Image_Counter := 0;
+        int timesExecuted := 0;
+        SendPattern: action ==> R:[v], G:[v], B:[v]
+        var
+            int v := 0
+        do
+            if(state = 0) then
+                v := count;
+            else
+                v := 255-count;
+            end
+            count := count + 1;
+            if(count >= 256)then
+                count := 0;
+            end
+            countPix := countPix + 1;
+            if(countPix >= (WIDTH*HEIGHT))then
+                countPix := 0;
+                if(state = 0)then
+                    state := 1;
+                else
+                    state := 0;
+                end
+            end
+            Image_Counter := Image_Counter + 1;
+        end
+        
+        SendNewImage: action ==>
+        guard
+            Image_Counter = HEIGHT * WIDTH
+        do
+            Image_Counter := 0;
+            timesExecuted := timesExecuted + 1;
+        end
+        
+        SentW: action ==> SOI:[WIDTH]
+        end
+        
+        SentH: action ==> SOI:[HEIGHT]
+        end
+        
+        TimesExecuted: action ==>
+        guard
+            timesExecuted = 0
+        end
+        
+        schedule fsm s0:
+            s0 (SentW) --> s1;
+            s1 (SentH) --> s2; 
+            s2 (SendPattern) --> s2;
+            s2 (SendNewImage) --> s3;
+            s3 (TimesExecuted) --> s0;
+        end
+        
+        priority
+            SendNewImage > SendPattern;
+        end
+
+    end
+
+end

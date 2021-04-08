@@ -1,0 +1,43 @@
+namespace converters.yuvtorgb:
+
+    actor YCrCbtoRGB()
+        uint(size=8) Y,
+        uint(size=8) Cr,
+        uint(size=8) Cb
+            ==>
+            uint(size=8) R,
+            uint(size=8) G,
+            uint(size=8) B:
+
+        
+        function clamp(int x) --> uint(size=8) 
+        var
+            int n = if x > 255 then 255 else x end
+        :
+            if n < 0 then 0 else n end
+        end
+        
+        action Y:[y8],
+            Cr:[cr8],
+            Cb:[cb8] ==> R:[clamp(r)],
+                            G:[clamp(g)],
+                            B:[clamp(b)]
+        var
+            int  y := y8,
+            int  cr := cr8,
+            int  cb := cb8,
+            int  r := 0,
+            int  g := 0,
+            int  b := 0
+            
+        do
+            cr := cr - 128 ;
+            cb := cb - 128 ;
+            r := y + 45 * cr / 32 ;
+            g := y - (11 * cb + 23 * cr) / 32 ;
+            b := y + 113 * cb / 64 ;
+
+        end
+    end
+
+end
