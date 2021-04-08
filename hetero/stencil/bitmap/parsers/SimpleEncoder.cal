@@ -66,9 +66,15 @@ namespace hetero.stencil.bitmap.encoders:
       List(type: uint(size = 8), size=14) bytes
     do
       h := _h; w := _w; bpp := _bpp;
-      row_size := (24 * w + 31) / 32 * 4;
+      row_size := (bpp * w + 31) / 32 * 4;
       img_size := row_size * h;
-      bmp_size := img_size + 54;
+      if bpp = 24 then
+        // BITMAPINFOHEADER
+        bmp_size := img_size + 14 + 40;
+      else
+        // BITMAPV3INFOHEADER
+        bmp_size := img_size + 14 + 56;
+      end
 
       bytes[0] := 0x42;
       bytes[1] := 0x4D;
@@ -80,7 +86,14 @@ namespace hetero.stencil.bitmap.encoders:
       bytes[7] := 0x00;
       bytes[8] := 0x00;
       bytes[9] := 0x00;
-      bytes[10] := 54;
+      if bpp = 24 then
+        // BITMAPINFOHEADER
+        bytes[10] := 14 + 40;
+      else
+        // BITMAPV3INFOHEADER
+        bytes[10] := 14 + 56;
+      end
+
       bytes[11] := 0;
       bytes[12] := 0;
       bytes[13] := 0;
@@ -92,8 +105,13 @@ namespace hetero.stencil.bitmap.encoders:
       List(type:uint(size = 8), size=40) bytes
     do
       padding := row_size - w * (bpp / 8);
+      
+      if bpp = 24 then
+        bytes[NUM_BYTES_ADDR] := 40;
+      else 
+        bytes[NUM_BYTES_ADDR] := 56;
+      end
 
-      bytes[NUM_BYTES_ADDR] := 40;
       bytes[NUM_BYTES_ADDR + 1] := 0;
       bytes[NUM_BYTES_ADDR + 2] := 0;
       bytes[NUM_BYTES_ADDR + 3] := 0;
