@@ -1,0 +1,23 @@
+namespace hetero.stencil.kernels.GuassianBlur:
+
+
+
+  // import entity hetero.stencil.kernels.utils.KernelStreamer;
+  // import entity hetero.stencil.kernels.utils.AlphaFilter;
+  // import entity hetero.stencil.kernels.utils.DynamicFilter;
+  // import entity hetero.stencil.kernels.utils.Splitter;
+  // import entity hetero.stencil.bitmap.streamers.BitMapSimpleStreamer;
+  // import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
+
+  // import entity ART.art_Sink_bin;
+  // import entity ART.art_Source_byte;
+
+
+  // actor GuassianBlurCompute(type DTYPE)
+  //   DTYPE Ref
+
+
+  // end
+
+
+end

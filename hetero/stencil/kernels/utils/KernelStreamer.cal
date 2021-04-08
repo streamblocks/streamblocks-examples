@@ -69,7 +69,7 @@ namespace hetero.stencil.kernels.utils:
     end
     
     reset: action ==>
-    guard x_index = (orig_w + stencil_x_pos) and y_index = (orig_h + stencil_y_pos) and idle = false
+    guard y_index = (orig_h + stencil_y_pos) and idle = false
     do
       orig_w := 0;
       orig_h := 0;
@@ -138,6 +138,104 @@ namespace hetero.stencil.kernels.utils:
       end
     end
   end
+
+
+  /**
+    This actor can be placed before the KernelStreamer to feed the output
+    of one kernel to itself given some compile time known number of iterations
+    Since this actor is used in a cyclic network, the input IteratedStream
+    should have enough space for a whole image, i.e., if the the image has
+    w * h dimensions, then the buffer should be at least w * h large.
+   */
+  actor StreamIterator(type DTYPE, uint(size = 32) NUM_ITERATIONS) 
+    DTYPE InitialStream,
+    DTYPE IteratedStream,
+    uint(size = 32) WidthIn, uint(size = 32) HeightIn
+    ==>
+    DTYPE PixelStream,
+    DTYPE Out,
+    uint(size = 32) WidthOut, uint(size = 32) HeightOut:
+
+    uint(size = 32) h;
+    uint(size = 32) w;
+    uint(size = 32) iteration := 0;
+    uint(size = 32) pixels_to_stream := 0;
+    uint(size = 32) pixels_streamed := 0;
+    bool iterations_active := false;
+    uint(size = 32) iterations := 0;
+
+    init: action WidthIn:[_w], HeightIn:[_h] ==>
+    guard iterations = 0 and pixels_to_stream = 0
+    do
+      iterations := NUM_ITERATIONS;
+      w := _w;
+      h := _h;
+      pixels_to_stream := w * h;
+      iterations_active := false;    
+    end
+
+
+    iter_start: action ==> WidthOut:[w], HeightOut:[h]
+    guard iterations != 0 and iterations_active = false
+    do
+      pixels_streamed := 0;
+      iterations_active := true;
+    end
+
+    first_iter: action InitialStream:[t] ==> PixelStream:[t]
+    guard iterations = NUM_ITERATIONS and iterations_active = true
+    do
+      pixels_streamed := pixels_streamed + 1;
+      if (pixels_streamed = pixels_to_stream) then
+        iterations := iterations - 1;
+        iterations_active := false;
+      end
+
+    end
+
+    loop_body: action IteratedStream:[t] ==> PixelStream:[t]
+    guard iterations > 0 and iterations < NUM_ITERATIONS and iterations_active = true
+    do
+      pixels_streamed := pixels_streamed + 1;
+      if (pixels_streamed = pixels_to_stream) then
+        iterations := iterations - 1;
+        iterations_active := false;
+      end
+    end
+
+    end_loop: action ==>
+    guard iterations = 0 and iterations_active = false
+    do
+      pixels_streamed := 0;
+
+    end
+
+    stream_output: action IteratedStream:[t] ==> Out:[t]
+    guard pixels_streamed != pixels_to_stream 
+    do
+      pixels_streamed := pixels_streamed + 1;
+    end
+    
+    reset: action ==>
+    guard pixels_streamed = pixels_to_stream
+    do
+      w := 0;
+      h := 0;
+      iterations_active := false;
+    end
+
+    schedule fsm init_state:
+      init_state(init) --> loop_state;
+      loop_state(iter_start) --> loop_state;
+      loop_state(first_iter) --> loop_state;
+      loop_state(loop_body) --> loop_state;
+      loop_state(end_loop) --> output_state;
+      output_state(stream_output) --> output_state;
+      output_state(reset) --> init_state;
+    end
+  end
+
+  
 end
 
 

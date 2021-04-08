@@ -1,6 +1,7 @@
-namespace hetero.stencil.kernels:
+namespace hetero.stencil.kernels.Blur:
 
   import entity hetero.stencil.kernels.utils.KernelStreamer;
+  import entity hetero.stencil.kernels.utils.StreamIterator;
   import entity hetero.stencil.kernels.utils.AlphaFilter;
   import entity hetero.stencil.kernels.utils.DynamicFilter;
   import entity hetero.stencil.kernels.utils.Splitter;
@@ -165,21 +166,102 @@ namespace hetero.stencil.kernels:
       padding.PaddedHeight --> kernel.Height;
       padding.PaddedWidth --> kernel.Width;
 
-
-      
       kernel.Out --> Out;
 
   end
 
+
+  network BitmapBlurNetworkSingleIterative() 
+    uint(size = 8) PixelStream,
+    uint(size = 32) Width,
+    uint(size = 32) Height ==>
+    uint(size = 8) Out:
+
+    entities
+
+
+      iterator = StreamIterator(DTYPE : uint(size = 8), 
+        NUM_ITERATIONS = 100);
+      /**Pad the borders of the image so that the output image
+       will have the same size as the input image
+       */
+      padding = KernelStreamer(
+        stencil_x_neg = -1, stencil_x_pos = 1,
+        stencil_y_neg = -1, stencil_y_pos = 1,
+        pad_value = 0
+      );
+
+      kernel = BlurNetworkSingle();
+
+
+    structure
+
+      PixelStream --> iterator.InitialStream;
+      Width --> iterator.WidthIn;
+      Height --> iterator.HeightIn;
+
+      iterator.WidthOut --> padding.Width;
+      iterator.HeightOut --> padding.Height;
+      iterator.PixelStream --> padding.PixelStream;
+
+      
+      padding.PaddedStream --> kernel.In;
+      padding.PaddedHeight --> kernel.Height;
+      padding.PaddedWidth --> kernel.Width;
+
+      kernel.Out --> iterator.IteratedStream;
+
+      iterator.Out --> Out;
+
+  end
+
+  // network BitmapBlurMultiNetworkSingleChannel()
+  //   uint(size = 8) PixelStream,
+  //   uint(size = 32) Width,
+  //   uint(size = 32) Height ==>
+  //   uint(size = 8) Out:
+
+  //   entities 
+  //     paddings = [KernelStreamer(
+  //       stencil_x_neg = -1, stencil_x_pos = 1,
+  //       stencil_y_neg = -1, stencil_y_pos = 1,
+  //       pad_value = 0
+  //     ) : for int i in 0 .. (2 - 1)];
+  //     kernels = [
+  //       BlurNetworkSingle() : for int i  in 0 .. (2 - 1)
+  //     ];
+
+  //   structure
+
+  //     PixelStream --> paddings[0].PixelStream;
+      
+
+  //     foreach int i in 0 .. (2 - 1) do
+  //       Width --> paddings[i].Width;
+  //       Height --> paddings[i].Height;  
+  //       paddings[i].PaddedStream --> kernels[i].In;
+  //       paddings[i].PaddedHeight --> kernels[i].Height;
+  //       paddings[i].PaddedWidth --> kernels[i].Width;
+  //       if ( i != 2 - 1) then
+  //         kernels[i].Out --> paddings[i + 1].PixelStream;
+  //       else
+  //         kernels[i].Out --> Out;
+  //       end
+  //     end
+      
+  // end
+
+
+
   network BitmapBlurNetwork() ==> :
 
     entities
-      file_reader = art_Source_byte(fileName="images/concentric_720_rgba.bmp", loops=0);
+      file_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/lena.bmp", loops=0);
       streamer = BitMapSimpleStreamer();
-      kernel_r = BitmapBlurNetworkSingle();
-      kernel_g = BitmapBlurNetworkSingle();
-      kernel_b = BitmapBlurNetworkSingle();
-      kernel_a = BitmapBlurNetworkSingle();
+      kernel_r = BitmapBlurNetworkSingleIterative();
+      kernel_g = BitmapBlurNetworkSingleIterative();
+      kernel_b = BitmapBlurNetworkSingleIterative();
+      kernel_a = BitmapBlurNetworkSingleIterative();
       alpha_filter = AlphaFilter();
 
       encoder = SimpleBitmapEncoder();
