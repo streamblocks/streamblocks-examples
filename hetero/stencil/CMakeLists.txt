@@ -40,12 +40,21 @@ set(FormatIdentityTest_SOURCES
   ${EXAMPLES_HOME}/jpeg/decoder/serial
   ${EXAMPLES_HOME}/jpeg/io
 )
+
 streamblocks(
   FormatIdentityTest_MC
   PLATFORM multicore
   QID hetero.stencil.test.FormatIdentityTest
   SOURCE_PATH ${FormatIdentityTest_SOURCES}
   TARGET_PATH generated/test/FormatIdentityTest
+)
+
+streamblocks(
+  RgbTo420Mb
+  PLATFORM multicore
+  QID hetero.stencil.test.RgbTo420Mb
+  SOURCE_PATH ${FormatIdentityTest_SOURCES}
+  TARGET_PATH generated/test/RgbTo420Mb
 )
 
 

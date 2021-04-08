@@ -49,22 +49,20 @@ namespace hetero.stencil.utils.formats:
         end
         
         SentW: action ==> SOI:[WIDTH]
+        guard
+            timesExecuted < 10
         end
         
         SentH: action ==> SOI:[HEIGHT]
         end
         
-        TimesExecuted: action ==>
-        guard
-            timesExecuted = 0
-        end
+       
         
         schedule fsm s0:
             s0 (SentW) --> s1;
             s1 (SentH) --> s2; 
             s2 (SendPattern) --> s2;
-            s2 (SendNewImage) --> s3;
-            s3 (TimesExecuted) --> s0;
+            s2 (SendNewImage) --> s0;
         end
         
         priority

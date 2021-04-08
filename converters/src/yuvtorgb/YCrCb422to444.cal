@@ -8,8 +8,6 @@ namespace converters.yuvtorgb:
                 uint(size=8) Cb:
                 
         
-        //function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
-        //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
         function tap(int(size=10) a,int(size=10) b) --> int(size=10) : (a + b)/2 end
     
         int(size=11) ChromaR0 := 0;
@@ -45,15 +43,11 @@ namespace converters.yuvtorgb:
             t:=true;
         end
         
-        action SOI:[w, h] ==>
-        guard
-        	t
-        end
-        
-
+     
         Cr1Start : action CrCb422:[ChromaR] ==>
         do
             ChromaR0 := ChromaR;
+            count := count + 1;
         end
 
         CbStart: action CrCb422:[ChromaB] ==> Cr:[CrOut], Cb:[CbOut]
@@ -93,27 +87,34 @@ namespace converters.yuvtorgb:
                 i := 0;
                 j := j + 1;
             end
-            count := count + 1;
         end
-        /* 
+        
+        Cr3Start: action ==> Cr:[CrOut], Cb:[CbOut]
+        do
+            
+            CrOut := ChromaR1;
+            CbOut := ChromaB1;
+        end
+         
         eoi: action ==>
         guard
             count = height*width
-        end*/
+        end
         
         schedule fsm s0:
             s0	(getSOI) 	--> s1;
             s1	(Cr1Start)	--> s2;
-            //s2	(eoi)		--> s0;
             s2	(CbStart)	--> s3;
+            s3	(eoi)		--> s5;
             s3	(Cr1Start)	--> s4;
             s4	(Cr2Start)	--> s2;
+            s5	(Cr3Start)	--> s0;
         end
-        /*
+        
         priority
-            eoi	> CbStart;
+            eoi	> Cr1Start;
             
-        end */
+        end 
 
     end
 

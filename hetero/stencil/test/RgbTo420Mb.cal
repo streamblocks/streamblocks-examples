@@ -1,0 +1,63 @@
+namespace hetero.stencil.test:
+ 
+import entity jpeg.io.Display;
+
+import entity hetero.stencil.utils.formats.PatternGenerator;
+
+import entity converters.yuvtorgb.YUVtoRGB;
+import entity converters.rgbtoyuv.RGBtoYUV;
+import entity converters.rasterizers.RasterToMB;
+import entity converters.size.SoiMB;
+
+
+    network RgbTo420Mb() ==> :
+    var
+        int WIDTH = 512; 
+        int HEIGHT = 512;
+    entities
+    	pattern = PatternGenerator(WIDTH=WIDTH, HEIGHT=HEIGHT);
+      	to_yuv = RGBtoYUV();
+	    to_rgb = YUVtoRGB();
+	    to_yuv_2 = RGBtoYUV();
+      	raster_to_mb = RasterToMB();
+	  	display = Display();
+	  	soi_mb = SoiMB();
+    
+    structure
+		pattern.SOI --> to_yuv.SOI;
+		pattern.SOI --> to_yuv_2.SOI;
+		pattern.SOI --> to_rgb.SOI;
+		pattern.SOI --> soi_mb.SOI_IN;
+		pattern.SOI --> raster_to_mb.SOI;
+		
+		soi_mb.SOI_OUT --> display.SOI;
+		
+		
+		pattern.R --> to_yuv.R;
+		pattern.G --> to_yuv.G;
+		pattern.B --> to_yuv.B;
+		
+		
+		to_yuv.Y --> to_rgb.Y;
+		to_yuv.CrCb --> to_rgb.CrCb;
+		
+		to_rgb.R --> to_yuv_2.R;
+		to_rgb.G --> to_yuv_2.G;
+		to_rgb.B --> to_yuv_2.B;
+		
+		
+		
+		
+		
+		to_yuv_2.Y --> raster_to_mb.Y;
+		to_yuv_2.CrCb --> raster_to_mb.CbCr;
+		
+		
+		
+		
+		//to_yuv.YCrCb --> to_rgb.YCrCb;
+
+		raster_to_mb.YCbCr --> display.In;
+    end
+ 
+end
