@@ -1,6 +1,7 @@
 namespace hetero.stencil.kernels:
 
   import entity hetero.stencil.kernels.utils.KernelStreamer;
+  import entity hetero.stencil.kernels.utils.AlphaFilter;
   import entity hetero.stencil.kernels.utils.DynamicFilter;
   import entity hetero.stencil.kernels.utils.Splitter;
   import entity hetero.stencil.bitmap.streamers.BitMapSimpleStreamer;
@@ -173,12 +174,13 @@ namespace hetero.stencil.kernels:
   network BitmapBlurNetwork() ==> :
 
     entities
-      file_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric_3.bmp", loops=0);
+      file_reader = art_Source_byte(fileName="images/concentric_720_rgba.bmp", loops=0);
       streamer = BitMapSimpleStreamer();
       kernel_r = BitmapBlurNetworkSingle();
       kernel_g = BitmapBlurNetworkSingle();
       kernel_b = BitmapBlurNetworkSingle();
       kernel_a = BitmapBlurNetworkSingle();
+      alpha_filter = AlphaFilter();
 
       encoder = SimpleBitmapEncoder();
       file_writer = art_Sink_bin(fileName="out.bmp");
@@ -198,9 +200,13 @@ namespace hetero.stencil.kernels:
       streamer.Width --> kernel_b.Width;
       streamer.Height --> kernel_b.Height;
 
+      streamer.Width --> alpha_filter.WidthIn;
+      streamer.Height --> alpha_filter.HeightIn;
+      streamer.BitsPerPixel --> alpha_filter.BitsPerPixelIn;
+
       streamer.Alpha --> kernel_a.PixelStream;
-      streamer.Width --> kernel_a.Width;
-      streamer.Height --> kernel_a.Height;
+      alpha_filter.WidthOut --> kernel_a.Width;
+      alpha_filter.HeightOut --> kernel_a.Height;
 
       streamer.Width --> encoder.Width;
       streamer.Height --> encoder.Height;

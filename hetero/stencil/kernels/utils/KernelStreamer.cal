@@ -41,7 +41,12 @@ namespace hetero.stencil.kernels.utils:
       orig_w := w;
       x_index := stencil_x_neg;
       y_index := stencil_y_neg;
-      idle := false;
+
+      if (h != 0 and w != 0) then
+        idle := false;
+      else
+        idle := true;
+      end
     end
 
     pixel_stream: action PixelStream:[pixel] ==> PaddedStream:[pixel]
@@ -79,6 +84,59 @@ namespace hetero.stencil.kernels.utils:
       pad_stream > reset;
     end
   
+  end
+
+
+  // this actor drops or passes 'count' number of tokens
+  actor ChannelGate(type  DTYPE) bool Command, uint(size = 32) Count,
+    DTYPE In ==> DTYPE Out:
+
+    bool DROP_COMMAND := false;
+    bool PASS_COMMAND := true;
+
+    uint(size = 32) count := 0;
+    bool cmd := PASS_COMMAND;
+    bool idle := true;
+
+    recv_cmd: action Command:[_cmd], Count:[_count] ==>
+    guard count = 0
+    do
+      count := _count;
+      cmd := _cmd;
+      
+    end
+
+    drop: action In:[t] ==>
+    guard cmd = DROP_COMMAND and count != 0
+    do
+      count := count - 1;
+    end
+    pass: action In:[t] ==> Out:[t]
+    guard cmd = PASS_COMMAND and count != 0
+    do
+      count := count - 1;
+    end
+
+  end
+
+
+  actor AlphaFilter() 
+    uint(size = 32) WidthIn, uint(size = 32) HeightIn, uint(size = 32) BitsPerPixelIn
+    ==>
+    uint(size = 32) WidthOut, uint(size = 32) HeightOut
+    :
+    action WidthIn:[w], HeightIn:[h], BitsPerPixelIn:[bpp] ==>
+      WidthOut:[ww], HeightOut:[hh]
+    var uint(size = 32) ww, uint(size = 32) hh
+    do
+      if (bpp = 32) then
+        ww := w;
+        hh := h;
+      else
+        ww := 0;
+        hh := 0;
+      end
+    end
   end
 end
 

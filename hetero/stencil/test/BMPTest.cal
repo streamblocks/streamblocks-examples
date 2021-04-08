@@ -74,7 +74,7 @@ namespace hetero.stencil.bitmap.test:
   end
   network BitMapDecodeEncodeTest() ==>:
     entities
-      header_parser = BitMapHeaderFileParser(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric.bmp");
+      header_parser = BitMapHeaderFileParser(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/concentric_3_rgba.bmp");
       info_parser = InfoHeaderParser();
       pixel_stripper = PixelStreamStripper();
       encoder = SimpleBitmapEncoder();
