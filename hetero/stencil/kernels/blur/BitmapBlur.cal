@@ -1,0 +1,65 @@
+namespace hetero.stencil.kernels.Blur:
+
+  import entity hetero.stencil.kernels.utils.KernelStreamer;
+  import entity hetero.stencil.kernels.utils.StreamIterator;
+  import entity hetero.stencil.kernels.utils.AlphaFilter;
+  import entity hetero.stencil.kernels.utils.DynamicFilter;
+  import entity hetero.stencil.kernels.utils.Splitter;
+  import entity hetero.stencil.bitmap.streamers.BitMapSimpleStreamer;
+  import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
+
+
+  import entity ART.art_Sink_bin;
+  import entity ART.art_Source_byte;
+
+  network BitmapBlurNetwork() ==> :
+
+    entities
+      file_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/images/lena.bmp", loops=0);
+      streamer = BitMapSimpleStreamer();
+      kernel_r = BlurNetworkSingle();
+      kernel_g = BlurNetworkSingle();
+      kernel_b = BlurNetworkSingle();
+      kernel_a = BlurNetworkSingle();
+      alpha_filter = AlphaFilter();
+
+      encoder = SimpleBitmapEncoder();
+      file_writer = art_Sink_bin(fileName="out.bmp");
+
+    structure 
+
+      file_reader.Out --> streamer.ByteStream;
+      streamer.Red --> kernel_r.PixelStream;
+      streamer.Width --> kernel_r.Width;
+      streamer.Height --> kernel_r.Height;
+
+      streamer.Green --> kernel_g.PixelStream;
+      streamer.Width --> kernel_g.Width;
+      streamer.Height --> kernel_g.Height;
+
+      streamer.Blue --> kernel_b.PixelStream;
+      streamer.Width --> kernel_b.Width;
+      streamer.Height --> kernel_b.Height;
+
+      streamer.Width --> alpha_filter.WidthIn;
+      streamer.Height --> alpha_filter.HeightIn;
+      streamer.BitsPerPixel --> alpha_filter.BitsPerPixelIn;
+
+      streamer.Alpha --> kernel_a.PixelStream;
+      alpha_filter.WidthOut --> kernel_a.Width;
+      alpha_filter.HeightOut --> kernel_a.Height;
+
+      streamer.Width --> encoder.Width;
+      streamer.Height --> encoder.Height;
+      streamer.BitsPerPixel --> encoder.BitsPerPixel;
+      kernel_r.Out --> encoder.Red;
+      kernel_g.Out --> encoder.Green;
+      kernel_b.Out --> encoder.Blue;
+      kernel_a.Out --> encoder.Alpha;
+
+      encoder.ByteStream --> file_writer.In;
+
+  end
+  
+
+end
