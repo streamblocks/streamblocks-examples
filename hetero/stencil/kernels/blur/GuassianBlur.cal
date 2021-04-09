@@ -2,22 +2,240 @@ namespace hetero.stencil.kernels.GuassianBlur:
 
 
 
-  // import entity hetero.stencil.kernels.utils.KernelStreamer;
-  // import entity hetero.stencil.kernels.utils.AlphaFilter;
-  // import entity hetero.stencil.kernels.utils.DynamicFilter;
-  // import entity hetero.stencil.kernels.utils.Splitter;
-  // import entity hetero.stencil.bitmap.streamers.BitMapSimpleStreamer;
-  // import entity hetero.stencil.bitmap.encoders.SimpleBitmapEncoder;
+  import entity hetero.stencil.kernels.utils.KernelStreamer;
 
-  // import entity ART.art_Sink_bin;
-  // import entity ART.art_Source_byte;
+  import entity hetero.stencil.kernels.utils.DynamicFilter;
+  import entity hetero.stencil.kernels.utils.Splitter;
+
+  actor GuassianBlurPartialCompute(type DTYPE)
+    DTYPE Col_p1, // Ref(x = 1, y = _)
+    DTYPE Col_p0, // Ref(x = 0, y = _)
+    DTYPE Col_n1  // Ref(x = -1, y = _)
+    ==> DTYPE Out:
+
+    compute: action Col_p1:[t0], Col_p0:[t1], Col_n1:[t2] ==>
+      Out:[t0 + (t1 << 1) + t2] 
+    end
+
+  end
+
+  actor GuassianBlurComputeAggregator(type DTYPE)
+    DTYPE Row_p1,
+    DTYPE Row_p0,
+    DTYPE Row_n1 ==> DTYPE Out:
+
+    aggregate: action Row_p1:[t0], Row_p0:[t1], Row_n1:[t2] ==>
+      Out:[((t0 + t2) + (t1 << 1)) >> 4]
+    end
+  end
 
 
-  // actor GuassianBlurCompute(type DTYPE)
-  //   DTYPE Ref
+  network GuassianBlurKernel()
+    uint(size = 8) In,
+    uint Width, uint Height ==> uint(size = 8) Out:
+
+    var 
+      int X_UB = -2;
+      int Y_UB = -2;
+      int X_LB = 1;
+      int Y_LB = 1;
+    entities
+      
+      f0 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 1,
+        y_offset = 1);
+      f1 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 0,
+        y_offset = 1);
+      f2 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = -1,
+        y_offset = 1);
+      f3 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 1,
+        y_offset = 0);
+      f4 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 0,
+        y_offset = 0);
+      f5 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = -1,
+        y_offset = 0);
+      f6 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 1,
+        y_offset = -1);
+      f7 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = 0,
+        y_offset = -1);
+      f8 = DynamicFilter(
+        DTYPE: uint(size=8),
+        x_lb_offset = X_LB, 
+        x_ub_offset = X_UB,
+        y_lb_offset = Y_LB,
+        y_ub_offset = Y_UB,
+        x_offset = -1,
+        y_offset = -1);
 
 
-  // end
+      s0 = Splitter(DTYPE: uint(size=8));
+      s1 = Splitter(DTYPE: uint(size=8));
+      s2 = Splitter(DTYPE: uint(size=8));
+      s3 = Splitter(DTYPE: uint(size=8));
+      s4 = Splitter(DTYPE: uint(size=8));
+      s5 = Splitter(DTYPE: uint(size=8));
+      s6 = Splitter(DTYPE: uint(size=8));
+      s7 = Splitter(DTYPE: uint(size=8));
+
+      col_p1_compute = GuassianBlurPartialCompute(DTYPE : uint(size = 8));
+      col_p0_compute = GuassianBlurPartialCompute(DTYPE : uint(size = 8));
+      col_n1_compute = GuassianBlurPartialCompute(DTYPE : uint(size = 8));
+      row_agg_compute = GuassianBlurComputeAggregator(DTYPE: uint(size = 8));
+    structure
+
+      In --> s0.In;
+
+      s0.Left --> f0.In { bufferSize = 4; };
+      s0.Right --> s1.In;
+
+      s1.Left --> f1.In { bufferSize = 4; };
+      s1.Right --> s2.In;
+
+      s2.Left --> f2.In { bufferSize = 4; };
+      s2.Right --> s3.In;
+
+      s3.Left --> f3.In { bufferSize = 4; };
+      s3.Right --> s4.In;
+
+      s4.Left --> f4.In { bufferSize = 4; };
+      s4.Right --> s5.In;
+
+      s5.Left --> f5.In { bufferSize = 4; };
+      s5.Right --> s6.In;
+
+      s6.Left --> f6.In { bufferSize = 4; };
+      s6.Right --> s7.In;
+
+      s7.Left --> f7.In { bufferSize = 4; };
+      s7.Right --> f8.In { bufferSize = 4; };
+
+      f0.Out --> col_p1_compute.Col_p1 { bufferSize = 4; };
+      f1.Out --> col_p1_compute.Col_p0 { bufferSize = 4; };
+      f2.Out --> col_p1_compute.Col_n1 { bufferSize = 4; };
+
+      f3.Out --> col_p0_compute.Col_p1 { bufferSize = 4; };
+      f4.Out --> col_p0_compute.Col_p0 { bufferSize = 4; };
+      f5.Out --> col_p0_compute.Col_n1 { bufferSize = 4; };
+
+      f6.Out --> col_n1_compute.Col_p1 { bufferSize = 4; };
+      f7.Out --> col_n1_compute.Col_p0 { bufferSize = 4; };
+      f8.Out --> col_n1_compute.Col_n1 { bufferSize = 4; };
+
+      col_p1_compute.Out --> row_agg_compute.Row_p1 { bufferSize = 4; };
+      col_p0_compute.Out --> row_agg_compute.Row_p0 { bufferSize = 4; };
+      col_n1_compute.Out --> row_agg_compute.Row_n1 { bufferSize = 4; };
+
+      Width  --> f0.Width; 
+      Height --> f0.Height; 
+      
+      Width  --> f1.Width; 
+      Height --> f1.Height; 
+      
+      Width  --> f2.Width; 
+      Height --> f2.Height; 
+      
+      Width  --> f3.Width; 
+      Height --> f3.Height; 
+      
+      Width  --> f4.Width; 
+      Height --> f4.Height; 
+      
+      Width  --> f5.Width; 
+      Height --> f5.Height; 
+      
+      Width  --> f6.Width; 
+      Height --> f6.Height; 
+      
+      Width  --> f7.Width; 
+      Height --> f7.Height; 
+      
+      Width  --> f8.Width; 
+      Height --> f8.Height; 
+      
+      row_agg_compute.Out --> Out;
+      
+  end
+
+  network GuassianBlurNetworkSingle()
+    uint(size = 8) PixelStream,
+    uint(size = 8) Width,
+    uint(size = 8) Height ==>
+    uint(size = 8) Out:
+  
+    entities
+
+      /**Pad the borders of the image so that the output image
+       will have the same size as the input image
+       */
+      padding = KernelStreamer(
+        stencil_x_neg = -1, stencil_x_pos = 1,
+        stencil_y_neg = -1, stencil_y_pos = 1,
+        pad_value = 0
+      );
+
+      kernel = GuassianBlurKernel();
+
+
+    structure
+
+      PixelStream --> padding.PixelStream;
+      Width --> padding.Width;
+      Height --> padding.Height;
+
+      padding.PaddedStream --> kernel.In;
+      padding.PaddedHeight --> kernel.Height;
+      padding.PaddedWidth --> kernel.Width;
+
+      kernel.Out --> Out;
+
+  end
 
 
 end

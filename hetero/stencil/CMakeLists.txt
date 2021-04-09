@@ -37,7 +37,7 @@ set(FormatIdentityTest_SOURCES
   ${EXAMPLES_HOME}/converters/src
   ${EXAMPLES_HOME}/system/art
   ${EXAMPLES_HOME}/system/std
-  ${EXAMPLES_HOME}/jpeg/decoder/serial
+  ${EXAMPLES_HOME}/jpeg/decoder/parallel
   ${EXAMPLES_HOME}/jpeg/io
 )
 
@@ -47,6 +47,13 @@ streamblocks(
   QID hetero.stencil.test.FormatIdentityTest
   SOURCE_PATH ${FormatIdentityTest_SOURCES}
   TARGET_PATH generated/test/FormatIdentityTest
+)
+
+streamblocks_systemc(
+  FormatIdentityTest_systemc
+  QID hetero.stencil.test.FormatIdentityTest
+  SOURCE_PATH ${FormatIdentityTest_SOURCES}
+  TARGET_PATH generated/test/systemc/FormatIdentityTest
 )
 
 streamblocks(

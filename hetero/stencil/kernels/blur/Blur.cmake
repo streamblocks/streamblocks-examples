@@ -33,8 +33,15 @@ set(JpegBlurNetwork_SOURCES
 streamblocks(
   JpegBlurNetwork_MC
   PLATFORM multicore
-  QID hetero.stencil.kernels.Blur.JpegBlurNetwork
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork
   SOURCE_PATH ${JpegBlurNetwork_SOURCES}
   TARGET_PATH generated/test/JpegBlurNetwork
 )
 
+
+streamblocks_systemc(
+  JpegBlurNetwork_systemc
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/systemc/JpegBlurNetwork
+)

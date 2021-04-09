@@ -6,7 +6,7 @@ namespace hetero.stencil.kernels.utils:
     the kernel computation. All of the input ports can have a buffer size
     of 1.
    */
-  @pipeline(flushing=true)
+  // @pipeline(flushing=true)
   actor DynamicFilter(
     type DTYPE,
     int x_lb_offset, int x_ub_offset, 

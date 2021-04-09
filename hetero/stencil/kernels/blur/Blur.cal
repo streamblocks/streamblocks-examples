@@ -13,7 +13,7 @@ namespace hetero.stencil.kernels.Blur:
   import entity ART.art_Source_byte;
 
 
-  @pipeline(flushing=true, ii=1)
+  // @pipeline(flushing=true, ii=1)
   actor BlurCompute(type DTYPE) 
     DTYPE Ref_p0_p1, // Ref(x = 0, y = 1)
     DTYPE Ref_p1_p0, // Ref(x = 1, y = 0)
@@ -113,23 +113,23 @@ namespace hetero.stencil.kernels.Blur:
 
       In --> s0.In;
       
-      s0.Left --> f0.In;
+      s0.Left --> f0.In { bufferSize = 4; };
       s0.Right --> s1.In;
       
-      s1.Left --> f1.In;
+      s1.Left --> f1.In { bufferSize = 4; };
       s1.Right --> s2.In;
 
-      s2.Left --> f2.In;
+      s2.Left --> f2.In { bufferSize = 4; };
       s2.Right --> s3.In;
 
-      s3.Left --> f3.In;
-      s3.Right --> f4.In;
+      s3.Left --> f3.In { bufferSize = 4; };
+      s3.Right --> f4.In { bufferSzie = 4; };
 
-      f0.Out --> compute.Ref_p0_p1;
-      f1.Out --> compute.Ref_p1_p0;
-      f2.Out --> compute.Ref_p0_p0;
-      f3.Out --> compute.Ref_n1_p0;
-      f4.Out --> compute.Ref_p0_n1;
+      f0.Out --> compute.Ref_p0_p1 { bufferSize = 4; };
+      f1.Out --> compute.Ref_p1_p0 { bufferSize = 4; };
+      f2.Out --> compute.Ref_p0_p0 { bufferSize = 4; };
+      f3.Out --> compute.Ref_n1_p0 { bufferSize = 4; };
+      f4.Out --> compute.Ref_p0_n1 { bufferSize = 4; };
 
       compute.Out --> Out;
 

@@ -1,4 +1,4 @@
-namespace hetero.stencil.kernels.Blur:
+namespace hetero.stencil.kernels.GuassianBlur:
 
 
 	import entity jpeg.io.Source;
@@ -11,6 +11,7 @@ namespace hetero.stencil.kernels.Blur:
   import entity converters.rasterizers.MBToRaster;
   import entity converters.rasterizers.RasterToMB;
   import entity converters.size.SoiUpscale;
+  // import entity hetero.stencil.kernels.GuassianBlur.GuassianBlurNetworkSingle;
 
   actor SOIToWidthHeight() uint(size=16) SOI ==> 
     uint(size = 32) Width, uint(size = 32) Height:
@@ -21,26 +22,29 @@ namespace hetero.stencil.kernels.Blur:
   network JpegBlurNetwork() ==> :
     entities 
 
+      // Software only actors
       source = Source();
-      decoder = JpegDecoder(); 
-      to_rgb = YUVtoRGB();
-      to_yuv = RGBtoYUV();
       display = Display();
-      soi_up = SoiUpscale();
-      raster_to_mb = RasterToMB();
-      mb_to_raster = MBToRaster();
+
+      // Heterogeneous actors
+      decoder = JpegDecoder() { partition = "hw"; }; 
+      to_rgb = YUVtoRGB() { partition = "hw"; };
+      to_yuv = RGBtoYUV() { partition = "hw"; };
+      soi_up = SoiUpscale() { partition = "hw"; };
+      raster_to_mb = RasterToMB() { partition = "hw"; };
+      mb_to_raster = MBToRaster() { partition = "hw"; };
 
 
       // Blur kernels
-      // kernel_r = BlurLayeredNetworkSingle();
-      // kernel_g = BlurLayeredNetworkSingle();
-      // kernel_b = BlurLayeredNetworkSingle();
+      // kernel_r = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_g = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_b = BlurLayeredNetworkSingle() { partition = "hw"; };
 
-      kernel_r = BlurNetworkSingle();
-      kernel_g = BlurNetworkSingle();
-      kernel_b = BlurNetworkSingle();
+      kernel_r = GuassianBlurNetworkSingle() { partition = "hw"; };
+      kernel_g = GuassianBlurNetworkSingle() { partition = "hw"; };
+      kernel_b = GuassianBlurNetworkSingle() { partition = "hw"; };
       
-      soi_to_wh = SOIToWidthHeight();
+      soi_to_wh = SOIToWidthHeight() { partition = "hw"; };
       
     
     structure
