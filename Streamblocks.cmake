@@ -19,7 +19,7 @@ function (streamblocks TARGET)
 
   # Extra arguments and settings
   # -- on/off settings
-  set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE)
+  set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE EXPERIMENTAL)
   
   # -- value settings
   set(streamblocks_value_settings 
@@ -76,6 +76,11 @@ function (streamblocks TARGET)
   # --set partitioning
   if (STREAMBLOCKS_ARGS_PARTITIONING)
     list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set partitioning=on)
+  endif()
+
+  # --set experimental network elaboration
+  if (STREAMBLOCKS_ARGS_EXPERIMENTAL)
+    list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set experimental-network-elaboration=on)
   endif()
   
   # --set max-bram
