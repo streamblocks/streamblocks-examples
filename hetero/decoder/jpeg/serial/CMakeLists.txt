@@ -50,7 +50,7 @@ streamblocks(
   jpeg_software
   PLATFORM multicore
   QID hetero.decoder.jpeg.serial.JpegSerialNetwork
-  TARGET_PATH generated/profiling/sw
+  TARGET_PATH generated/sw
   SOURCE_PATH ${jpeg_SOURCES}
 )
 

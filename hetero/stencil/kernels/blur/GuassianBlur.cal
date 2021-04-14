@@ -7,6 +7,7 @@ namespace hetero.stencil.kernels.GuassianBlur:
   import entity hetero.stencil.kernels.utils.DynamicFilter;
   import entity hetero.stencil.kernels.utils.Splitter;
 
+  @pipeline(flushing=true)
   actor GuassianBlurPartialCompute(type DTYPE)
     DTYPE Col_p1, // Ref(x = 1, y = _)
     DTYPE Col_p0, // Ref(x = 0, y = _)
@@ -19,6 +20,7 @@ namespace hetero.stencil.kernels.GuassianBlur:
 
   end
 
+  @pipeline(flushing=true)
   actor GuassianBlurComputeAggregator(type DTYPE)
     DTYPE Row_p1,
     DTYPE Row_p0,
@@ -29,7 +31,7 @@ namespace hetero.stencil.kernels.GuassianBlur:
     end
   end
 
-
+  
   network GuassianBlurKernel()
     uint(size = 8) In,
     uint Width, uint Height ==> uint(size = 8) Out:
