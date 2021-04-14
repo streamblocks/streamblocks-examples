@@ -45,3 +45,47 @@ streamblocks_systemc(
   SOURCE_PATH ${JpegBlurNetwork_SOURCES}
   TARGET_PATH generated/systemc/JpegBlurNetwork
 )
+
+
+
+add_custom_target(all_jpegblur_gen_hls)
+add_custom_target(all_jpegblur_gen_multicore)
+
+function(jpegblur_gen CONFIG_IDX)
+
+  
+  
+  set(CONFIG_ROOT ${EXAMPLES_HOME}/hetero/stencil/kernels/blur/profiled_data/unique/)
+  set(THIS_CONFIG ${CONFIG_ROOT}/unique_${CONFIG_IDX}.xcf)
+  set(OUTPUT_PATH build/generated/jpegblur/unique_${CONFIG_IDX})
+
+
+  set(__THIS_TARGET__ jpeg_unique_${CONFIG_IDX})
+  streamblocks(
+    ${__THIS_TARGET__}_hls
+    PLATFORM vivado-hls
+    QID hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork
+    PARTITIONING
+    SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+    TARGET_PATH ${OUTPUT_PATH}
+    XCF_SOURCE_PATH ${THIS_CONFIG}
+  )
+
+  streamblocks(
+    ${__THIS_TARGET__}_multicore
+    PLATFORM multicore
+    QID hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork
+    PARTITIONING
+    SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+    TARGET_PATH ${OUTPUT_PATH}
+    XCF_SOURCE_PATH ${THIS_CONFIG}
+  )
+
+  add_dependencies(all_jpegblur_gen_hls ${__THIS_TARGET__}_hls)
+  add_dependencies(all_jpegblur_gen_multicore ${__THIS_TARGET__}_multicore)
+endfunction()
+
+
+foreach(index RANGE 0 34)  
+  jpegblur_gen(${index})
+endforeach()
