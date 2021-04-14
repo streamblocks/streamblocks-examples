@@ -1,7 +1,7 @@
 namespace std.counters:
 
-    external function timeMSec() --> float end
+    external function timeMSec() --> uint(size=32) end
 
-    external function timeSec() --> float end
+    external function timeSec() --> uint(size=32) end
 
 end

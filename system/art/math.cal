@@ -1,6 +1,5 @@
 namespace System.math:
 
-
 	
 	    external function round(float f) --> int end
 	    
@@ -17,6 +16,10 @@ namespace System.math:
 		external function exp(float f) --> float end
 		
 		external function log(float f) --> float end
+		
+		external function rand() --> int end
+		
+		external function random(float low, float high) --> float end
 		
 		float PI=3.14159265358979323846; 
 
