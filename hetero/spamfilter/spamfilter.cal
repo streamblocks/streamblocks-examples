@@ -5,6 +5,8 @@ namespace hetero.spamfilter:
   import entity ART.art_Sink_bin;
   import entity hetero.spamfilter.utils.BytesToFloat;
   import entity hetero.spamfilter.utils.FloatToBytes;
+  import entity hetero.spamfilter.kernel.SpamFilterKernel;
+  import entity hetero.spamfilter.sgd.EpochManager;
 
   actor FeatureInit(int NUM_FEATURES) ==> float Out:
     uint ix := 0;
@@ -39,7 +41,7 @@ namespace hetero.spamfilter:
       feature_init = FeatureInit(NUM_FEATURES = 1024);
       iter_init = IterSetter(NUM_ITERS = 4500, NUM_EPOCS = 1);
 
-      kernel = SpamFilterKernel();
+      kernel = SpamFilterKernel(NUM_FEATURES = 1024, NUM_TRAINING = 4500);
 
       feature_conv = FloatToBytes();
 
@@ -57,6 +59,53 @@ namespace hetero.spamfilter:
       iter_init.IterConfig --> kernel.IterConfig;
 
       kernel.TrainedFeatures --> feature_conv.FloatStream;
+      feature_conv.ByteStream --> features_sink.In;
+
+
+  end
+
+  network SimpleSpamFilterEpochs() ==> :
+
+    var 
+      int NUM_EPOCHS = 100;
+      int NUM_DATA_LOOPS = NUM_EPOCHS - 1;
+    entities
+
+      data_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/spamfilter/data/training_data.bin", loops=NUM_DATA_LOOPS);
+      label_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/spamfilter/data/training_labels.bin", loops=NUM_DATA_LOOPS);
+      data_conv = BytesToFloat();
+      label_conv = BytesToFloat();
+      
+      epoch_manager = EpochManager(
+        FeatureType: float,
+        NUM_EPOCHS = NUM_EPOCHS,
+        NUM_FEATURES = 1024,
+        NUM_ITERS = 4500
+      );
+
+      kernel = SpamFilterKernel(
+        NUM_FEATURES = 1024,
+        NUM_TRAINING = 4500
+      );
+
+      feature_conv = FloatToBytes();
+
+      features_sink = art_Sink_bin(fileName="trained_features.bin");
+
+    structure
+
+      data_reader.Out --> data_conv.ByteStream;
+      data_conv.FloatStream --> kernel.Data;
+      label_reader.Out --> label_conv.ByteStream;
+      label_conv.FloatStream --> kernel.Label;
+
+      epoch_manager.FeaturesOut --> kernel.Feature;
+      epoch_manager.IterConfig --> kernel.IterConfig;
+
+      kernel.TrainedFeatures --> epoch_manager.FeaturesIn;
+      
+      
+      epoch_manager.FeaturesTrained --> feature_conv.FloatStream;
       feature_conv.ByteStream --> features_sink.In;
 
 

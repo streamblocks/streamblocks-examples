@@ -16,44 +16,41 @@ namespace hetero.spamfilter.sgd:
     int epoch_counter := 0;
     int token_idx := 0;
     
+    procedure update_index()
+    begin
+      if token_idx = NUM_FEATURES - 1 then
+        token_idx := 0;
+        epoch_counter := epoch_counter + 1;
+        // println("Epoch " + epoch_counter);
+      else
+        token_idx := token_idx + 1;
+      end
+    end
 
     loop.init: action ==> IterConfig:[
       [NUM_ITERS : for int i in 0 .. (NUM_EPOCHS - 1)]
     ] repeat NUM_EPOCHS
     guard epoch_counter < NUM_EPOCHS
+    do
+      // println("Starting training");
     end
 
     loop.prologue: action ==> FeaturesOut:[0.0]
     guard epoch_counter = 0
     do
-      if token_idx = NUM_FEATURES - 1 then
-        token_idx := 0;
-        epoch_counter := epoch_counter + 1;
-      else
-        token_idx := token_idx + 1;
-      end
+      update_index();
     end
 
     loop.body: action FeaturesIn:[t] ==> FeaturesOut:[t]
     guard epoch_counter != 0 and epoch_counter != NUM_EPOCHS
     do
-      if token_idx = NUM_FEATURES - 1 then
-        token_idx := 0;
-        epoch_counter := epoch_counter + 1;
-      else
-        token_idx := token_idx + 1;
-      end
+      update_index();
     end
 
     loop.epilogue: action FeaturesIn:[t] ==> FeaturesTrained:[t]
     guard epoch_counter = NUM_EPOCHS
     do
-      if token_idx = NUM_FEATURES - 1 then
-        token_idx := 0;
-        epoch_counter := epoch_counter + 1;
-      else
-        token_idx := token_idx + 1;
-      end
+      update_index();
     end
     
 

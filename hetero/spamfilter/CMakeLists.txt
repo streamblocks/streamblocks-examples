@@ -16,7 +16,7 @@ set(spamfilter_SORUCES
 
 streamblocks(
   spamfilter_software
-  QID hetero.spamfilter.SimpleSpamFilter
+  QID hetero.spamfilter.SimpleSpamFilterEpochs
   PLATFORM multicore
   SOURCE_PATH ${spamfilter_SORUCES}
   TARGET_PATH build/generated/sw
