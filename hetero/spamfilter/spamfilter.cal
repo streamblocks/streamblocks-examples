@@ -1,0 +1,66 @@
+namespace hetero.spamfilter:
+
+
+  import entity ART.art_Source_byte;
+  import entity ART.art_Sink_bin;
+  import entity hetero.spamfilter.utils.BytesToFloat;
+  import entity hetero.spamfilter.utils.FloatToBytes;
+
+  actor FeatureInit(int NUM_FEATURES) ==> float Out:
+    uint ix := 0;
+    do
+      // println("Initializing features to ");
+      while ix < NUM_FEATURES do
+        Out <-- 0.0;
+        ix := ix + 1;
+      end
+    end
+  end
+
+  actor IterSetter(int NUM_ITERS, int NUM_EPOCS) ==> int IterConfig:
+
+    bool done:=false;
+    action ==> IterConfig:[[NUM_ITERS : for int i in 0 .. (NUM_EPOCS - 1)]] repeat NUM_EPOCS
+    guard done = false
+    do
+      done := true;
+    end
+
+  end
+
+  network SimpleSpamFilter() ==>:
+
+    entities
+
+      data_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/spamfilter/data/training_data.bin", loops=0);
+      label_reader = art_Source_byte(fileName="/home/mayy/streamblocks/streamblocks-examples/hetero/spamfilter/data/training_labels.bin", loops=0);
+      data_conv = BytesToFloat();
+      label_conv = BytesToFloat();
+      feature_init = FeatureInit(NUM_FEATURES = 1024);
+      iter_init = IterSetter(NUM_ITERS = 4500, NUM_EPOCS = 1);
+
+      kernel = SpamFilterKernel();
+
+      feature_conv = FloatToBytes();
+
+      features_sink = art_Sink_bin(fileName="trained_features.bin");
+
+    structure
+
+      data_reader.Out --> data_conv.ByteStream;
+      data_conv.FloatStream --> kernel.Data;
+      label_reader.Out --> label_conv.ByteStream;
+      label_conv.FloatStream --> kernel.Label;
+
+      feature_init.Out --> kernel.Feature;
+
+      iter_init.IterConfig --> kernel.IterConfig;
+
+      kernel.TrainedFeatures --> feature_conv.FloatStream;
+      feature_conv.ByteStream --> features_sink.In;
+
+
+  end
+
+
+end

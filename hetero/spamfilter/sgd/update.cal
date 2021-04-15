@@ -1,0 +1,11 @@
+namespace hetero.spamfilter.sgd:
+
+  @pipeline(flush=true)
+  actor ParameterUpdate(type FeatureType, int NUM_FEATURES, FeatureType ALPHA) 
+    FeatureType Grad, FeatureType ThetaOld 
+    ==> FeatureType ThetaNew:
+
+    compute: action Grad:[g], ThetaOld:[t] ==>  ThetaNew:[t + g * ALPHA]
+    end
+  end
+end

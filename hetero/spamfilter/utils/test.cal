@@ -1,0 +1,26 @@
+namespace hetero.spamfilter.utils:
+
+  import System.math.random;
+
+  actor FloatSource(int NUM) ==> float Out:
+
+    uint ix := 0;
+    do
+      while ix < NUM do 
+        Out <-- random(0.0, 10.0);
+        ix := ix + 1;
+      end
+      // println("Sent out " + NUM + " tokens");
+    end
+  end
+
+  actor FloatSink() float In ==>:
+
+    action In:[t] ==> 
+    do
+      // println("Sinking " + t);
+    end
+  end
+  
+
+end

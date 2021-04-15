@@ -7,5 +7,8 @@ namespace system.util:
 
 		external function randint(int min, int max) --> int end
 
+		external function reinterpret_float(uint int_value) --> float end
+		external function reinterpret_uint(float float_value) --> uint end
+
 end
 

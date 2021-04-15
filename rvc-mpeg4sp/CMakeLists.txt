@@ -9,7 +9,7 @@ option(REMOTE_XCLBIN "Remotely fetch generated xclbins" OFF)
 # List of HLS_CLOCK_PERIOD settings to build binaries for
 # Current clock speeds 300, 250, 200, 150 and 100 MHz
 
-
+set(CONFIGURATION_PREFIX "configuration" CACHE STRING "XCF file prefix such as configuration or unique")
 set(CONFIGURATIONS "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15" CACHE STRING "List of ; separated configuration ids")
 set(CONFIG_ROOT "." CACHE STRING "Root folder for the configurations name as configuration_N where N is a number")
 set(CLOCK_LIST "3.3;10;5;2.5;1.667;6.667;13.333" CACHE STRING "List of ; seperated HLS clock settings")
@@ -44,6 +44,7 @@ add_custom_target(all_sc_bin) # build all sc binaries
 add_custom_target(all_sc_run) # run all sc simulations
 add_custom_target(all_multicore)
 add_custom_target(all_hls)
+
 
 list(LENGTH CLOCK_LIST CLOCKS_COUNT)
 math(EXPR MAX_CLOCK_INDEX "${CLOCKS_COUNT} - 1")
@@ -98,6 +99,7 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
 
   add_dependencies(all_multicore ${__TARGET__}_MULTICORE)
   add_dependencies(all_hls ${__TARGET__}_HLS)
+
 
   
   # Make directories
@@ -174,13 +176,13 @@ macro(rvc_generate CONFIG_PATH CLK_IX)
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/Top_RVC_Decoder
     COMMAND ${CMAKE_COMMAND} -DDISPLAY=off -DCMAKE_BUILD_TYPE=Release .. > cmake.bin.config.log
     COMMAND make Top_RVC_Decoder -j &> cmake.make.log
-    DEPENDS ${__TARGET__}
+    DEPENDS ${__TARGET__}_MULTICORE
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/build
   )
   
   add_custom_target(
     ${__TARGET__}_bin ALL
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/Top_RVC_Decoder
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${__TARGET_PATH__}/bin/Top_RVC_Decoder ${__TARGET_DIRS_FILES__}
   )
 
   
@@ -316,7 +318,7 @@ endmacro()
 foreach(index ${CONFIGURATIONS})
   foreach(CLK_IX RANGE 0 ${MAX_CLOCK_INDEX})
 
-    rvc_generate(configuration_${index} ${CLK_IX})
+    rvc_generate(${CONFIGURATION_PREFIX}_${index} ${CLK_IX})
 
   endforeach()
 endforeach()

@@ -1,0 +1,48 @@
+namespace hetero.spamfilter.streamer:
+
+  @pipeline(flush=true)
+  actor Splitter(type T, int STRIDE_SIZE) 
+    T In ==> T Out1, T Out2, T Out3, T Out4:
+    
+    int idx := 0;
+    int(size=8) state := 0;
+    procedure update_index()
+    begin
+      if idx = STRIDE_SIZE - 1 then
+        idx := 0;
+        if state = 3 then
+          state := 0;
+        else 
+          state := state + 1;
+        end
+      else
+        idx := idx + 1;
+      end
+    end
+
+    stream.out1:action In:[t] ==> Out1:[t]
+    guard state = 0
+    do
+      update_index();
+    end
+    stream.out2:action In:[t] ==> Out2:[t]
+    guard state = 1
+    do
+      update_index();
+    end
+    stream.out3:action In:[t] ==> Out3:[t]
+    guard state = 2
+    do
+      update_index();
+    end
+    stream.out4:action In:[t] ==> Out4:[t]
+    guard state = 3
+    do
+      update_index();
+    end
+
+
+
+
+  end
+end

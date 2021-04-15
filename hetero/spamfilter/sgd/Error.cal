@@ -1,0 +1,8 @@
+namespace hetero.spamfilter.sgd:
+
+  @pipeline(flush=true)
+  actor Error (type FeatureType ) FeatureType Pred, FeatureType Actual ==>
+    FeatureType Err:
+    action Pred:[p], Actual:[y] ==> Err:[p - y] end
+  end
+end

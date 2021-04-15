@@ -1,0 +1,38 @@
+namespace hetero.spamfilter.utils:
+
+  import var system.util.reinterpret_float;
+  import var system.util.reinterpret_uint;
+
+  // reinterprets a stream of bytes to floats (little-endian)
+  actor BytesToFloat() uint(size = 8) ByteStream ==> float FloatStream:
+
+    reinterpret: action ByteStream:[b0, b1, b2, b3] ==> FloatStream:[
+        reinterpret_float(
+          ((b0 as uint)       ) |
+          ((b1 as uint) <<  8 ) |
+          ((b2 as uint) <<  16) |
+          ((b3 as uint) <<  24))
+      ]
+    end
+
+  end
+  
+  actor FloatToBytes() float FloatStream ==> uint(size = 8) ByteStream:
+
+    reinterpret: action FloatStream:[f] ==> ByteStream:[b0, b1, b2, b3]
+    var
+      uint(size = 8) b0, uint(size=8) b1, uint(size=8) b2, uint(size = 8) b3,
+      uint(size = 32) word
+    do
+
+      word := reinterpret_uint(f);
+      b0 := (word      ) & 0x000000FF;
+      b1 := (word >> 8 ) & 0x000000FF;
+      b2 := (word >> 16) & 0x000000FF;
+      b3 := (word >> 24) & 0x000000FF;
+
+    end
+
+  end
+
+end

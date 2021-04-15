@@ -56,7 +56,7 @@ streamblocks(
   fir_software
   PLATFORM multicore
   QID fir.TopFIRThroughput
-  TARGET_PATH generated/profiling/sw
+  TARGET_PATH generated/sw
   SOURCE_PATH ${fir_SOURCES}
   EXPERIMENTAL
 )

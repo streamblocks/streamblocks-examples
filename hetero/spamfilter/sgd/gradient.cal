@@ -1,0 +1,22 @@
+namespace hetero.spamfilter.sgd:
+
+  @pipeline(flush=true)
+  actor Gradient(type FeatureType, type DataType, int NUM_FEATURES)
+    DataType Data, FeatureType Scale ==> FeatureType Grad:
+    
+    FeatureType s;
+    int idx := NUM_FEATURES;
+    read.scale: action Scale:[_s] ==>
+    guard idx = NUM_FEATURES
+    do
+      s := _s;
+      idx := 0;
+    end
+    compute: action Data:[f] ==> Grad:[f * s]
+    guard idx < NUM_FEATURES
+    do
+        idx := idx + 1; 
+    end
+
+  end
+end

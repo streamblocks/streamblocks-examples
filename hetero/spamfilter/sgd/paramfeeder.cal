@@ -1,0 +1,84 @@
+namespace hetero.spamfilter.sgd:
+
+
+  /**
+   ParamFeeder feeds the network parameters iteratively based on
+   the value read on the IterConfig port. For instance,
+   if 10 is read on the IterConfig port, first NUM_FEATURES of
+   tokens are pass to CurrentParams from InitialStream and then 
+   for 9 times, NUM_FEATURS tokens from UpdatedParams are fed to the 
+   the CurrentParams. This actually essentially is the out for loop in 
+   for parameter update.
+   */
+  actor ParamFeeder(type FeatureType, int NUM_FEATURES) 
+    int IterConfig,
+    FeatureType InitialParams, FeatureType UpdatedParams ==> 
+    FeatureType CurrentParams, FeatureType FinalParams:
+  
+
+    procedure update_state() 
+    begin
+      if idx = NUM_FEATURES - 1 then
+        if iter = max_iter then
+          iter := -1;
+        else
+          // println("Chaning iteration " + iter);
+          iter := iter + 1;
+        end
+        idx := 0;
+      else
+        idx := idx + 1;
+      end
+    end
+
+    int iter := -1;
+    int max_iter := 0;
+    int idx := 0;
+
+    iter.init: action IterConfig:[i] ==>
+    guard iter = -1
+    do
+      if i > 0 then
+        // println("Starting param feed with " + i + " iterations and coeff " + coeff);
+        max_iter := i;
+        iter := 0;
+        idx := 0;
+      end
+    end
+    
+    stream.init: action InitialParams:[p] ==> CurrentParams:[p] 
+    guard iter = 0
+    do
+      update_state();
+    end
+
+    stream.body: action UpdatedParams:[p] ==> CurrentParams:[p]
+    guard iter > 0
+    do
+      update_state();
+    end
+
+    stream.finish: action UpdatedParams:[p] ==> FinalParams:[p]
+    guard iter = max_iter
+    do
+      update_state();
+    end
+
+    stream.reset: action ==>
+    guard iter = -1
+    end
+
+    schedule fsm init:
+      init(iter.init) --> streaming;
+      streaming(stream.init) --> streaming;
+      streaming(stream.body) --> streaming;
+      streaming(stream.finish) --> streaming;
+      streaming(stream.reset) --> init;
+    end
+
+    priority
+      stream.finish > stream.body;
+    end
+  end
+
+end

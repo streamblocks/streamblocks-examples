@@ -1,0 +1,70 @@
+namespace hetero.spamfilter:
+
+  import entity hetero.spamfilter.sgd.ParamFeeder;
+  import entity hetero.spamfilter.sgd.DotProduct;
+  import entity hetero.spamfilter.sgd.Sigmoid;
+  import entity hetero.spamfilter.sgd.Error;
+  import entity hetero.spamfilter.sgd.Gradient;
+  import entity hetero.spamfilter.sgd.ParameterUpdate;
+
+
+  
+  network SpamFilterKernel() 
+    float Data, float Feature, float Label,
+    int IterConfig ==>
+    float TrainedFeatures:
+    // Data should contian NUM_FEATURES * NUM_TRAINING points
+    // Feature should contain NUM_FEATURES
+    // Label should contain NUM_TRAINING
+    var int NUM_FEATURES = 1024 ;
+        int NUM_TRAINING = 4500 ;
+
+    entities
+      theta_feeder = ParamFeeder(FeatureType: float, 
+        NUM_FEATURES = NUM_FEATURES);
+      dot_op = DotProduct(
+        DataType : float, 
+        FeatureType : float,
+        NUM_FEATURES = NUM_FEATURES
+      );
+
+      sig_op = Sigmoid();
+
+      err_op = Error(FeatureType : float);
+
+      grad = Gradient(FeatureType : float, DataType : float, 
+        NUM_FEATURES = NUM_FEATURES);
+
+      update = ParameterUpdate(FeatureType : float,
+        NUM_FEATURES = NUM_FEATURES,
+        ALPHA = 0.7324);
+
+    structure
+
+      Data --> dot_op.Data;
+      Data --> grad.Data;
+      Feature --> theta_feeder.InitialParams;
+      IterConfig --> theta_feeder.IterConfig;
+      Label --> err_op.Actual;
+
+      theta_feeder.CurrentParams --> dot_op.Theta;
+      theta_feeder.CurrentParams --> update.ThetaOld;
+
+      theta_feeder.FinalParams --> TrainedFeatures;
+
+      update.ThetaNew --> theta_feeder.UpdatedParams;
+
+      dot_op.Dot --> sig_op.Exponent;
+
+      sig_op.Sig --> err_op.Pred;
+
+      err_op.Err --> grad.Scale;
+
+      grad.Grad --> update.Grad;
+
+      
+
+
+  end
+
+end

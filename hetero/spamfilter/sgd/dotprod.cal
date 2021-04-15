@@ -1,0 +1,29 @@
+namespace hetero.spamfilter.sgd:
+
+
+  @pipeline(flush=true)
+  actor DotProduct(type DataType, type FeatureType, int NUM_FEATURES) 
+    DataType Data, FeatureType Theta ==> FeatureType Dot:
+
+    int idx := 0;
+    FeatureType res := 0;
+    dot: action Data:[data], Theta:[theta] ==>
+    guard idx < NUM_FEATURES
+    do
+      res := res + data * theta;
+      idx := idx + 1;
+    end
+
+    emit: action ==> Dot:[dot_value]
+    guard idx = NUM_FEATURES
+    var FeatureType dot_value := 0
+    do
+      dot_value := res;
+      res := 0;
+      idx := 0;
+    end
+
+  end
+
+
+end
