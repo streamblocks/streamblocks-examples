@@ -93,8 +93,8 @@ namespace RVC:
         BTYPE --> framebuf.BTYPE;
         BTYPE --> add.BTYPE;
         TEX --> add.TEX; 
-        framebuf.halfpel --> interpolation.halfpel;
         framebuf.RD --> interpolation.RD;
+        framebuf.halfpel --> interpolation.halfpel;
         interpolation.MOT --> add.MOT; 
         add.VID --> framebuf.WD;
         add.VID -->VID;

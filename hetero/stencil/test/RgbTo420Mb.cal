@@ -16,9 +16,9 @@ import entity converters.size.SoiMB;
         int HEIGHT = 512;
     entities
     	pattern = PatternGenerator(WIDTH=WIDTH, HEIGHT=HEIGHT);
-      	to_yuv = RGBtoYUV();
+      	to_yuv = RGBtoYUV(name="to_yuv"); 
 	    to_rgb = YUVtoRGB();
-	    to_yuv_2 = RGBtoYUV();
+	    to_yuv_2 = RGBtoYUV(name="to_yuv_1");
       	raster_to_mb = RasterToMB();
 	  	display = Display();
 	  	soi_mb = SoiMB();
@@ -41,7 +41,7 @@ import entity converters.size.SoiMB;
 		to_yuv.Y --> to_rgb.Y;
 		to_yuv.CrCb --> to_rgb.CrCb;
 		
-		to_rgb.R --> to_yuv_2.R;
+		to_rgb.R --> to_yuv_2.R; 
 		to_rgb.G --> to_yuv_2.G;
 		to_rgb.B --> to_yuv_2.B;
 		

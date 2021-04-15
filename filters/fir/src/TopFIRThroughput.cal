@@ -21,7 +21,7 @@ namespace fir:
 		   0.0181163,  0.0322875,  -0.0448093
 	   ];	
 	entities
-		rand  = Random(limit=true);
+		rand  = Random(limit=false);
 		mul   = ConstantMultiply(c = noise);
 		add   = Add();
 		sine  = Sine(d = 0.01);

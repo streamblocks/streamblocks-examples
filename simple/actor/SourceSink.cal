@@ -1,7 +1,5 @@
 namespace simple.dwf:
     // -- Import extranl function for printing
-    import var system.io.println_s_i;
-
     /*
      * Source actor 
      * Produces 16 token from 0 to 15, and send them to output OUT.
@@ -32,7 +30,7 @@ namespace simple.dwf:
     
         action IN:[token] ==>
         do 
-            println_s_i("Value", token);
+            println("Value:" + token);
         end
     end
 
@@ -47,7 +45,7 @@ namespace simple.dwf:
             source = Source();
             sink = Sink();
         structure
-            source.OUT --> sink.IN;
+            source.OUT --> sink.IN ;// -- uncomment for composition{ composition="ss"; buffersize=1; };
     end
 
 end

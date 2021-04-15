@@ -16,3 +16,8 @@ hetero/decoder/mpeg/parallel/build
 hetero/decoder/mpeg/parallel/genx
 hetero/smith-waterman/build
 hetero/smith-waterman/generated
+hetero/stencil/build
+hetero/stencil/generated
+hetero/filters/fir/build
+hetero/filters/fir/configs
+hetero/filters/fir/generated
