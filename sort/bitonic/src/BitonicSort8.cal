@@ -1,0 +1,226 @@
+namespace sort:
+
+	bool ASCEDNING = true;
+	bool DESCENDING = false;
+
+	actor Compare(bool DIRECTION) int I_0, int I_1 ==> int O_0, int O_1:
+		action I_0:[a], 
+			   I_1:[b] 
+			   ==> 
+			   O_0:[if a > b then b else a end], 
+			   O_1:[if a > b then a else b end]
+		guard DIRECTION = ASCEDNING
+		end
+		
+		action I_0:[a], 
+			   I_1:[b] 
+			   ==> 
+			   O_0:[if a < b then b else a end], 
+			   O_1:[if a < b then a else b end]
+		guard DIRECTION = DESCENDING
+		end
+	end
+	
+	network BitonicMerge4(bool DIRECTION) 
+		int I_0, 
+		int I_1,
+		int I_2,
+		int I_3
+		==>
+		int O_0, 
+		int O_1,
+		int O_2,
+		int O_3:
+	
+		entities
+			compare03 = Compare(DIRECTION=DIRECTION);
+			compare12 = Compare(DIRECTION=DIRECTION);
+			compare01 = Compare(DIRECTION=DIRECTION);
+			compare23 = Compare(DIRECTION=DIRECTION);	
+		structure
+			I_0 --> compare03.I_0;
+			I_3 --> compare03.I_1;
+			
+			I_1 --> compare12.I_0;
+			I_2 --> compare12.I_1;
+			
+			compare03.O_0 --> compare01.I_0;
+			compare12.O_0 --> compare01.I_1;
+			
+			compare12.O_1 --> compare23.I_0;
+			compare03.O_1 --> compare23.I_1;
+			
+			compare01.O_0 --> O_0;
+			compare01.O_1 --> O_1;
+			
+			compare23.O_0 --> O_2;
+			compare23.O_1 --> O_3;
+	end
+ 
+ 	network BitonicMerge8(bool DIRECTION) 
+		int I_0, 
+		int I_1,
+		int I_2,
+		int I_3,
+		int I_4,
+		int I_5,
+		int I_6,
+		int I_7
+		==>
+		int O_0, 
+		int O_1,
+		int O_2,
+		int O_3,
+		int O_4,
+		int O_5,
+		int O_6,
+		int O_7:
+		
+		entities
+			compare07 = Compare(DIRECTION=DIRECTION);
+			compare16 = Compare(DIRECTION=DIRECTION);
+			compare25 = Compare(DIRECTION=DIRECTION);
+			compare34 = Compare(DIRECTION=DIRECTION);
+			
+			compare02 = Compare(DIRECTION=DIRECTION);
+			compare13 = Compare(DIRECTION=DIRECTION);
+			
+			
+			compare46 = Compare(DIRECTION=DIRECTION);
+			compare57 = Compare(DIRECTION=DIRECTION);
+			
+			
+			compare01 = Compare(DIRECTION=DIRECTION);
+			
+			compare23 = Compare(DIRECTION=DIRECTION);
+			
+			compare45 = Compare(DIRECTION=DIRECTION);
+			
+			compare67 = Compare(DIRECTION=DIRECTION);
+		structure
+			I_0 --> compare07.I_0;
+			I_7 --> compare07.I_1;
+			
+			I_1 --> compare16.I_0;
+			I_6 --> compare16.I_1;
+			
+			I_2 --> compare25.I_0;
+			I_5 --> compare25.I_1;
+			
+			I_3 --> compare34.I_0;
+			I_4 --> compare34.I_1;
+			
+			compare07.O_0 --> compare02.I_0;
+			compare25.O_0 --> compare02.I_1;
+			
+			compare16.O_0 --> compare13.I_0;
+			compare34.O_0 --> compare13.I_1;
+			
+			compare34.O_1 --> compare46.I_0;
+			compare16.O_1 --> compare46.I_1;
+			
+			compare25.O_1 --> compare57.I_0;
+			compare07.O_1 --> compare57.I_1;
+			
+			compare02.O_0 --> compare01.I_0;
+			compare13.O_0 --> compare01.I_1;
+			
+			compare02.O_1 --> compare23.I_0;
+			compare13.O_1 --> compare23.I_1;
+			
+			compare46.O_0 --> compare45.I_0;
+			compare57.O_0 --> compare45.I_1;
+			
+			compare46.O_1 --> compare67.I_0;
+			compare57.O_1 --> compare67.I_1;
+			
+			compare01.O_0 --> O_0;
+			compare01.O_1 --> O_1;
+			
+			compare23.O_0 --> O_2;
+			compare23.O_1 --> O_3;
+			
+			compare45.O_0 --> O_4;
+			compare45.O_1 --> O_5;
+			
+			compare67.O_0 --> O_6;
+			compare67.O_1 --> O_7;
+			
+			
+ 	end
+ 	
+ 	network BitonicSort8(bool DIRECTION=true)
+ 		int I_0, 
+		int I_1,
+		int I_2,
+		int I_3,
+		int I_4,
+		int I_5,
+		int I_6,
+		int I_7
+		==>
+		int O_0, 
+		int O_1,
+		int O_2,
+		int O_3,
+		int O_4,
+		int O_5,
+		int O_6,
+		int O_7:
+		
+		entities
+			compare01 = Compare(DIRECTION=DIRECTION);
+			compare23 = Compare(DIRECTION=DIRECTION);
+			compare45 = Compare(DIRECTION=DIRECTION);
+			compare67 = Compare(DIRECTION=DIRECTION);
+			
+			merge03 = BitonicMerge4(DIRECTION=DIRECTION);
+			merge47 = BitonicMerge4(DIRECTION=DIRECTION);
+			
+			merge07 = BitonicMerge8(DIRECTION=DIRECTION);
+		structure
+			I_0 --> compare01.I_0;
+			I_1 --> compare01.I_1;
+			
+			I_2 --> compare23.I_0;
+			I_3 --> compare23.I_1;
+			
+			I_4 --> compare45.I_0;
+			I_5 --> compare45.I_1;
+			
+			I_6 --> compare67.I_0;
+			I_7 --> compare67.I_1;
+			
+			compare01.O_0 --> merge03.I_0;
+			compare01.O_1 --> merge03.I_1;
+			
+			compare23.O_0 --> merge03.I_2;
+			compare23.O_1 --> merge03.I_3;
+			
+			compare45.O_0 --> merge47.I_0;
+			compare45.O_1 --> merge47.I_1;
+			
+			compare67.O_0 --> merge47.I_2;
+			compare67.O_1 --> merge47.I_3;
+			
+			merge03.O_0 --> merge07.I_0;
+			merge03.O_1 --> merge07.I_1;
+			merge03.O_2 --> merge07.I_2;
+			merge03.O_3 --> merge07.I_3;
+			
+			merge47.O_0 --> merge07.I_4;
+			merge47.O_1 --> merge07.I_5;
+			merge47.O_2 --> merge07.I_6;
+			merge47.O_3 --> merge07.I_7;
+			
+			merge07.O_0 --> O_0;
+			merge07.O_1 --> O_1;
+			merge07.O_2 --> O_2;
+			merge07.O_3 --> O_3;
+			merge07.O_4 --> O_4;
+			merge07.O_5 --> O_5;
+			merge07.O_6 --> O_6;
+			merge07.O_7 --> O_7;
+	end
+ 
+end
