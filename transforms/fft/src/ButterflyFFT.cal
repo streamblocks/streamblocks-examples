@@ -1,0 +1,16 @@
+namespace fft:
+
+
+	network ButterflyFFT (type T, uint NSTAGES, float scale) T In ==> T Out :
+	
+	entities
+		bf = Butterfly(NSTAGES = NSTAGES);
+		scaler = ConstantMultiply(c = scale); 
+		
+	structure 
+		In --> bf.In;
+		bf.Out --> scaler.In;
+		scaler.Out --> Out;
+	end
+
+end

@@ -1,0 +1,10 @@
+namespace fft:
+
+	actor Radix2Cell (type T) T X0, T X1, T W ==> T Y0, T Y1 :
+	
+		action X0: [x0], X1: [x1], W: [w] ==> Y0: [x0 + x1], Y1: [(x0 - x1)*w] 
+		end
+	
+	end 
+
+end

@@ -1,0 +1,86 @@
+namespace sort:
+
+import var System.math.randInt;
+
+	actor Send(bool p, uint DATA) 
+		==>
+		int O_0, 
+		int O_1,
+		int O_2,
+		int O_3,
+		int O_4,
+		int O_5,
+		int O_6,
+		int O_7
+		:
+		
+		uint Counter := 0;
+		
+		action ==> O_0:[i0], O_1:[i1], O_2:[i2],O_3:[i3],O_4:[i4],O_5:[i5],O_6:[i6],O_7:[i7]
+		guard
+			Counter < DATA
+		var
+					int i0 = randInt(100),
+					int i1 = randInt(100),
+					int i2 = randInt(100),
+					int i3 = randInt(100),
+					int i4 = randInt(100),
+					int i5 = randInt(100),
+					int i6 = randInt(100),
+					int i7 = randInt(100)
+		do
+			if(p) then
+				println("seed : [" + i0 + ", " + i1 + ", " + i2 + ", " + i3 + ", " + i4 + ", " + i5 + ", " + i6 + ", " + i7 + "]");
+			end
+			Counter := Counter + 1;
+		end
+		
+	end
+
+	actor Print(bool p)
+		int I_0, 
+		int I_1,
+		int I_2,
+		int I_3,
+		int I_4,
+		int I_5,
+		int I_6,
+		int I_7
+		==>
+		:
+		
+	
+		action I_0:[i0], I_1:[i1], I_2:[i2],I_3:[i3],I_4:[i4],I_5:[i5],I_6:[i6],I_7:[i7] ==>
+		do
+			if(p) then
+				println("sorted : [" + i0 + ", " + i1 + ", " + i2 + ", " + i3 + ", " + i4 + ", " + i5 + ", " + i6 + ", " + i7 + "]");
+			end
+		end
+	end
+	
+	network TopBitonicSort() ==> :
+	entities
+		send = Send(p=false, DATA=50000000);
+		sort = BitonicSort8(DIRECTION=DESCENDING) {partition = "hw";};
+		print = Print(p=false);
+	structure
+		send.O_0 --> sort.I_0;
+		send.O_1 --> sort.I_1;
+		send.O_2 --> sort.I_2;
+		send.O_3 --> sort.I_3;
+		send.O_4 --> sort.I_4;
+		send.O_5 --> sort.I_5;
+		send.O_6 --> sort.I_6;
+		send.O_7 --> sort.I_7;
+		
+		sort.O_0 --> print.I_0;
+		sort.O_1 --> print.I_1;
+		sort.O_2 --> print.I_2;
+		sort.O_3 --> print.I_3;
+		sort.O_4 --> print.I_4;
+		sort.O_5 --> print.I_5;
+		sort.O_6 --> print.I_6;
+		sort.O_7 --> print.I_7;
+	end
+
+end

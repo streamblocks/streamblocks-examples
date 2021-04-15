@@ -1,0 +1,15 @@
+namespace fft:
+
+import var System.math.sin;
+
+	actor Sine (float d) ==> float Out: 
+	
+		float x := 0.0;
+		
+		action ==> Out:[(sin(old x) as float)]
+		do
+			x := x + d;
+		end
+	end
+	
+end 

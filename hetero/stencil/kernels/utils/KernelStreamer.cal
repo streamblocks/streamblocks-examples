@@ -84,7 +84,7 @@ namespace hetero.stencil.kernels.utils:
       s_stream(pad_stream) --> s_stream;
       s_stream(reset) --> s_init;
     end
-    
+     
     priority 
       read_h_w > pixel_stream;
       pixel_stream > pad_stream;

@@ -225,11 +225,7 @@ namespace hetero.stencil.bitmap.encoders:
       row_size := 0;
     end
 
-    priority
-      emit_bitmask > stream_pixel_rgba;
-      stream_pixel_rgba > stream_pixel_rgb;
-    end
-
+   
     schedule fsm s_init:
       s_init(encode_header) --> s_encode_info;
       s_encode_info(encode_info_header) --> s_pixels;
@@ -238,6 +234,11 @@ namespace hetero.stencil.bitmap.encoders:
       s_pixels(stream_pixel_rgba) --> s_pixels;
       s_pixels(stream_padding) --> s_pixels;
       s_pixels(reset) --> s_init;
+    end
+    
+    priority
+      emit_bitmask > stream_pixel_rgba;
+      stream_pixel_rgba > stream_pixel_rgb;
     end
 
   end
