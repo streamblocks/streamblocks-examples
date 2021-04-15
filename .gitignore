@@ -1,3 +1,4 @@
+jobs/
 rvc-mpeg4sp/cmake/configuration_*
 rvc-mpeg4sp/genx
 rvc-mpeg4sp/configurations
@@ -21,3 +22,7 @@ hetero/stencil/generated
 hetero/filters/fir/build
 hetero/filters/fir/configs
 hetero/filters/fir/generated
+hetero/transforms/idct/build
+hetero/transforms/idct/generated
+hetero/sort/bitonic/build
+hetero/sort/bitonic/generated
