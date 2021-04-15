@@ -1,0 +1,10 @@
+namespace fft:
+
+	actor ConstantMultiply (type T, T c) T  In ==> T Out :
+
+		action In:[a] ==> Out:[c * a] 
+		end
+		
+	end
+
+end

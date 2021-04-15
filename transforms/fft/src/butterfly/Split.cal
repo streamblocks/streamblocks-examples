@@ -1,0 +1,31 @@
+namespace fft:
+
+	actor Split (type T, uint N) T In ==> T A,  T B :
+	
+		bool toA := true;
+		uint n := 0;
+		
+		action In: [v] ==> A: [v]
+		guard
+			toA
+		do
+			n := n + 1;
+			if n >= N then
+				n := 0;
+				toA := false;
+			end
+		end
+		
+		action In: [v] ==> B: [v]
+		guard
+			not toA
+		do
+			n := n + 1;
+			if n >= N then
+				n := 0;
+				toA := true;
+			end
+		end
+	end	
+
+end

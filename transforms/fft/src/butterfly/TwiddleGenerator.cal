@@ -1,0 +1,25 @@
+namespace fft:
+
+import var System.math.sin;
+import var System.math.cos;
+
+	//type complex(float Re, float Im):  () end
+
+	actor TwiddleGenerator (type T, uint N) int Trigger ==>  T W :
+	
+		uint n := 0;
+		
+		action Trigger: [_1, _2] ==> W: [twiddles[old n]]
+		do
+			n := n + 1;
+			if n >= N then
+				n := 0;
+			end
+		end
+	
+		List(type:float, size=N) twiddles = [exp(complex(0, (MinusPI * k) / N)) : for uint k in 0 .. N - 1];
+		float PI = -3.1415926535;
+	end
+
+
+end
