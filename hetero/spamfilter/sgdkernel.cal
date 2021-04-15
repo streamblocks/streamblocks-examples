@@ -1,4 +1,4 @@
-namespace hetero.spamfilter:
+namespace hetero.spamfilter.kernel:
 
   import entity hetero.spamfilter.sgd.ParamFeeder;
   import entity hetero.spamfilter.sgd.DotProduct;
@@ -6,18 +6,18 @@ namespace hetero.spamfilter:
   import entity hetero.spamfilter.sgd.Error;
   import entity hetero.spamfilter.sgd.Gradient;
   import entity hetero.spamfilter.sgd.ParameterUpdate;
-
-
   
-  network SpamFilterKernel() 
+  
+
+  network SpamFilterKernel(int NUM_FEATURES, int NUM_TRAINING) 
     float Data, float Feature, float Label,
     int IterConfig ==>
     float TrainedFeatures:
     // Data should contian NUM_FEATURES * NUM_TRAINING points
     // Feature should contain NUM_FEATURES
     // Label should contain NUM_TRAINING
-    var int NUM_FEATURES = 1024 ;
-        int NUM_TRAINING = 4500 ;
+    // var int NUM_FEATURES = 1024 ;
+    //     int NUM_TRAINING = 4500 ;
 
     entities
       theta_feeder = ParamFeeder(FeatureType: float, 
@@ -66,5 +66,7 @@ namespace hetero.spamfilter:
 
 
   end
+
+
 
 end

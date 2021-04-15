@@ -20,6 +20,6 @@ streamblocks(
   PLATFORM multicore
   SOURCE_PATH ${spamfilter_SORUCES}
   TARGET_PATH build/generated/sw
-  EXPERIMENTAL
+  # EXPERIMENTAL
 )
 

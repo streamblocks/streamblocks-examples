@@ -1,0 +1,71 @@
+namespace hetero.spamfilter.sgd:
+
+
+  actor EpochManager(type FeatureType, int NUM_EPOCHS,
+    int NUM_FEATURES, int NUM_ITERS)
+    float FeaturesIn
+    ==>
+    float FeaturesOut,
+    float FeaturesTrained,
+    int IterConfig:
+    
+    // int NUM_ITERS = 4500;
+    // int NUM_EPOCHS = 5;
+    // int NUM_FEATURES = 1024;
+    // int NUM_EPOCHS = 5;
+    int epoch_counter := 0;
+    int token_idx := 0;
+    
+
+    loop.init: action ==> IterConfig:[
+      [NUM_ITERS : for int i in 0 .. (NUM_EPOCHS - 1)]
+    ] repeat NUM_EPOCHS
+    guard epoch_counter < NUM_EPOCHS
+    end
+
+    loop.prologue: action ==> FeaturesOut:[0.0]
+    guard epoch_counter = 0
+    do
+      if token_idx = NUM_FEATURES - 1 then
+        token_idx := 0;
+        epoch_counter := epoch_counter + 1;
+      else
+        token_idx := token_idx + 1;
+      end
+    end
+
+    loop.body: action FeaturesIn:[t] ==> FeaturesOut:[t]
+    guard epoch_counter != 0 and epoch_counter != NUM_EPOCHS
+    do
+      if token_idx = NUM_FEATURES - 1 then
+        token_idx := 0;
+        epoch_counter := epoch_counter + 1;
+      else
+        token_idx := token_idx + 1;
+      end
+    end
+
+    loop.epilogue: action FeaturesIn:[t] ==> FeaturesTrained:[t]
+    guard epoch_counter = NUM_EPOCHS
+    do
+      if token_idx = NUM_FEATURES - 1 then
+        token_idx := 0;
+        epoch_counter := epoch_counter + 1;
+      else
+        token_idx := token_idx + 1;
+      end
+    end
+    
+
+
+    schedule fsm s_init:
+      s_init(loop.init) --> s_stream;
+      s_stream(loop.prologue) --> s_stream;
+      s_stream(loop.epilogue) --> s_stream;
+      s_stream(loop.body) --> s_stream;
+
+    end
+
+
+  end
+end
