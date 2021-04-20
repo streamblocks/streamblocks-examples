@@ -1,0 +1,22 @@
+{
+  "username" : "emami",
+  "token": "11f4d87adc1dfb229037d7ea990baa08e7",
+  "jobs": [
+    {
+      "name" : "jpegblur_@INDEX@",
+      "dir" : "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_@INDEX@",
+      "network" : "JpegBlurNetwork",
+      "operation": "build",
+      "params" : {
+        "HLS_CLOCK_PERIOD" : 3.3,
+        "KERNEL_FREQ" : 300,
+        "TARGET" : "hw",
+        "PLATFORM": "xilinx_u250_xdma_201830_2",
+        "FPGA_NAME": "xcu250-figd2104-2L-e",
+        "IS_MPSOC": "OFF",
+        "MPSOC_CLOCK_ID" : "0"
+      }
+    }
+  ]
+}
+

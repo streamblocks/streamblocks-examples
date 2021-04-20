@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration>
+    <network id="hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork"/>
+    <partitioning>
+        <partition id="0" pe="x86_64" scheduling="ROUND_ROBIN" code-generator="sw" host="true">
+            <instance id="column"/>
+            <instance id="column_1"/>
+            <instance id="display"/>
+            <instance id="huffman"/>
+            <instance id="iq_Cb"/>
+            <instance id="iq_Cr"/>
+            <instance id="iq_Y"/>
+            <instance id="mb_to_raster"/>
+            <instance id="merger"/>
+            <instance id="parse"/>
+            <instance id="raster_to_mb"/>
+            <instance id="retranspose"/>
+            <instance id="retranspose_1"/>
+            <instance id="row"/>
+            <instance id="row_1"/>
+            <instance id="scale"/>
+            <instance id="scale_1"/>
+            <instance id="shift"/>
+            <instance id="shift_1"/>
+            <instance id="source"/>
+            <instance id="splitter420"/>
+            <instance id="transpose"/>
+            <instance id="transpose_1"/>
+        </partition>
+        <partition id="1" pe="FPGA" scheduling="FULL_PARALLEL" code-generator="hw" host="false">
+            <instance id="col_n1_compute"/>
+            <instance id="col_n1_compute_0"/>
+            <instance id="col_n1_compute_1"/>
+            <instance id="col_p0_compute"/>
+            <instance id="col_p0_compute_0"/>
+            <instance id="col_p0_compute_1"/>
+            <instance id="col_p1_compute"/>
+            <instance id="col_p1_compute_0"/>
+            <instance id="col_p1_compute_1"/>
+            <instance id="column_0"/>
+            <instance id="conv_420_422"/>
+            <instance id="conv_422_420"/>
+            <instance id="conv_422_444"/>
+            <instance id="conv_444_422"/>
+            <instance id="f0"/>
+            <instance id="f0_0"/>
+            <instance id="f0_1"/>
+            <instance id="f1"/>
+            <instance id="f1_0"/>
+            <instance id="f1_1"/>
+            <instance id="f2"/>
+            <instance id="f2_0"/>
+            <instance id="f2_1"/>
+            <instance id="f3"/>
+            <instance id="f3_0"/>
+            <instance id="f3_1"/>
+            <instance id="f4"/>
+            <instance id="f4_0"/>
+            <instance id="f4_1"/>
+            <instance id="f5"/>
+            <instance id="f5_0"/>
+            <instance id="f5_1"/>
+            <instance id="f6"/>
+            <instance id="f6_0"/>
+            <instance id="f6_1"/>
+            <instance id="f7"/>
+            <instance id="f7_0"/>
+            <instance id="f7_1"/>
+            <instance id="f8"/>
+            <instance id="f8_0"/>
+            <instance id="f8_1"/>
+            <instance id="padding"/>
+            <instance id="padding_0"/>
+            <instance id="padding_1"/>
+            <instance id="retranspose_0"/>
+            <instance id="rgb_to_ycrcb"/>
+            <instance id="row_0"/>
+            <instance id="row_agg_compute"/>
+            <instance id="row_agg_compute_0"/>
+            <instance id="row_agg_compute_1"/>
+            <instance id="s0"/>
+            <instance id="s0_0"/>
+            <instance id="s0_1"/>
+            <instance id="s1"/>
+            <instance id="s1_0"/>
+            <instance id="s1_1"/>
+            <instance id="s2"/>
+            <instance id="s2_0"/>
+            <instance id="s2_1"/>
+            <instance id="s3"/>
+            <instance id="s3_0"/>
+            <instance id="s3_1"/>
+            <instance id="s4"/>
+            <instance id="s4_0"/>
+            <instance id="s4_1"/>
+            <instance id="s5"/>
+            <instance id="s5_0"/>
+            <instance id="s5_1"/>
+            <instance id="s6"/>
+            <instance id="s6_0"/>
+            <instance id="s6_1"/>
+            <instance id="s7"/>
+            <instance id="s7_0"/>
+            <instance id="s7_1"/>
+            <instance id="scale_0"/>
+            <instance id="shift_0"/>
+            <instance id="soi_to_wh"/>
+            <instance id="soi_up"/>
+            <instance id="splitQT"/>
+            <instance id="transpose_0"/>
+            <instance id="ycrcb_to_rgb"/>
+        </partition>
+    </partitioning>
+    <code-generators>
+        <code-generator id="sw" platform="multicore"/>
+        <code-generator id="hw" platform="vivado-hls"/>
+    </code-generators>
+    <connections/>
+</configuration>

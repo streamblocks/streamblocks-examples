@@ -26,6 +26,7 @@ set(JpegBlurNetwork_SOURCES
   ${EXAMPLES_HOME}/system/art
   ${EXAMPLES_HOME}/system/std
   ${EXAMPLES_HOME}/jpeg/decoder/parallel
+  ${EXAMPLES_HOME}/jpeg/decoder/serial
   ${EXAMPLES_HOME}/jpeg/io
   ${EXAMPLES_HOME}/hetero/stencil/kernels
 )
@@ -51,20 +52,20 @@ streamblocks_systemc(
 add_custom_target(all_jpegblur_gen_hls)
 add_custom_target(all_jpegblur_gen_multicore)
 
-function(jpegblur_gen CONFIG_IDX)
+function(jpegblur_gen CONFIG_IDX NETWORK PREFIX)
 
   
   
-  set(CONFIG_ROOT ${EXAMPLES_HOME}/hetero/stencil/kernels/blur/profiled_data/unique/)
+  set(CONFIG_ROOT ${EXAMPLES_HOME}/hetero/stencil/kernels/blur/${PREFIX}/unique/)
   set(THIS_CONFIG ${CONFIG_ROOT}/unique_${CONFIG_IDX}.xcf)
-  set(OUTPUT_PATH build/generated/jpegblur/unique_${CONFIG_IDX})
+  set(OUTPUT_PATH build/${PREFIX}/jpegblur/unique_${CONFIG_IDX})
 
 
   set(__THIS_TARGET__ jpeg_unique_${CONFIG_IDX})
   streamblocks(
     ${__THIS_TARGET__}_hls
     PLATFORM vivado-hls
-    QID hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork
+    QID hetero.stencil.kernels.GuassianBlur.${NETWORK}
     PARTITIONING
     SOURCE_PATH ${JpegBlurNetwork_SOURCES}
     TARGET_PATH ${OUTPUT_PATH}
@@ -74,7 +75,7 @@ function(jpegblur_gen CONFIG_IDX)
   streamblocks(
     ${__THIS_TARGET__}_multicore
     PLATFORM multicore
-    QID hetero.stencil.kernels.GuassianBlur.JpegBlurNetwork
+    QID hetero.stencil.kernels.GuassianBlur.${NETWORK}
     PARTITIONING
     SOURCE_PATH ${JpegBlurNetwork_SOURCES}
     TARGET_PATH ${OUTPUT_PATH}
@@ -86,6 +87,102 @@ function(jpegblur_gen CONFIG_IDX)
 endfunction()
 
 
-foreach(index RANGE 0 34)  
-  jpegblur_gen(${index})
+
+
+streamblocks(
+  JpegNaiveBlurNetwork_MC
+  PLATFORM multicore
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurNaiveNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/test/JpegBlurNaiveNetwork
+  
+)
+
+
+streamblocks(
+  JpegNaiveNaiveNetwork_multicore
+  PLATFORM multicore
+  PARTITIONING
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurNaiveNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH build/naive_profile/jpegblur/fpga_only
+  
+)
+
+streamblocks(
+  JpegNaiveNaiveNetwork_hls
+  PLATFORM vivado-hls
+  PARTITIONING
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurNaiveNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH build/naive_profile/jpegblur/fpga_only
+  
+)
+
+streamblocks_systemc(
+  JpegNaiveBlurNetwork_systemc
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurNaiveNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/systemc/JpegBlurNaiveNetwork
+  
+)
+
+
+streamblocks(
+  JpegBlurOptNetwork_MC
+  PLATFORM multicore
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurOptNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/test/JpegBlurOptNetwork
+  
+)
+
+streamblocks_systemc(
+  JpegBlurOptNetwork_systemc
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurOptNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/systemc/JpegBlurOptNetwork
+)
+
+
+
+streamblocks(
+  JpegBlurSerialNetwork_MC
+  PLATFORM multicore
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurSerialNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/test/JpegBlurSerialNetwork
+  
+)
+
+streamblocks_systemc(
+  JpegBlurSerialNetwork_systemc
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurSerialNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH generated/systemc/JpegBlurSerialNetwork
+)
+
+
+streamblocks(
+  JpegBlurSerialNetwork_hls
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurSerialNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH build/serial_profile/jpegblur/fpga_only
+  PARTITIONING
+  PLATFORM vivado-hls
+)
+
+streamblocks(
+  JpegBlurSerialNetwork_multicore
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurSerialNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH build/serial_profile/jpegblur/fpga_only
+  PARTITIONING
+  PLATFORM multicore
+)
+
+
+
+foreach(index RANGE 0 4)  
+  jpegblur_gen(${index} JpegBlurSerialNetwork serial_profile)
 endforeach()

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<partitioning>
+		<partition id="0" scheduling="ROUND_ROBIN">
+			<instance id="source" complexity="13014727"/>
+			<instance id="display" complexity="38958885"/>
+			<instance id="soi_up" complexity="12070"/>
+			<instance id="raster_to_mb" complexity="142475634"/>
+			<instance id="mb_to_raster" complexity="100347451"/>
+			<instance id="soi_to_wh" complexity="14373"/>
+			<instance id="parser" complexity="7182494"/>
+			<instance id="huffman" complexity="184441106"/>
+			<instance id="dequant" complexity="37721981"/>
+			<instance id="idct2d" complexity="63409981"/>
+			<instance id="conv_420_422" complexity="49308522"/>
+			<instance id="conv_422_444" complexity="105245994"/>
+			<instance id="ycrcb_to_rgb" complexity="150455635"/>
+			<instance id="rgb_to_ycrcb" complexity="120349280"/>
+			<instance id="conv_444_422" complexity="142128383"/>
+			<instance id="conv_422_420" complexity="95773971"/>
+			<instance id="padding" complexity="66978797"/>
+			<instance id="f0" complexity="72961797"/>
+			<instance id="f1" complexity="73075480"/>
+			<instance id="f2" complexity="72946218"/>
+			<instance id="f3" complexity="72890677"/>
+			<instance id="f4" complexity="72977865"/>
+			<instance id="f5" complexity="79106544"/>
+			<instance id="f6" complexity="72988254"/>
+			<instance id="f7" complexity="73152180"/>
+			<instance id="f8" complexity="73019882"/>
+			<instance id="s0" complexity="37449675"/>
+			<instance id="s1" complexity="37588600"/>
+			<instance id="s2" complexity="37629766"/>
+			<instance id="s3" complexity="38297307"/>
+			<instance id="s4" complexity="37526706"/>
+			<instance id="s5" complexity="37208559"/>
+			<instance id="s6" complexity="37483500"/>
+			<instance id="s7" complexity="37554289"/>
+			<instance id="col_p1_compute" complexity="53243965"/>
+			<instance id="col_p0_compute" complexity="53237469"/>
+			<instance id="col_n1_compute" complexity="52758955"/>
+			<instance id="row_agg_compute" complexity="53290729"/>
+			<instance id="padding_0" complexity="67119759"/>
+			<instance id="f0_0" complexity="72909475"/>
+			<instance id="f1_0" complexity="73055996"/>
+			<instance id="f2_0" complexity="73125839"/>
+			<instance id="f3_0" complexity="73032471"/>
+			<instance id="f4_0" complexity="72965150"/>
+			<instance id="f5_0" complexity="78982590"/>
+			<instance id="f6_0" complexity="72973166"/>
+			<instance id="f7_0" complexity="73082349"/>
+			<instance id="f8_0" complexity="73270512"/>
+			<instance id="s0_0" complexity="37629499"/>
+			<instance id="s1_0" complexity="37623686"/>
+			<instance id="s2_0" complexity="37588023"/>
+			<instance id="s3_0" complexity="37452278"/>
+			<instance id="s4_0" complexity="37558328"/>
+			<instance id="s5_0" complexity="37655655"/>
+			<instance id="s6_0" complexity="37496040"/>
+			<instance id="s7_0" complexity="37420136"/>
+			<instance id="col_p1_compute_0" complexity="53007106"/>
+			<instance id="col_p0_compute_0" complexity="53203615"/>
+			<instance id="col_n1_compute_0" complexity="52768816"/>
+			<instance id="row_agg_compute_0" complexity="53920638"/>
+			<instance id="padding_1" complexity="67014399"/>
+			<instance id="f0_1" complexity="72875575"/>
+			<instance id="f1_1" complexity="72963947"/>
+			<instance id="f2_1" complexity="73018833"/>
+			<instance id="f3_1" complexity="73135422"/>
+			<instance id="f4_1" complexity="72954635"/>
+			<instance id="f5_1" complexity="78886857"/>
+			<instance id="f6_1" complexity="73093662"/>
+			<instance id="f7_1" complexity="73067530"/>
+			<instance id="f8_1" complexity="72972875"/>
+			<instance id="s0_1" complexity="37485746"/>
+			<instance id="s1_1" complexity="37668617"/>
+			<instance id="s2_1" complexity="37677248"/>
+			<instance id="s3_1" complexity="37401190"/>
+			<instance id="s4_1" complexity="37493435"/>
+			<instance id="s5_1" complexity="37627584"/>
+			<instance id="s6_1" complexity="37393848"/>
+			<instance id="s7_1" complexity="37325942"/>
+			<instance id="col_p1_compute_1" complexity="52987521"/>
+			<instance id="col_p0_compute_1" complexity="52856127"/>
+			<instance id="col_n1_compute_1" complexity="52662576"/>
+			<instance id="row_agg_compute_1" complexity="53632442"/>
+		</partition>
+	</partitioning>
+	<connections>
+		<fifo-connection source="source" source-port="Out" target="parser" target-port="Byte" size="1048576" token-size="1" bandwidth="1193623"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="raster_to_mb" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="mb_to_raster" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="soi_to_wh" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_420_422" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_422_444" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_444_422" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_422_420" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="raster_to_mb" source-port="YCbCr" target="display" target-port="In" size="1048576" token-size="1" bandwidth="11404800"/>
+		<fifo-connection source="mb_to_raster" source-port="Y" target="ycrcb_to_rgb" target-port="Y" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="mb_to_raster" source-port="CbCr" target="conv_420_422" target-port="CrCb420" size="1048576" token-size="1" bandwidth="3801600"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="parser" source-port="Bits" target="huffman" target-port="Bit" size="1048576" token-size="1" bandwidth="1002550"/>
+		<fifo-connection source="parser" source-port="QT" target="dequant" target-port="QT" size="1048576" token-size="1" bandwidth="39000"/>
+		<fifo-connection source="parser" source-port="HT" target="huffman" target-port="HT" size="1048576" token-size="1" bandwidth="124800"/>
+		<fifo-connection source="parser" source-port="SOI" target="display" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parser" source-port="SOI" target="soi_up" target-port="SOI_IN" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parser" source-port="SOI" target="huffman" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parser" source-port="SOI" target="dequant" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="huffman" source-port="Block" target="dequant" target-port="Block" size="1048576" token-size="4" bandwidth="11404800"/>
+		<fifo-connection source="dequant" source-port="Out" target="idct2d" target-port="IN" size="1048576" token-size="2" bandwidth="11404800"/>
+		<fifo-connection source="idct2d" source-port="OUT" target="mb_to_raster" target-port="YCbCr" size="1048576" token-size="1" bandwidth="11404800"/>
+		<fifo-connection source="conv_420_422" source-port="CrCb422" target="conv_422_444" target-port="CrCb422" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_444" source-port="Cr" target="ycrcb_to_rgb" target-port="Cr" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_444" source-port="Cb" target="ycrcb_to_rgb" target-port="Cb" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="R" target="padding" target-port="PixelStream" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="G" target="padding_0" target-port="PixelStream" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="B" target="padding_1" target-port="PixelStream" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Y" target="raster_to_mb" target-port="Y" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Cr" target="conv_444_422" target-port="Cr" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Cb" target="conv_444_422" target-port="Cb" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_444_422" source-port="CrCb422" target="conv_422_420" target-port="CrCb422" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_420" source-port="CrCb420" target="raster_to_mb" target-port="CbCr" size="1048576" token-size="1" bandwidth="3801600"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f2" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f3" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f4" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f5" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f6" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f7" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="f8" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f2" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f3" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f4" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f5" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f6" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f7" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="f8" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedStream" target="s0" target-port="In" size="1048576" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="f0" source-port="Out" target="col_p1_compute" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f1" source-port="Out" target="col_p1_compute" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f2" source-port="Out" target="col_p1_compute" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f3" source-port="Out" target="col_p0_compute" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f4" source-port="Out" target="col_p0_compute" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f5" source-port="Out" target="col_p0_compute" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f6" source-port="Out" target="col_n1_compute" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f7" source-port="Out" target="col_n1_compute" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f8" source-port="Out" target="col_n1_compute" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="s0" source-port="Left" target="f0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s0" source-port="Right" target="s1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s1" source-port="Left" target="f1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s1" source-port="Right" target="s2" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s2" source-port="Left" target="f2" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s2" source-port="Right" target="s3" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s3" source-port="Left" target="f3" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s3" source-port="Right" target="s4" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s4" source-port="Left" target="f4" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s4" source-port="Right" target="s5" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s5" source-port="Left" target="f5" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s5" source-port="Right" target="s6" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s6" source-port="Left" target="f6" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s6" source-port="Right" target="s7" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s7" source-port="Left" target="f7" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s7" source-port="Right" target="f8" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="col_p1_compute" source-port="Out" target="row_agg_compute" target-port="Row_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="col_p0_compute" source-port="Out" target="row_agg_compute" target-port="Row_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="col_n1_compute" source-port="Out" target="row_agg_compute" target-port="Row_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="row_agg_compute" source-port="Out" target="rgb_to_ycrcb" target-port="R" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f0_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f1_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f2_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f3_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f4_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f5_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f6_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f7_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="f8_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f0_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f1_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f2_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f3_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f4_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f5_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f6_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f7_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="f8_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedStream" target="s0_0" target-port="In" size="1048576" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="f0_0" source-port="Out" target="col_p1_compute_0" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f1_0" source-port="Out" target="col_p1_compute_0" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f2_0" source-port="Out" target="col_p1_compute_0" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f3_0" source-port="Out" target="col_p0_compute_0" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f4_0" source-port="Out" target="col_p0_compute_0" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f5_0" source-port="Out" target="col_p0_compute_0" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f6_0" source-port="Out" target="col_n1_compute_0" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f7_0" source-port="Out" target="col_n1_compute_0" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f8_0" source-port="Out" target="col_n1_compute_0" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="s0_0" source-port="Left" target="f0_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s0_0" source-port="Right" target="s1_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s1_0" source-port="Left" target="f1_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s1_0" source-port="Right" target="s2_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s2_0" source-port="Left" target="f2_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s2_0" source-port="Right" target="s3_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s3_0" source-port="Left" target="f3_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s3_0" source-port="Right" target="s4_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s4_0" source-port="Left" target="f4_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s4_0" source-port="Right" target="s5_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s5_0" source-port="Left" target="f5_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s5_0" source-port="Right" target="s6_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s6_0" source-port="Left" target="f6_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s6_0" source-port="Right" target="s7_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s7_0" source-port="Left" target="f7_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s7_0" source-port="Right" target="f8_0" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="col_p1_compute_0" source-port="Out" target="row_agg_compute_0" target-port="Row_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="col_p0_compute_0" source-port="Out" target="row_agg_compute_0" target-port="Row_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="col_n1_compute_0" source-port="Out" target="row_agg_compute_0" target-port="Row_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="row_agg_compute_0" source-port="Out" target="rgb_to_ycrcb" target-port="G" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f0_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f1_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f2_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f3_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f4_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f5_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f6_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f7_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="f8_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f0_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f1_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f2_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f3_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f4_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f5_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f6_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f7_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="f8_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedStream" target="s0_1" target-port="In" size="1048576" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="f0_1" source-port="Out" target="col_p1_compute_1" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f1_1" source-port="Out" target="col_p1_compute_1" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f2_1" source-port="Out" target="col_p1_compute_1" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f3_1" source-port="Out" target="col_p0_compute_1" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f4_1" source-port="Out" target="col_p0_compute_1" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f5_1" source-port="Out" target="col_p0_compute_1" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f6_1" source-port="Out" target="col_n1_compute_1" target-port="Col_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f7_1" source-port="Out" target="col_n1_compute_1" target-port="Col_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="f8_1" source-port="Out" target="col_n1_compute_1" target-port="Col_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="s0_1" source-port="Left" target="f0_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s0_1" source-port="Right" target="s1_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s1_1" source-port="Left" target="f1_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s1_1" source-port="Right" target="s2_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s2_1" source-port="Left" target="f2_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s2_1" source-port="Right" target="s3_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s3_1" source-port="Left" target="f3_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s3_1" source-port="Right" target="s4_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s4_1" source-port="Left" target="f4_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s4_1" source-port="Right" target="s5_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s5_1" source-port="Left" target="f5_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s5_1" source-port="Right" target="s6_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s6_1" source-port="Left" target="f6_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s6_1" source-port="Right" target="s7_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s7_1" source-port="Left" target="f7_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="s7_1" source-port="Right" target="f8_1" target-port="In" size="1048576" token-size="4" bandwidth="7796400"/>
+		<fifo-connection source="col_p1_compute_1" source-port="Out" target="row_agg_compute_1" target-port="Row_p1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="col_p0_compute_1" source-port="Out" target="row_agg_compute_1" target-port="Row_p0" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="col_n1_compute_1" source-port="Out" target="row_agg_compute_1" target-port="Row_n1" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="row_agg_compute_1" source-port="Out" target="rgb_to_ycrcb" target-port="B" size="1048576" token-size="4" bandwidth="7603200"/>
+	</connections>
+</configuration>

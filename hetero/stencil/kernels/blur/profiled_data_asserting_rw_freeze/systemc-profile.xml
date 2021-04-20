@@ -1,0 +1,832 @@
+<!-- foreman_qcif_5f.mjpg -->
+<network name="JpegBlurNetwork" clockcycles-total="2250805" runs="48" >
+	<actor id="soi_up" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="$untagged0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="1119194" miss-firings="1119194"/>
+
+	</actor>
+	<actor id="raster_to_mb" clockcyles="1.97166" clockcycles-min="1" clockcyles-max="388" clockcycles-total="798540" firings="405010" >
+
+		<action id="getSzW" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="getSzH" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="10" firings="5" />
+		<action id="done" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="45" firings="45" />
+		<action id="storeY.start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="7920" firings="7920" />
+		<action id="storeY.save" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="storeY.finish" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="15840" firings="7920" />
+		<action id="storeCbCr.start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3960" firings="3960" />
+		<action id="storeCbCr.save" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63360" firings="63360" />
+		<action id="storeCbCr.finish" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="7920" firings="3960" />
+		<action id="doneSend.EOI" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="doneSend.Line" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="40" firings="40" />
+		<action id="send.start" clockcyles="388" clockcycles-min="388" clockcyles-max="388" clockcycles-total="192060" firings="495" />
+		<action id="send_send" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="380160" firings="190080" />
+		<action id="send.stop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="495" firings="495" />
+		<wait clockcyles-total="517419" miss-firings="517419"/>
+
+	</actor>
+	<actor id="mb_to_raster" clockcyles="3.72575" clockcycles-min="1" clockcyles-max="646" clockcycles-total="799080" firings="214475" >
+
+		<action id="getSOI" clockcyles="3" clockcycles-min="3" clockcyles-max="3" clockcycles-total="15" firings="5" />
+		<action id="getMB" clockcyles="646" clockcycles-min="646" clockcyles-max="646" clockcycles-total="319770" firings="495" />
+		<action id="stopMB" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="45" firings="45" />
+		<action id="done" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="45" firings="45" />
+		<action id="sendY.start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="7920" firings="7920" />
+		<action id="sendY.send" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="253440" firings="126720" />
+		<action id="sendY.finish" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="15840" firings="7920" />
+		<action id="sendCbCr.start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3960" firings="3960" />
+		<action id="sendCbCr.send" clockcyles="3" clockcycles-min="3" clockcyles-max="3" clockcycles-total="190080" firings="63360" />
+		<action id="sendCbCr.finish" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="7920" firings="3960" />
+		<action id="doneSend.Line" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="40" firings="40" />
+		<action id="doneSend.EOI" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="612736" miss-firings="612736"/>
+
+	</actor>
+	<actor id="soi_to_wh" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="$untagged0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="1119194" miss-firings="1119194"/>
+
+	</actor>
+	<actor id="huffman" clockcyles="5.417" clockcycles-min="1" clockcyles-max="312" clockcycles-total="982623" firings="181396" >
+
+		<action id="getbit.read" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="16011" firings="16011" />
+		<action id="getbit.noread" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="112058" firings="112058" />
+		<action id="getSOI" clockcyles="9" clockcycles-min="9" clockcyles-max="9" clockcycles-total="45" firings="5" />
+		<action id="receive_HT_len" clockcyles="39" clockcycles-min="39" clockcyles-max="39" clockcycles-total="780" firings="20" />
+		<action id="receive_code" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="1740" firings="1740" />
+		<action id="build_HT" clockcyles="201" clockcycles-min="126" clockcyles-max="276" clockcycles-total="4020" firings="20" />
+		<action id="done_HT" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="DC.done_len" clockcyles="13.2377" clockcycles-min="8" clockcyles-max="20" clockcycles-total="39316" firings="2970" />
+		<action id="DC.done" clockcyles="69" clockcycles-min="69" clockcyles-max="69" clockcycles-total="204930" firings="2970" />
+		<action id="AC.done_len" clockcyles="15.4925" clockcycles-min="8" clockcyles-max="312" clockcycles-total="353166" firings="22796" />
+		<action id="AC.done" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="39652" firings="19826" />
+		<action id="EOB" clockcyles="71" clockcycles-min="71" clockcyles-max="71" clockcycles-total="210870" firings="2970" />
+		<action id="EOI" clockcyles="6" clockcycles-min="6" clockcyles-max="6" clockcycles-total="30" firings="5" />
+		<wait clockcyles-total="537192" miss-firings="537192"/>
+
+	</actor>
+	<actor id="splitter420" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="196020" firings="2970" >
+
+		<action id="Y" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="130680" firings="1980" />
+		<action id="Cb" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="32670" firings="495" />
+		<action id="Cr" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="32670" firings="495" />
+		<wait clockcyles-total="1019704" miss-firings="1019704"/>
+
+	</actor>
+	<actor id="iq_Y" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="183540" firings="1995" >
+
+		<action id="get_SOI" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<action id="receive_QT" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<action id="receive_block" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="182160" firings="1980" />
+		<action id="eoi" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<wait clockcyles-total="2039824" miss-firings="22172"/>
+
+	</actor>
+	<actor id="iq_Cb" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="46920" firings="510" >
+
+		<action id="get_SOI" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<action id="receive_QT" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<action id="receive_block" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="45540" firings="495" />
+		<action id="eoi" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<wait clockcyles-total="2176444" miss-firings="23657"/>
+
+	</actor>
+	<actor id="iq_Cr" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="46920" firings="510" >
+
+		<action id="get_SOI" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<action id="receive_QT" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<action id="receive_block" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="45540" firings="495" />
+		<action id="eoi" clockcyles="92" clockcycles-min="92" clockcyles-max="92" clockcycles-total="460" firings="5" />
+		<wait clockcyles-total="2176444" miss-firings="23657"/>
+
+	</actor>
+	<actor id="merger" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="196020" firings="2970" >
+
+		<action id="Y" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="130680" firings="1980" />
+		<action id="Cb" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="32670" firings="495" />
+		<action id="Cr" clockcyles="66" clockcycles-min="66" clockcyles-max="66" clockcycles-total="32670" firings="495" />
+		<wait clockcyles-total="1019705" miss-firings="1019705"/>
+
+	</actor>
+	<actor id="parse" clockcyles="1.02017" clockcycles-min="1" clockcyles-max="19" clockcycles-total="19474" firings="19089" >
+
+		<action id="SOI" clockcyles="5" clockcycles-min="5" clockcyles-max="5" clockcycles-total="25" firings="5" />
+		<action id="receive_marker" clockcyles="7" clockcycles-min="7" clockcyles-max="7" clockcycles-total="315" firings="45" />
+		<action id="skip" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="120" firings="120" />
+		<action id="done" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="40" firings="40" />
+		<action id="APPn" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="COMM" clockcyles="0" clockcycles-min="18446744073709551615" clockcyles-max="0" clockcycles-total="0" firings="0" />
+		<action id="DQT" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="10" firings="10" />
+		<action id="send_DQT" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="650" firings="650" />
+		<action id="SOF0" clockcyles="19" clockcycles-min="19" clockcyles-max="19" clockcycles-total="95" firings="5" />
+		<action id="DHT" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="20" firings="20" />
+		<action id="send_DHT" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="2080" firings="2080" />
+		<action id="SOS" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="scan_data" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="15913" firings="15913" />
+		<action id="receive_FF" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="93" firings="93" />
+		<action id="stuffing" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="88" firings="88" />
+		<action id="EOI" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="padding16" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="10" firings="5" />
+		<wait clockcyles-total="1099917" miss-firings="1099917"/>
+
+	</actor>
+	<actor id="splitQT" clockcyles="63" clockcycles-min="63" clockcyles-max="63" clockcycles-total="1260" firings="20" >
+
+		<action id="Luminance" clockcyles="63" clockcycles-min="63" clockcyles-max="63" clockcycles-total="315" firings="5" />
+		<action id="Chrominance" clockcyles="63" clockcycles-min="63" clockcyles-max="63" clockcycles-total="315" firings="5" />
+		<action id="receive_Luminance" clockcyles="63" clockcycles-min="63" clockcyles-max="63" clockcycles-total="315" firings="5" />
+		<action id="receive_Chrominance" clockcyles="63" clockcycles-min="63" clockcyles-max="63" clockcycles-total="315" firings="5" />
+		<wait clockcyles-total="2208906" miss-firings="35062"/>
+
+	</actor>
+	<actor id="scale" clockcyles="65" clockcycles-min="65" clockcyles-max="65" clockcycles-total="128700" firings="1980" >
+
+		<action id="scale" clockcyles="65" clockcycles-min="65" clockcyles-max="65" clockcycles-total="128700" firings="1980" />
+		<wait clockcyles-total="2082730" miss-firings="32042"/>
+
+	</actor>
+	<actor id="row" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="253440" firings="15840" >
+
+		<action id="$untagged0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="253440" firings="15840" />
+		<wait clockcyles-total="1855008" miss-firings="115938"/>
+
+	</actor>
+	<actor id="transpose" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="221760" firings="1980" >
+
+		<action id="$untagged0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="221760" firings="1980" />
+		<wait clockcyles-total="2007488" miss-firings="17924"/>
+
+	</actor>
+	<actor id="column" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="253440" firings="15840" >
+
+		<action id="$untagged0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="253440" firings="15840" />
+		<wait clockcyles-total="1855008" miss-firings="115938"/>
+
+	</actor>
+	<actor id="retranspose" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="221760" firings="1980" >
+
+		<action id="$untagged0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="221760" firings="1980" />
+		<wait clockcyles-total="2007488" miss-firings="17924"/>
+
+	</actor>
+	<actor id="shift" clockcyles="64" clockcycles-min="64" clockcyles-max="64" clockcycles-total="126720" firings="1980" >
+
+		<action id="shift" clockcyles="64" clockcycles-min="64" clockcyles-max="64" clockcycles-total="126720" firings="1980" />
+		<wait clockcyles-total="2084480" miss-firings="32570"/>
+
+	</actor>
+	<actor id="scale_0" clockcyles="65" clockcycles-min="65" clockcyles-max="65" clockcycles-total="32175" firings="495" >
+
+		<action id="scale" clockcyles="65" clockcycles-min="65" clockcyles-max="65" clockcycles-total="32175" firings="495" />
+		<wait clockcyles-total="2179255" miss-firings="33527"/>
+
+	</actor>
+	<actor id="row_0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" >
+
+		<action id="$untagged0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" />
+		<wait clockcyles-total="2045088" miss-firings="127818"/>
+
+	</actor>
+	<actor id="transpose_0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" >
+
+		<action id="$untagged0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" />
+		<wait clockcyles-total="2173808" miss-firings="19409"/>
+
+	</actor>
+	<actor id="column_0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" >
+
+		<action id="$untagged0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" />
+		<wait clockcyles-total="2045088" miss-firings="127818"/>
+
+	</actor>
+	<actor id="retranspose_0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" >
+
+		<action id="$untagged0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" />
+		<wait clockcyles-total="2173808" miss-firings="19409"/>
+
+	</actor>
+	<actor id="shift_0" clockcyles="64" clockcycles-min="64" clockcyles-max="64" clockcycles-total="31680" firings="495" >
+
+		<action id="shift" clockcyles="64" clockcycles-min="64" clockcyles-max="64" clockcycles-total="31680" firings="495" />
+		<wait clockcyles-total="2179520" miss-firings="34055"/>
+
+	</actor>
+	<actor id="scale_1" clockcyles="65" clockcycles-min="65" clockcyles-max="65" clockcycles-total="32175" firings="495" >
+
+		<action id="scale" clockcyles="65" clockcycles-min="65" clockcyles-max="65" clockcycles-total="32175" firings="495" />
+		<wait clockcyles-total="2179255" miss-firings="33527"/>
+
+	</actor>
+	<actor id="row_1" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" >
+
+		<action id="$untagged0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" />
+		<wait clockcyles-total="2045088" miss-firings="127818"/>
+
+	</actor>
+	<actor id="transpose_1" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" >
+
+		<action id="$untagged0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" />
+		<wait clockcyles-total="2173808" miss-firings="19409"/>
+
+	</actor>
+	<actor id="column_1" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" >
+
+		<action id="$untagged0" clockcyles="16" clockcycles-min="16" clockcyles-max="16" clockcycles-total="63360" firings="3960" />
+		<wait clockcyles-total="2045088" miss-firings="127818"/>
+
+	</actor>
+	<actor id="retranspose_1" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" >
+
+		<action id="$untagged0" clockcyles="112" clockcycles-min="112" clockcyles-max="112" clockcycles-total="55440" firings="495" />
+		<wait clockcyles-total="2173808" miss-firings="19409"/>
+
+	</actor>
+	<actor id="shift_1" clockcyles="64" clockcycles-min="64" clockcyles-max="64" clockcycles-total="31680" firings="495" >
+
+		<action id="shift" clockcyles="64" clockcycles-min="64" clockcyles-max="64" clockcycles-total="31680" firings="495" />
+		<wait clockcyles-total="2179520" miss-firings="34055"/>
+
+	</actor>
+	<actor id="conv_420_422" clockcyles="2.98858" clockcycles-min="1" clockcyles-max="3" clockcycles-total="380895" firings="127450" >
+
+		<action id="getSOI" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="10" firings="5" />
+		<action id="PhaseA" clockcyles="3" clockcycles-min="3" clockcyles-max="3" clockcycles-total="190080" firings="63360" />
+		<action id="PhaseB" clockcyles="3" clockcycles-min="3" clockcyles-max="3" clockcycles-total="190080" firings="63360" />
+		<action id="stop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="720" firings="720" />
+		<action id="eoi" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="865025" miss-firings="865025"/>
+
+	</actor>
+	<actor id="conv_422_444" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="190090" firings="190090" >
+
+		<action id="getSOI" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="Cr1Start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63360" firings="63360" />
+		<action id="CbStart" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63360" firings="63360" />
+		<action id="Cr2Start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63355" firings="63355" />
+		<action id="Cr3Start" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="eoi" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="929109" miss-firings="929109"/>
+
+	</actor>
+	<actor id="ycrcb_to_rgb" clockcyles="4" clockcycles-min="4" clockcyles-max="4" clockcycles-total="506880" firings="126720" >
+
+		<action id="$untagged0" clockcyles="4" clockcycles-min="4" clockcyles-max="4" clockcycles-total="506880" firings="126720" />
+		<wait clockcyles-total="802398" miss-firings="802398"/>
+
+	</actor>
+	<actor id="rgb_to_ycrcb" clockcyles="4" clockcycles-min="4" clockcyles-max="4" clockcycles-total="506880" firings="126720" >
+
+		<action id="$untagged0" clockcyles="4" clockcycles-min="4" clockcyles-max="4" clockcycles-total="506880" firings="126720" />
+		<wait clockcyles-total="802399" miss-firings="802399"/>
+
+	</actor>
+	<actor id="conv_444_422" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="190095" firings="190095" >
+
+		<action id="getw" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="geth" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="wait" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63360" firings="63360" />
+		<action id="firecr" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63360" firings="63360" />
+		<action id="firecb" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="63360" firings="63360" />
+		<action id="done" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="929104" miss-firings="929104"/>
+
+	</actor>
+	<actor id="conv_422_420" clockcyles="2.99419" clockcycles-min="1" clockcyles-max="3" clockcycles-total="381610" firings="127450" >
+
+		<action id="getw" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="geth" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="process.next" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="720" firings="360" />
+		<action id="process.next2" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="710" firings="355" />
+		<action id="process.wait" clockcyles="3" clockcycles-min="3" clockcyles-max="3" clockcycles-total="190080" firings="63360" />
+		<action id="process.fire" clockcyles="3" clockcycles-min="3" clockcyles-max="3" clockcycles-total="190080" firings="63360" />
+		<action id="done" clockcyles="2" clockcycles-min="2" clockcyles-max="2" clockcycles-total="10" firings="5" />
+		<wait clockcyles-total="1144766" miss-firings="584675"/>
+
+	</actor>
+	<actor id="padding" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129950" firings="129950" >
+
+		<action id="read_h_w" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="pixel_stream" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="pad_stream" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="reset" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="989249" miss-firings="989249"/>
+
+	</actor>
+	<actor id="f0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f2" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f3" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f4" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f5" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f6" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f7" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f8" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="s0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s2" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s3" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s4" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s5" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s6" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s7" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="col_p1_compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="col_p0_compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="col_n1_compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="row_agg_compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="aggregate" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="padding_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129950" firings="129950" >
+
+		<action id="read_h_w" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="pixel_stream" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="pad_stream" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="reset" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="989249" miss-firings="989249"/>
+
+	</actor>
+	<actor id="f0_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f1_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f2_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f3_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f4_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f5_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f6_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f7_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f8_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="s0_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s1_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s2_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s3_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s4_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s5_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s6_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s7_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="col_p1_compute_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="col_p0_compute_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="col_n1_compute_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="row_agg_compute_0" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="aggregate" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="padding_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129950" firings="129950" >
+
+		<action id="read_h_w" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<action id="pixel_stream" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="pad_stream" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="reset" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="989249" miss-firings="989249"/>
+
+	</actor>
+	<actor id="f0_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f1_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f2_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f3_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f4_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f5_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f6_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f7_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="f8_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129945" firings="129945" >
+
+		<action id="drop" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="3220" firings="3220" />
+		<action id="pass" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<action id="init" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2108317"/>
+
+	</actor>
+	<actor id="s0_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s1_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s2_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s3_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s4_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s5_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s6_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="s7_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" >
+
+		<action id="split" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="129940" firings="129940" />
+		<wait clockcyles-total="0" miss-firings="2108322"/>
+
+	</actor>
+	<actor id="col_p1_compute_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="col_p0_compute_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="col_n1_compute_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="compute" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="row_agg_compute_1" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" >
+
+		<action id="aggregate" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="126720" firings="126720" />
+		<wait clockcyles-total="992479" miss-firings="992479"/>
+
+	</actor>
+	<actor id="fanout_padding_port_PaddedWidth" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_padding_port_PaddedHeight" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_padding_1_port_PaddedWidth" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_padding_1_port_PaddedHeight" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_soi_to_wh_port_Height" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_soi_to_wh_port_Width" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_padding_0_port_PaddedWidth" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_padding_0_port_PaddedHeight" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="5" firings="5" />
+		<wait clockcyles-total="0" miss-firings="2238257"/>
+
+	</actor>
+	<actor id="fanout_splitQT_port_QT_UV" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="320" firings="320" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="320" firings="320" />
+		<wait clockcyles-total="0" miss-firings="2237942"/>
+
+	</actor>
+	<actor id="fanout_soi_up_port_SOI_OUT" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="10" firings="10" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="10" firings="10" />
+		<wait clockcyles-total="0" miss-firings="2238252"/>
+
+	</actor>
+	<actor id="fanout_parse_port_SOI" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="10" firings="10" >
+
+		<action id="untagged" clockcyles="1" clockcycles-min="1" clockcyles-max="1" clockcycles-total="10" firings="10" />
+		<wait clockcyles-total="0" miss-firings="2238252"/>
+
+	</actor>
+</network>

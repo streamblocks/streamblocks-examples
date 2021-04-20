@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profile-data>
+	<bandwidth-test type="single">
+		<Connection ticks="152" repeats="1000000" buffer-size="8" />
+		<Connection ticks="158" repeats="1000000" buffer-size="16" />
+		<Connection ticks="157" repeats="1000000" buffer-size="32" />
+		<Connection ticks="157" repeats="1000000" buffer-size="64" />
+		<Connection ticks="162" repeats="1000000" buffer-size="128" />
+		<Connection ticks="161" repeats="1000000" buffer-size="256" />
+		<Connection ticks="177" repeats="1000000" buffer-size="512" />
+		<Connection ticks="196" repeats="1000000" buffer-size="1024" />
+		<Connection ticks="240" repeats="1000000" buffer-size="2048" />
+		<Connection ticks="328" repeats="1000000" buffer-size="4096" />
+		<Connection ticks="558" repeats="1000000" buffer-size="8192" />
+		<Connection ticks="1589" repeats="1000000" buffer-size="16384" />
+		<Connection ticks="3242" repeats="1000000" buffer-size="32768" />
+		<Connection ticks="6064" repeats="1000000" buffer-size="65536" />
+		<Connection ticks="15294" repeats="1000000" buffer-size="131072" />
+		<Connection ticks="32053" repeats="1000000" buffer-size="262144" />
+		<Connection ticks="82315" repeats="1000000" buffer-size="524288" />
+		<Connection ticks="290458" repeats="1000000" buffer-size="1048576" />
+		<Connection ticks="629904" repeats="1000000" buffer-size="2097152" />
+		<Connection ticks="1392913" repeats="1000000" buffer-size="4194304" />
+	</bandwidth-test>
+	<bandwidth-test type="multi">
+		<Connection ticks="16044" repeats="1000000" buffer-size="8" />
+		<Connection ticks="23834" repeats="1000000" buffer-size="16" />
+		<Connection ticks="24417" repeats="1000000" buffer-size="32" />
+		<Connection ticks="24329" repeats="1000000" buffer-size="64" />
+		<Connection ticks="24791" repeats="1000000" buffer-size="128" />
+		<Connection ticks="24815" repeats="1000000" buffer-size="256" />
+		<Connection ticks="26727" repeats="1000000" buffer-size="512" />
+		<Connection ticks="29407" repeats="1000000" buffer-size="1024" />
+		<Connection ticks="30274" repeats="1000000" buffer-size="2048" />
+		<Connection ticks="30123" repeats="1000000" buffer-size="4096" />
+		<Connection ticks="31247" repeats="1000000" buffer-size="8192" />
+		<Connection ticks="22545" repeats="1000000" buffer-size="16384" />
+		<Connection ticks="24721" repeats="1000000" buffer-size="32768" />
+		<Connection ticks="53949" repeats="1000000" buffer-size="65536" />
+		<Connection ticks="140363" repeats="1000000" buffer-size="131072" />
+		<Connection ticks="247004" repeats="1000000" buffer-size="262144" />
+		<Connection ticks="416804" repeats="1000000" buffer-size="524288" />
+		<Connection ticks="865597" repeats="1000000" buffer-size="1048576" />
+		<Connection ticks="2100329" repeats="1000000" buffer-size="2097152" />
+		<Connection ticks="1461450" repeats="1000000" buffer-size="4194304" />
+	</bandwidth-test>
+</profile-data>

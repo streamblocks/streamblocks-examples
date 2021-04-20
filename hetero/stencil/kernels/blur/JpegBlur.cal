@@ -5,6 +5,8 @@ namespace hetero.stencil.kernels.GuassianBlur:
 	import entity jpeg.io.Display;
 	import entity jpeg.decoder.parallel.JpegDecoder;
 
+  import entity jpeg.decoder.JpegDecoder = JpegSerialDecoder;
+
   import entity converters.yuvtorgb.YUVtoRGB;
   import entity converters.rgbtoyuv.RGBtoYUV;
 
@@ -93,5 +95,235 @@ namespace hetero.stencil.kernels.GuassianBlur:
     	
      	raster_to_mb.YCbCr --> display.In;
 
-	end	
+	end
+
+
+  network JpegBlurNaiveNetwork() ==> :
+    entities 
+
+      // Software only actors
+      source = Source();
+      display = Display();
+
+      // Heterogeneous actors
+      decoder = JpegDecoder() { partition = "hw"; }; 
+      to_rgb = YUVtoRGB() { partition = "hw"; };
+      to_yuv = RGBtoYUV() { partition = "hw"; };
+      soi_up = SoiUpscale() { partition = "hw"; };
+      raster_to_mb = RasterToMB() { partition = "hw"; };
+      mb_to_raster = MBToRaster() { partition = "hw"; };
+
+
+      // Blur kernels
+      // kernel_r = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_g = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_b = BlurLayeredNetworkSingle() { partition = "hw"; };
+
+      kernel_r = GuassianBlurNaiveNetworkSingle() { partition = "hw"; };
+      kernel_g = GuassianBlurNaiveNetworkSingle() { partition = "hw"; };
+      kernel_b = GuassianBlurNaiveNetworkSingle() { partition = "hw"; };
+      
+      soi_to_wh = SOIToWidthHeight() { partition = "hw"; };
+      
+    
+    structure
+    	source.Out --> decoder.Byte;
+    	decoder.SOI --> soi_up.SOI_IN;
+    	decoder.SOI --> display.SOI;
+    	
+    	soi_up.SOI_OUT --> raster_to_mb.SOI;
+    	soi_up.SOI_OUT --> mb_to_raster.SOI;
+    	soi_up.SOI_OUT --> to_rgb.SOI;
+    	soi_up.SOI_OUT --> to_yuv.SOI;
+    	
+    	decoder.YCbCr --> mb_to_raster.YCbCr;
+    	
+    	mb_to_raster.Y --> to_rgb.Y;
+    	mb_to_raster.CbCr --> to_rgb.CrCb;
+    	
+
+
+
+    	// to_rgb.R --> to_yuv.R;
+    	// to_rgb.G --> to_yuv.G;
+    	// to_rgb.B --> to_yuv.B;
+    	to_rgb.R --> kernel_r.PixelStream;
+      to_rgb.G --> kernel_g.PixelStream;
+      to_rgb.B --> kernel_b.PixelStream;
+
+      soi_up.SOI_OUT --> soi_to_wh.SOI;
+
+      soi_to_wh.Width --> kernel_r.Width;
+      soi_to_wh.Height --> kernel_r.Height;
+
+
+      soi_to_wh.Width --> kernel_g.Width;
+      soi_to_wh.Height --> kernel_g.Height;
+
+      soi_to_wh.Width --> kernel_b.Width;
+      soi_to_wh.Height --> kernel_b.Height;
+
+      kernel_r.Out --> to_yuv.R;
+      kernel_g.Out --> to_yuv.G;
+      kernel_b.Out --> to_yuv.B;
+
+    	to_yuv.Y --> raster_to_mb.Y;
+    	to_yuv.CrCb --> raster_to_mb.CbCr;
+    	
+     	raster_to_mb.YCbCr --> display.In;
+
+	end
+
+
+  network JpegBlurOptNetwork() ==> :
+    entities 
+
+      // Software only actors
+      source = Source();
+      display = Display();
+
+      // Heterogeneous actors
+      decoder = JpegSerialDecoder() { partition = "hw"; }; 
+      to_rgb = YUVtoRGB() { partition = "hw"; };
+      to_yuv = RGBtoYUV() { partition = "hw"; };
+      soi_up = SoiUpscale() { partition = "hw"; };
+      raster_to_mb = RasterToMB() { partition = "hw"; };
+      mb_to_raster = MBToRaster() { partition = "hw"; };
+
+
+      // Blur kernels
+      // kernel_r = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_g = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_b = BlurLayeredNetworkSingle() { partition = "hw"; };
+
+      kernel_r = GuassianBlurNetworkSingle() { partition = "hw"; };
+      kernel_g = GuassianBlurNetworkSingle() { partition = "hw"; };
+      kernel_b = GuassianBlurNetworkSingle() { partition = "hw"; };
+      
+      soi_to_wh = SOIToWidthHeight() { partition = "hw"; };
+      
+    
+    structure
+    	source.Out --> decoder.BYTE;
+    	decoder.SOI --> soi_up.SOI_IN;
+    	decoder.SOI --> display.SOI;
+    	
+    	soi_up.SOI_OUT --> raster_to_mb.SOI;
+    	soi_up.SOI_OUT --> mb_to_raster.SOI;
+    	soi_up.SOI_OUT --> to_rgb.SOI;
+    	soi_up.SOI_OUT --> to_yuv.SOI;
+    	
+    	decoder.YCbCr --> mb_to_raster.YCbCr;
+    	
+    	mb_to_raster.Y --> to_rgb.Y;
+    	mb_to_raster.CbCr --> to_rgb.CrCb;
+    	
+
+
+
+    	// to_rgb.R --> to_yuv.R;
+    	// to_rgb.G --> to_yuv.G;
+    	// to_rgb.B --> to_yuv.B;
+    	to_rgb.R --> kernel_r.PixelStream;
+      to_rgb.G --> kernel_g.PixelStream;
+      to_rgb.B --> kernel_b.PixelStream;
+
+      soi_up.SOI_OUT --> soi_to_wh.SOI;
+
+      soi_to_wh.Width --> kernel_r.Width;
+      soi_to_wh.Height --> kernel_r.Height;
+
+
+      soi_to_wh.Width --> kernel_g.Width;
+      soi_to_wh.Height --> kernel_g.Height;
+
+      soi_to_wh.Width --> kernel_b.Width;
+      soi_to_wh.Height --> kernel_b.Height;
+
+      kernel_r.Out --> to_yuv.R;
+      kernel_g.Out --> to_yuv.G;
+      kernel_b.Out --> to_yuv.B;
+
+    	to_yuv.Y --> raster_to_mb.Y;
+    	to_yuv.CrCb --> raster_to_mb.CbCr;
+    	
+     	raster_to_mb.YCbCr --> display.In;
+
+	end
+
+  network JpegBlurSerialNetwork() ==> :
+    entities 
+
+      // Software only actors
+      source = Source();
+      display = Display();
+
+      // Heterogeneous actors
+      decoder = JpegSerialDecoder() { partition = "hw"; }; 
+      to_rgb = YUVtoRGB() { partition = "hw"; };
+      to_yuv = RGBtoYUV() { partition = "hw"; };
+      soi_up = SoiUpscale() { partition = "hw"; };
+      raster_to_mb = RasterToMB() { partition = "hw"; };
+      mb_to_raster = MBToRaster() { partition = "hw"; };
+
+
+      // Blur kernels
+      // kernel_r = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_g = BlurLayeredNetworkSingle() { partition = "hw"; };
+      // kernel_b = BlurLayeredNetworkSingle() { partition = "hw"; };
+
+      kernel_r = GuassianBlurNaiveNetworkSingle() { partition = "hw"; };
+      kernel_g = GuassianBlurNaiveNetworkSingle() { partition = "hw"; };
+      kernel_b = GuassianBlurNaiveNetworkSingle() { partition = "hw"; };
+      
+      soi_to_wh = SOIToWidthHeight() { partition = "hw"; };
+      
+    
+    structure
+    	source.Out --> decoder.BYTE;
+    	decoder.SOI --> soi_up.SOI_IN;
+    	decoder.SOI --> display.SOI;
+    	
+    	soi_up.SOI_OUT --> raster_to_mb.SOI;
+    	soi_up.SOI_OUT --> mb_to_raster.SOI;
+    	soi_up.SOI_OUT --> to_rgb.SOI;
+    	soi_up.SOI_OUT --> to_yuv.SOI;
+    	
+    	decoder.YCbCr --> mb_to_raster.YCbCr;
+    	
+    	mb_to_raster.Y --> to_rgb.Y;
+    	mb_to_raster.CbCr --> to_rgb.CrCb;
+    	
+
+
+
+    	// to_rgb.R --> to_yuv.R;
+    	// to_rgb.G --> to_yuv.G;
+    	// to_rgb.B --> to_yuv.B;
+    	to_rgb.R --> kernel_r.PixelStream;
+      to_rgb.G --> kernel_g.PixelStream;
+      to_rgb.B --> kernel_b.PixelStream;
+
+      soi_up.SOI_OUT --> soi_to_wh.SOI;
+
+      soi_to_wh.Width --> kernel_r.Width;
+      soi_to_wh.Height --> kernel_r.Height;
+
+
+      soi_to_wh.Width --> kernel_g.Width;
+      soi_to_wh.Height --> kernel_g.Height;
+
+      soi_to_wh.Width --> kernel_b.Width;
+      soi_to_wh.Height --> kernel_b.Height;
+
+      kernel_r.Out --> to_yuv.R;
+      kernel_g.Out --> to_yuv.G;
+      kernel_b.Out --> to_yuv.B;
+
+    	to_yuv.Y --> raster_to_mb.Y;
+    	to_yuv.CrCb --> raster_to_mb.CbCr;
+    	
+     	raster_to_mb.YCbCr --> display.In;
+
+	end				
 end

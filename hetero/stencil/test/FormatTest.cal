@@ -1,6 +1,6 @@
 namespace hetero.stencil.test:
 
-import entity jpeg.decoder.parallel.JpegDecoder;
+import entity jpeg.decoder.JpegDecoder;
 import entity jpeg.io.Source;
 import entity jpeg.io.Display;
 
@@ -19,13 +19,13 @@ import entity converters.size.SoiUpscale;
       display = Display();
       decoder = JpegDecoder() { partition = "hw"; }; 
       to_rgb = YUVtoRGB() { partition = "hw"; };
-      to_yuv = RGBtoYUV(name="to_yuv") { partition = "hw"; };
+      to_yuv = RGBtoYUV() { partition = "hw"; };
       soi_up = SoiUpscale() { partition = "hw"; };
       raster_to_mb = RasterToMB() { partition = "hw"; };
       mb_to_raster = MBToRaster() { partition = "hw"; };
     
     structure
-    	source.Out --> decoder.Byte;
+    	source.Out --> decoder.BYTE;
     	decoder.SOI --> soi_up.SOI_IN;
     	decoder.SOI --> display.SOI;
     	

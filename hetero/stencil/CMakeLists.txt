@@ -38,6 +38,7 @@ set(FormatIdentityTest_SOURCES
   ${EXAMPLES_HOME}/system/art
   ${EXAMPLES_HOME}/system/std
   ${EXAMPLES_HOME}/jpeg/decoder/parallel
+  ${EXAMPLES_HOME}/jpeg/decoder/serial
   ${EXAMPLES_HOME}/jpeg/io
 )
 

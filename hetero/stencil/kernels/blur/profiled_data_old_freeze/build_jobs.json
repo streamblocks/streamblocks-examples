@@ -1,0 +1,531 @@
+{
+    "username": "emami",
+    "token": "11f4d87adc1dfb229037d7ea990baa08e7",
+    "jobs": [
+        {
+            "name": "jpegblur_0",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_0",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_1",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_1",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_2",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_2",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_3",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_3",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_4",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_4",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_5",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_5",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_6",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_6",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_7",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_7",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_8",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_8",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_9",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_9",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_10",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_10",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_11",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_11",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_12",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_12",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_13",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_13",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_14",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_14",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_15",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_15",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_16",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_16",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_17",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_17",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_18",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_18",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_19",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_19",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_20",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_20",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_21",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_21",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_22",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_22",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_23",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_23",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_24",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_24",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_25",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_25",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_26",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_26",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_27",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_27",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_28",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_28",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_29",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_29",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_30",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_30",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_31",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_31",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_32",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_32",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_33",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_33",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        },
+        {
+            "name": "jpegblur_34",
+            "dir": "/home/mayy/streamblocks/streamblocks-examples/hetero/stencil/build/generated/jpegblur/unique_34",
+            "network": "JpegBlurNetwork",
+            "operation": "build",
+            "params": {
+                "HLS_CLOCK_PERIOD": 3.3,
+                "KERNEL_FREQ": 303,
+                "TARGET": "hw",
+                "PLATFORM": "xilinx_u250_xdma_201830_2",
+                "FPGA_NAME": "xcu250-figd2104-2L-e",
+                "IS_MPSOC": "OFF",
+                "MPSOC_CLOCK_ID": "0"
+            }
+        }
+    ]
+}

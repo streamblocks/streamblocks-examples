@@ -1,0 +1,28 @@
+<profile-data>
+  <bandwidth-test type="FPGA">
+    <Connection kernel-total="506085" write-total="176062" read-total="83565" buffer-size="16"/>
+    <Connection kernel-total="501584" write-total="159215" read-total="79886" buffer-size="32"/>
+    <Connection kernel-total="527661" write-total="213339" read-total="98278" buffer-size="64"/>
+    <Connection kernel-total="521790" write-total="175525" read-total="89157" buffer-size="128"/>
+    <Connection kernel-total="588693" write-total="226668" read-total="100603" buffer-size="256"/>
+    <Connection kernel-total="482412" write-total="184924" read-total="95192" buffer-size="512"/>
+    <Connection kernel-total="641971" write-total="257733" read-total="99205" buffer-size="1024"/>
+    <Connection kernel-total="632001" write-total="251797" read-total="107449" buffer-size="2048"/>
+    <Connection kernel-total="720287" write-total="237736" read-total="103917" buffer-size="4096"/>
+    <Connection kernel-total="591935" write-total="193883" read-total="104767" buffer-size="8192"/>
+    <Connection kernel-total="472782" write-total="126686" read-total="110534" buffer-size="16384"/>
+    <Connection kernel-total="511864" write-total="144086" read-total="117563" buffer-size="32768"/>
+    <Connection kernel-total="712944" write-total="195133" read-total="107806" buffer-size="65536"/>
+    <Connection kernel-total="773060" write-total="227561" read-total="143757" buffer-size="131072"/>
+    <Connection kernel-total="1189306" write-total="320886" read-total="194277" buffer-size="262144"/>
+    <Connection kernel-total="1836226" write-total="387874" read-total="251160" buffer-size="524288"/>
+    <Connection kernel-total="2923838" write-total="525553" read-total="406415" buffer-size="1048576"/>
+    <Connection kernel-total="5086697" write-total="843099" read-total="778551" buffer-size="2097152"/>
+    <Connection kernel-total="8900410" write-total="1412478" read-total="1455769" buffer-size="4194304"/>
+    <Connection kernel-total="17720565" write-total="2927593" read-total="3117057" buffer-size="8388608"/>
+    <Connection kernel-total="34893440" write-total="5775495" read-total="4964856" buffer-size="16777216"/>
+    <Connection kernel-total="68965459" write-total="10640144" read-total="9343689" buffer-size="33554432"/>
+    <Connection kernel-total="134075933" write-total="19128626" read-total="17633492" buffer-size="67108864"/>
+    <Connection kernel-total="265757417" write-total="36447672" read-total="34521186" buffer-size="134217728"/>
+  </bandwidth-test>
+</profile-data>

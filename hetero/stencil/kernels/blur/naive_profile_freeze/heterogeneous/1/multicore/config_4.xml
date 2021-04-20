@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <partitioning>
+        <partition id="0">
+            <instance id="padding_0"/>
+            <instance id="kernel_0"/>
+            <instance id="kernel_1"/>
+            <instance id="padding_1"/>
+            <instance id="raster_to_mb"/>
+            <instance id="kernel"/>
+            <instance id="rgb_to_ycrcb"/>
+            <instance id="ycrcb_to_rgb"/>
+            <instance id="source"/>
+            <instance id="padding"/>
+            <instance id="display"/>
+            <instance id="system_plink_0"/>
+        </partition>
+    </partitioning>
+    <connections>
+        <fifo-connection size="1048576" source="source" source-port="Out" target="system_plink_0" target-port="source_Out_parse_Byte"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="parse_SOI_display_SOI" target="display" target-port="SOI"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_up_SOI_OUT_raster_to_mb_SOI" target="raster_to_mb" target-port="SOI"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="mb_to_raster_Y_ycrcb_to_rgb_Y" target="ycrcb_to_rgb" target-port="Y"/>
+        <fifo-connection size="1048576" source="ycrcb_to_rgb" source-port="R" target="padding" target-port="PixelStream"/>
+        <fifo-connection size="1048576" source="ycrcb_to_rgb" source-port="G" target="padding_0" target-port="PixelStream"/>
+        <fifo-connection size="1048576" source="ycrcb_to_rgb" source-port="B" target="padding_1" target-port="PixelStream"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_to_wh_Width_padding_Width" target="padding" target-port="Width"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_to_wh_Height_padding_Height" target="padding" target-port="Height"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_to_wh_Width_padding_0_Width" target="padding_0" target-port="Width"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_to_wh_Height_padding_0_Height" target="padding_0" target-port="Height"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_to_wh_Width_padding_1_Width" target="padding_1" target-port="Width"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_to_wh_Height_padding_1_Height" target="padding_1" target-port="Height"/>
+        <fifo-connection size="1048576" source="kernel" source-port="Out" target="rgb_to_ycrcb" target-port="R"/>
+        <fifo-connection size="1048576" source="kernel_0" source-port="Out" target="rgb_to_ycrcb" target-port="G"/>
+        <fifo-connection size="1048576" source="kernel_1" source-port="Out" target="rgb_to_ycrcb" target-port="B"/>
+        <fifo-connection size="1048576" source="rgb_to_ycrcb" source-port="Y" target="raster_to_mb" target-port="Y"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="conv_422_420_CrCb420_raster_to_mb_CbCr" target="raster_to_mb" target-port="CbCr"/>
+        <fifo-connection size="1048576" source="raster_to_mb" source-port="YCbCr" target="display" target-port="In"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="conv_422_444_Cr_ycrcb_to_rgb_Cr" target="ycrcb_to_rgb" target-port="Cr"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="conv_422_444_Cb_ycrcb_to_rgb_Cb" target="ycrcb_to_rgb" target-port="Cb"/>
+        <fifo-connection size="1048576" source="rgb_to_ycrcb" source-port="Cr" target="system_plink_0" target-port="rgb_to_ycrcb_Cr_conv_444_422_Cr"/>
+        <fifo-connection size="1048576" source="rgb_to_ycrcb" source-port="Cb" target="system_plink_0" target-port="rgb_to_ycrcb_Cb_conv_444_422_Cb"/>
+        <fifo-connection size="1048576" source="padding" source-port="PaddedStream" target="kernel" target-port="In"/>
+        <fifo-connection size="1048576" source="padding" source-port="PaddedHeight" target="kernel" target-port="Height"/>
+        <fifo-connection size="1048576" source="padding" source-port="PaddedWidth" target="kernel" target-port="Width"/>
+        <fifo-connection size="1048576" source="padding_0" source-port="PaddedStream" target="kernel_0" target-port="In"/>
+        <fifo-connection size="1048576" source="padding_0" source-port="PaddedHeight" target="kernel_0" target-port="Height"/>
+        <fifo-connection size="1048576" source="padding_0" source-port="PaddedWidth" target="kernel_0" target-port="Width"/>
+        <fifo-connection size="1048576" source="padding_1" source-port="PaddedStream" target="kernel_1" target-port="In"/>
+        <fifo-connection size="1048576" source="padding_1" source-port="PaddedHeight" target="kernel_1" target-port="Height"/>
+        <fifo-connection size="1048576" source="padding_1" source-port="PaddedWidth" target="kernel_1" target-port="Width"/>
+    </connections>
+</configuration>

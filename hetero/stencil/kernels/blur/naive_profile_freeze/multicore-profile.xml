@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<partitioning>
+		<partition id="0" scheduling="ROUND_ROBIN">
+			<instance id="source" complexity="11993723"/>
+			<instance id="display" complexity="41193244"/>
+			<instance id="soi_up" complexity="14563"/>
+			<instance id="raster_to_mb" complexity="148502340"/>
+			<instance id="mb_to_raster" complexity="101192479"/>
+			<instance id="soi_to_wh" complexity="19191"/>
+			<instance id="huffman" complexity="188258086"/>
+			<instance id="splitter420" complexity="72118331"/>
+			<instance id="iq_Y" complexity="43718217"/>
+			<instance id="iq_Cb" complexity="11780597"/>
+			<instance id="iq_Cr" complexity="11779468"/>
+			<instance id="merger" complexity="7793789"/>
+			<instance id="parse" complexity="7388703"/>
+			<instance id="splitQT" complexity="44559"/>
+			<instance id="scale" complexity="26256025"/>
+			<instance id="row" complexity="122490818"/>
+			<instance id="transpose" complexity="27207812"/>
+			<instance id="column" complexity="123781399"/>
+			<instance id="retranspose" complexity="29878849"/>
+			<instance id="shift" complexity="43126788"/>
+			<instance id="scale_0" complexity="7168076"/>
+			<instance id="row_0" complexity="30914926"/>
+			<instance id="transpose_0" complexity="8135235"/>
+			<instance id="column_0" complexity="31255842"/>
+			<instance id="retranspose_0" complexity="8069193"/>
+			<instance id="shift_0" complexity="11210133"/>
+			<instance id="scale_1" complexity="7315983"/>
+			<instance id="row_1" complexity="31290092"/>
+			<instance id="transpose_1" complexity="8271530"/>
+			<instance id="column_1" complexity="31123763"/>
+			<instance id="retranspose_1" complexity="7870686"/>
+			<instance id="shift_1" complexity="11225400"/>
+			<instance id="conv_420_422" complexity="48976159"/>
+			<instance id="conv_422_444" complexity="104231007"/>
+			<instance id="ycrcb_to_rgb" complexity="157004288"/>
+			<instance id="rgb_to_ycrcb" complexity="123602392"/>
+			<instance id="conv_444_422" complexity="142646006"/>
+			<instance id="conv_422_420" complexity="96677924"/>
+			<instance id="padding" complexity="73197505"/>
+			<instance id="kernel" complexity="160681598"/>
+			<instance id="padding_0" complexity="73269993"/>
+			<instance id="kernel_0" complexity="160025245"/>
+			<instance id="padding_1" complexity="73725035"/>
+			<instance id="kernel_1" complexity="160576902"/>
+		</partition>
+	</partitioning>
+	<connections>
+		<fifo-connection source="source" source-port="Out" target="parse" target-port="Byte" size="1048576" token-size="1" bandwidth="1193623"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="raster_to_mb" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="mb_to_raster" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="soi_to_wh" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_420_422" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_422_444" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_444_422" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_422_420" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="raster_to_mb" source-port="YCbCr" target="display" target-port="In" size="1048576" token-size="1" bandwidth="11404800"/>
+		<fifo-connection source="mb_to_raster" source-port="Y" target="ycrcb_to_rgb" target-port="Y" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="mb_to_raster" source-port="CbCr" target="conv_420_422" target-port="CrCb420" size="1048576" token-size="1" bandwidth="3801600"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="huffman" source-port="Block" target="splitter420" target-port="YCbCr" size="1048576" token-size="4" bandwidth="11404800"/>
+		<fifo-connection source="splitter420" source-port="Y" target="iq_Y" target-port="Block" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="splitter420" source-port="Cb" target="iq_Cb" target-port="Block" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="splitter420" source-port="Cr" target="iq_Cr" target-port="Block" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="iq_Y" source-port="Out" target="scale" target-port="IN" size="1048576" token-size="2" bandwidth="7603200"/>
+		<fifo-connection source="iq_Cb" source-port="Out" target="scale_0" target-port="IN" size="1048576" token-size="2" bandwidth="1900800"/>
+		<fifo-connection source="iq_Cr" source-port="Out" target="scale_1" target-port="IN" size="1048576" token-size="2" bandwidth="1900800"/>
+		<fifo-connection source="merger" source-port="YCbCr" target="mb_to_raster" target-port="YCbCr" size="1048576" token-size="1" bandwidth="11404800"/>
+		<fifo-connection source="parse" source-port="Data" target="huffman" target-port="Bit" size="1048576" token-size="1" bandwidth="1002550"/>
+		<fifo-connection source="parse" source-port="QT" target="splitQT" target-port="QT" size="1048576" token-size="1" bandwidth="39000"/>
+		<fifo-connection source="parse" source-port="HT" target="huffman" target-port="HT" size="1048576" token-size="1" bandwidth="124800"/>
+		<fifo-connection source="parse" source-port="SOI" target="display" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parse" source-port="SOI" target="soi_up" target-port="SOI_IN" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parse" source-port="SOI" target="huffman" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parse" source-port="SOI" target="iq_Y" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parse" source-port="SOI" target="iq_Cb" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parse" source-port="SOI" target="iq_Cr" target-port="SOI" size="1048576" token-size="2" bandwidth="600"/>
+		<fifo-connection source="splitQT" source-port="QT_Y" target="iq_Y" target-port="QT" size="1048576" token-size="1" bandwidth="19200"/>
+		<fifo-connection source="splitQT" source-port="QT_UV" target="iq_Cb" target-port="QT" size="1048576" token-size="1" bandwidth="19200"/>
+		<fifo-connection source="splitQT" source-port="QT_UV" target="iq_Cr" target-port="QT" size="1048576" token-size="1" bandwidth="19200"/>
+		<fifo-connection source="scale" source-port="OUT" target="row" target-port="IN" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="row" source-port="OUT" target="transpose" target-port="IN" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="transpose" source-port="OUT" target="column" target-port="IN" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="column" source-port="OUT" target="retranspose" target-port="IN" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="retranspose" source-port="OUT" target="shift" target-port="IN" size="1048576" token-size="4" bandwidth="7603200"/>
+		<fifo-connection source="shift" source-port="OUT" target="merger" target-port="Y" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="scale_0" source-port="OUT" target="row_0" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="row_0" source-port="OUT" target="transpose_0" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="transpose_0" source-port="OUT" target="column_0" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="column_0" source-port="OUT" target="retranspose_0" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="retranspose_0" source-port="OUT" target="shift_0" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="shift_0" source-port="OUT" target="merger" target-port="Cb" size="1048576" token-size="1" bandwidth="1900800"/>
+		<fifo-connection source="scale_1" source-port="OUT" target="row_1" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="row_1" source-port="OUT" target="transpose_1" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="transpose_1" source-port="OUT" target="column_1" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="column_1" source-port="OUT" target="retranspose_1" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="retranspose_1" source-port="OUT" target="shift_1" target-port="IN" size="1048576" token-size="4" bandwidth="1900800"/>
+		<fifo-connection source="shift_1" source-port="OUT" target="merger" target-port="Cr" size="1048576" token-size="1" bandwidth="1900800"/>
+		<fifo-connection source="conv_420_422" source-port="CrCb422" target="conv_422_444" target-port="CrCb422" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_444" source-port="Cr" target="ycrcb_to_rgb" target-port="Cr" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_444" source-port="Cb" target="ycrcb_to_rgb" target-port="Cb" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="R" target="padding" target-port="PixelStream" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="G" target="padding_0" target-port="PixelStream" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="B" target="padding_1" target-port="PixelStream" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Y" target="raster_to_mb" target-port="Y" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Cr" target="conv_444_422" target-port="Cr" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Cb" target="conv_444_422" target-port="Cb" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_444_422" source-port="CrCb422" target="conv_422_420" target-port="CrCb422" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_420" source-port="CrCb420" target="raster_to_mb" target-port="CbCr" size="1048576" token-size="1" bandwidth="3801600"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="kernel" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="kernel" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedStream" target="kernel" target-port="In" size="1048576" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="kernel" source-port="Out" target="rgb_to_ycrcb" target-port="R" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="kernel_0" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="kernel_0" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedStream" target="kernel_0" target-port="In" size="1048576" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="kernel_0" source-port="Out" target="rgb_to_ycrcb" target-port="G" size="1048576" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="kernel_1" target-port="Height" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="kernel_1" target-port="Width" size="1048576" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedStream" target="kernel_1" target-port="In" size="1048576" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="kernel_1" source-port="Out" target="rgb_to_ycrcb" target-port="B" size="1048576" token-size="1" bandwidth="7603200"/>
+	</connections>
+</configuration>

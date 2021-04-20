@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<partitioning>
+		<partition id="0" scheduling="ROUND_ROBIN">
+			<instance id="source" complexity="9261935"/>
+			<instance id="display" complexity="42987959"/>
+			<instance id="soi_up" complexity="524775"/>
+			<instance id="raster_to_mb" complexity="145584999"/>
+			<instance id="mb_to_raster" complexity="96629966"/>
+			<instance id="soi_to_wh" complexity="542194"/>
+			<instance id="parser" complexity="6894438"/>
+			<instance id="huffman" complexity="198483565"/>
+			<instance id="dequant" complexity="37306975"/>
+			<instance id="idct2d" complexity="65407293"/>
+			<instance id="conv_420_422" complexity="50951954"/>
+			<instance id="conv_422_444" complexity="107310153"/>
+			<instance id="ycrcb_to_rgb" complexity="151239629"/>
+			<instance id="rgb_to_ycrcb" complexity="118117652"/>
+			<instance id="conv_444_422" complexity="140816418"/>
+			<instance id="conv_422_420" complexity="94676006"/>
+			<instance id="padding" complexity="68622708"/>
+			<instance id="kernel" complexity="185432038"/>
+			<instance id="padding_0" complexity="68739026"/>
+			<instance id="kernel_0" complexity="185155608"/>
+			<instance id="padding_1" complexity="68812685"/>
+			<instance id="kernel_1" complexity="194347238"/>
+		</partition>
+	</partitioning>
+	<connections>
+		<fifo-connection source="source" source-port="Out" target="parser" target-port="Byte" size="4096" token-size="1" bandwidth="1193623"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="raster_to_mb" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="mb_to_raster" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="soi_to_wh" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_420_422" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_422_444" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_444_422" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="soi_up" source-port="SOI_OUT" target="conv_422_420" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="raster_to_mb" source-port="YCbCr" target="display" target-port="In" size="4096" token-size="1" bandwidth="11404800"/>
+		<fifo-connection source="mb_to_raster" source-port="Y" target="ycrcb_to_rgb" target-port="Y" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="mb_to_raster" source-port="CbCr" target="conv_420_422" target-port="CrCb420" size="4096" token-size="1" bandwidth="3801600"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding" target-port="Width" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding_0" target-port="Width" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Width" target="padding_1" target-port="Width" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding" target-port="Height" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding_0" target-port="Height" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="soi_to_wh" source-port="Height" target="padding_1" target-port="Height" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="parser" source-port="Bits" target="huffman" target-port="Bit" size="4096" token-size="1" bandwidth="1002550"/>
+		<fifo-connection source="parser" source-port="QT" target="dequant" target-port="QT" size="4096" token-size="1" bandwidth="39000"/>
+		<fifo-connection source="parser" source-port="HT" target="huffman" target-port="HT" size="4096" token-size="1" bandwidth="124800"/>
+		<fifo-connection source="parser" source-port="SOI" target="display" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parser" source-port="SOI" target="soi_up" target-port="SOI_IN" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parser" source-port="SOI" target="huffman" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="parser" source-port="SOI" target="dequant" target-port="SOI" size="4096" token-size="2" bandwidth="600"/>
+		<fifo-connection source="huffman" source-port="Block" target="dequant" target-port="Block" size="4096" token-size="4" bandwidth="11404800"/>
+		<fifo-connection source="dequant" source-port="Out" target="idct2d" target-port="IN" size="4096" token-size="2" bandwidth="11404800"/>
+		<fifo-connection source="idct2d" source-port="OUT" target="mb_to_raster" target-port="YCbCr" size="4096" token-size="1" bandwidth="11404800"/>
+		<fifo-connection source="conv_420_422" source-port="CrCb422" target="conv_422_444" target-port="CrCb422" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_444" source-port="Cr" target="ycrcb_to_rgb" target-port="Cr" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_444" source-port="Cb" target="ycrcb_to_rgb" target-port="Cb" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="R" target="padding" target-port="PixelStream" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="G" target="padding_0" target-port="PixelStream" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="ycrcb_to_rgb" source-port="B" target="padding_1" target-port="PixelStream" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Y" target="raster_to_mb" target-port="Y" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Cr" target="conv_444_422" target-port="Cr" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="rgb_to_ycrcb" source-port="Cb" target="conv_444_422" target-port="Cb" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_444_422" source-port="CrCb422" target="conv_422_420" target-port="CrCb422" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="conv_422_420" source-port="CrCb420" target="raster_to_mb" target-port="CbCr" size="4096" token-size="1" bandwidth="3801600"/>
+		<fifo-connection source="padding" source-port="PaddedHeight" target="kernel" target-port="Height" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedWidth" target="kernel" target-port="Width" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding" source-port="PaddedStream" target="kernel" target-port="In" size="4096" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="kernel" source-port="Out" target="rgb_to_ycrcb" target-port="R" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="padding_0" source-port="PaddedHeight" target="kernel_0" target-port="Height" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedWidth" target="kernel_0" target-port="Width" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_0" source-port="PaddedStream" target="kernel_0" target-port="In" size="4096" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="kernel_0" source-port="Out" target="rgb_to_ycrcb" target-port="G" size="4096" token-size="1" bandwidth="7603200"/>
+		<fifo-connection source="padding_1" source-port="PaddedHeight" target="kernel_1" target-port="Height" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedWidth" target="kernel_1" target-port="Width" size="4096" token-size="4" bandwidth="300"/>
+		<fifo-connection source="padding_1" source-port="PaddedStream" target="kernel_1" target-port="In" size="4096" token-size="1" bandwidth="7796400"/>
+		<fifo-connection source="kernel_1" source-port="Out" target="rgb_to_ycrcb" target-port="B" size="4096" token-size="1" bandwidth="7603200"/>
+	</connections>
+</configuration>

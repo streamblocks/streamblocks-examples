@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration>
+    <network id="hetero.stencil.kernels.GuassianBlur.JpegBlurNaiveNetwork"/>
+    <partitioning>
+        <partition id="0" pe="x86_64" scheduling="ROUND_ROBIN" code-generator="sw" host="true">
+            <instance id="display"/>
+            <instance id="kernel"/>
+            <instance id="kernel_0"/>
+            <instance id="kernel_1"/>
+            <instance id="padding"/>
+            <instance id="padding_0"/>
+            <instance id="padding_1"/>
+            <instance id="raster_to_mb"/>
+            <instance id="rgb_to_ycrcb"/>
+            <instance id="source"/>
+            <instance id="ycrcb_to_rgb"/>
+        </partition>
+        <partition id="1" pe="FPGA" scheduling="FULL_PARALLEL" code-generator="hw" host="false">
+            <instance id="column"/>
+            <instance id="column_0"/>
+            <instance id="column_1"/>
+            <instance id="conv_420_422"/>
+            <instance id="conv_422_420"/>
+            <instance id="conv_422_444"/>
+            <instance id="conv_444_422"/>
+            <instance id="huffman"/>
+            <instance id="iq_Cb"/>
+            <instance id="iq_Cr"/>
+            <instance id="iq_Y"/>
+            <instance id="mb_to_raster"/>
+            <instance id="merger"/>
+            <instance id="parse"/>
+            <instance id="retranspose"/>
+            <instance id="retranspose_0"/>
+            <instance id="retranspose_1"/>
+            <instance id="row"/>
+            <instance id="row_0"/>
+            <instance id="row_1"/>
+            <instance id="scale"/>
+            <instance id="scale_0"/>
+            <instance id="scale_1"/>
+            <instance id="shift"/>
+            <instance id="shift_0"/>
+            <instance id="shift_1"/>
+            <instance id="soi_to_wh"/>
+            <instance id="soi_up"/>
+            <instance id="splitQT"/>
+            <instance id="splitter420"/>
+            <instance id="transpose"/>
+            <instance id="transpose_0"/>
+            <instance id="transpose_1"/>
+        </partition>
+    </partitioning>
+    <code-generators>
+        <code-generator id="sw" platform="multicore"/>
+        <code-generator id="hw" platform="vivado-hls"/>
+    </code-generators>
+    <connections/>
+</configuration>

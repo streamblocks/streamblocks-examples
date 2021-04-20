@@ -240,4 +240,159 @@ namespace hetero.stencil.kernels.GuassianBlur:
   end
 
 
+  // actor GuassianBlurNaiveKernel(int MAX_WINDOW) 
+  //   uint(size = 8) In,
+  //   uint Width, uint Height ==> uint(size = 8) Out:
+
+  //   List(type : uint(size = 8), size=MAX_WINDOW + 1) window_buffer;
+    
+  //   uint tail := 0;
+  //   uint head := 0;
+  //   uint width := 0;
+  //   uint height := 0;
+  //   uint window_size := 0;
+  //   uint pixel_index := 0;
+  //   wait_wh: action Width:[w], Height:[h] ==>
+  //   do
+  //     width := w;
+  //     height := h;
+  //     tail := 0;
+  //     head := 0;
+  //     window_size := 2 * w + 3;
+  //     pixels_left := w * h - window_size;
+  //   end
+
+  //   function wrap_inc(uint index) --> uint:
+  //     if index := MAX_WINDOW then
+  //       0;
+  //     else
+  //       index + 1;
+  //     end
+  //   end
+  //   read.inital_window: action In:[pixel] ==>
+  //   guard head < window_size
+  //   do
+  //     window_buffer[head] := pixel;
+  //     if head := MAX_WINDOW then
+  //       head := 0;
+  //     else
+  //       head := head + 1;
+  //     end
+  //   end
+
+  //   read.compute: action In:[pixel] ==> Out:[res]
+  //   var uint(size = 8) res
+  //   guard pixel_index < 
+  //   do
+  //     /// compute the output pixel
+  //     res := (
+  //       (window_buffer[tail] + 2 * window_buffer[tail + 1] + window_buffer[tail + 2]) +
+  //       (window_buffer[tail + w] + 2 * window_buffer[tail + w + 1] + window_buffer[tail + w + 2]) * 2
+  //       (window_buffer[tail + 2 * w] + 2 * window_buffer[tail + 2 * w + 1] + window_buffer[tail + 2 * w + 2])
+  //     ) / 16;
+  //     // read in the new pixel
+  //     window_buffer[head] := pixel;
+
+  //     tail := wrap_inc(tail);
+  //     head := wrap_inc(head);
+  //     pixel_index  := pixel_index + 1;
+  //   end
+
+  // end
+
+    actor GuassianBlurNaiveKernel(uint MAX_X, uint MAX_Y) 
+      uint(size = 8) In,
+      uint Width, uint Height ==> uint(size = 8) Out:
+    
+      repeat 
+        begin 
+        var
+          List(type: 
+            List(type : uint(size = 8), size = MAX_X), 
+              size = MAX_Y) image_buffer,
+          uint width := 0,
+          uint height := 0,
+          uint(size = 8) res := 0,
+          uint x := 0,
+          uint y := 0
+        do
+
+          // read the width and height
+          Width --> width;
+          Height --> height;
+          // read the image
+          x := 0;
+          y := 0;
+          @pipeline()
+          while y < height do
+            In --> image_buffer[x][y];
+            if x = width - 1 then
+              x := 0;
+              y := y + 1;
+            else
+              x := x + 1;
+            end
+            
+          end
+        
+           // compute and stream
+          x := 1; y := 1;
+          @pipeline()
+          while y < height - 1 do
+            res := (
+                (image_buffer[x - 1][y - 1] + 2 * image_buffer[x][y - 1] + image_buffer[x + 1][y - 1])     +
+                (image_buffer[x - 1][y    ] + 2 * image_buffer[x][y    ] + image_buffer[x + 1][y    ]) * 2 +
+                (image_buffer[x - 1][y + 1] + 2 * image_buffer[x][y + 1] + image_buffer[x + 1][y + 1])
+              ) / 16;
+            Out <-- res;
+            if x = width - 2 then
+              x := 1;
+              y := y + 1;  
+            else
+              x := x + 1;
+            end
+          end         
+          
+        end
+      end
+    end
+
+
+
+    network GuassianBlurNaiveNetworkSingle()
+      uint(size = 8) PixelStream,
+      uint(size = 8) Width,
+      uint(size = 8) Height ==>
+      uint(size = 8) Out:
+  
+    entities
+
+      /**Pad the borders of the image so that the output image
+       will have the same size as the input image
+       */
+      padding = KernelStreamer(
+        stencil_x_neg = -1, stencil_x_pos = 1,
+        stencil_y_neg = -1, stencil_y_pos = 1,
+        pad_value = 0
+      );
+
+      kernel = GuassianBlurNaiveKernel(
+        MAX_X = 256, MAX_Y = 256
+      );
+
+
+    structure
+
+      PixelStream --> padding.PixelStream;
+      Width --> padding.Width;
+      Height --> padding.Height;
+
+      padding.PaddedStream --> kernel.In;
+      padding.PaddedHeight --> kernel.Height;
+      padding.PaddedWidth --> kernel.Width;
+
+      kernel.Out --> Out;
+
+  end
+  
 end

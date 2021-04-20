@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <partitioning>
+        <partition id="0">
+            <instance id="display"/>
+            <instance id="source"/>
+            <instance id="system_plink_0"/>
+        </partition>
+        <partition id="1">
+            <instance id="soi_to_wh"/>
+        </partition>
+    </partitioning>
+    <connections>
+        <fifo-connection size="1048576" source="source" source-port="Out" target="system_plink_0" target-port="source_Out_parse_Byte"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="parse_SOI_display_SOI" target="display" target-port="SOI"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="soi_up_SOI_OUT_soi_to_wh_SOI" target="soi_to_wh" target-port="SOI"/>
+        <fifo-connection size="1048576" source="soi_to_wh" source-port="Width" target="system_plink_0" target-port="soi_to_wh_Width_padding_Width"/>
+        <fifo-connection size="1048576" source="soi_to_wh" source-port="Height" target="system_plink_0" target-port="soi_to_wh_Height_padding_Height"/>
+        <fifo-connection size="1048576" source="soi_to_wh" source-port="Width" target="system_plink_0" target-port="soi_to_wh_Width_padding_0_Width"/>
+        <fifo-connection size="1048576" source="soi_to_wh" source-port="Height" target="system_plink_0" target-port="soi_to_wh_Height_padding_0_Height"/>
+        <fifo-connection size="1048576" source="soi_to_wh" source-port="Width" target="system_plink_0" target-port="soi_to_wh_Width_padding_1_Width"/>
+        <fifo-connection size="1048576" source="soi_to_wh" source-port="Height" target="system_plink_0" target-port="soi_to_wh_Height_padding_1_Height"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="raster_to_mb_YCbCr_display_In" target="display" target-port="In"/>
+    </connections>
+</configuration>

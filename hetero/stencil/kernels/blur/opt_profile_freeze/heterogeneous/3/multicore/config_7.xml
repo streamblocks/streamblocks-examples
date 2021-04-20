@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <partitioning>
+        <partition id="0">
+            <instance id="ycrcb_to_rgb"/>
+            <instance id="huffman"/>
+            <instance id="parser"/>
+            <instance id="idct2d"/>
+            <instance id="system_plink_0"/>
+        </partition>
+        <partition id="1">
+            <instance id="conv_444_422"/>
+            <instance id="mb_to_raster"/>
+            <instance id="conv_422_444"/>
+            <instance id="soi_up"/>
+            <instance id="conv_422_420"/>
+            <instance id="dequant"/>
+        </partition>
+        <partition id="2">
+            <instance id="display"/>
+            <instance id="source"/>
+            <instance id="conv_420_422"/>
+        </partition>
+    </partitioning>
+    <connections>
+        <fifo-connection size="1048576" source="source" source-port="Out" target="parser" target-port="Byte"/>
+        <fifo-connection size="1048576" source="parser" source-port="SOI" target="soi_up" target-port="SOI_IN"/>
+        <fifo-connection size="1048576" source="parser" source-port="SOI" target="display" target-port="SOI"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="system_plink_0" target-port="soi_up_SOI_OUT_raster_to_mb_SOI"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="mb_to_raster" target-port="SOI"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="conv_420_422" target-port="SOI"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="conv_422_444" target-port="SOI"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="conv_444_422" target-port="SOI"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="conv_422_420" target-port="SOI"/>
+        <fifo-connection size="1048576" source="idct2d" source-port="OUT" target="mb_to_raster" target-port="YCbCr"/>
+        <fifo-connection size="1048576" source="mb_to_raster" source-port="Y" target="ycrcb_to_rgb" target-port="Y"/>
+        <fifo-connection size="1048576" source="mb_to_raster" source-port="CbCr" target="conv_420_422" target-port="CrCb420"/>
+        <fifo-connection size="1048576" source="ycrcb_to_rgb" source-port="R" target="system_plink_0" target-port="ycrcb_to_rgb_R_padding_PixelStream"/>
+        <fifo-connection size="1048576" source="ycrcb_to_rgb" source-port="G" target="system_plink_0" target-port="ycrcb_to_rgb_G_padding_0_PixelStream"/>
+        <fifo-connection size="1048576" source="ycrcb_to_rgb" source-port="B" target="system_plink_0" target-port="ycrcb_to_rgb_B_padding_1_PixelStream"/>
+        <fifo-connection size="1048576" source="soi_up" source-port="SOI_OUT" target="system_plink_0" target-port="soi_up_SOI_OUT_soi_to_wh_SOI"/>
+        <fifo-connection size="1048576" source="conv_422_420" source-port="CrCb420" target="system_plink_0" target-port="conv_422_420_CrCb420_raster_to_mb_CbCr"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="raster_to_mb_YCbCr_display_In" target="display" target-port="In"/>
+        <fifo-connection size="1048576" source="parser" source-port="Bits" target="huffman" target-port="Bit"/>
+        <fifo-connection size="1048576" source="parser" source-port="HT" target="huffman" target-port="HT"/>
+        <fifo-connection size="1048576" source="parser" source-port="SOI" target="huffman" target-port="SOI"/>
+        <fifo-connection size="1048576" source="parser" source-port="QT" target="dequant" target-port="QT"/>
+        <fifo-connection size="1048576" source="parser" source-port="SOI" target="dequant" target-port="SOI"/>
+        <fifo-connection size="1048576" source="huffman" source-port="Block" target="dequant" target-port="Block"/>
+        <fifo-connection size="1048576" source="dequant" source-port="Out" target="idct2d" target-port="IN"/>
+        <fifo-connection size="1048576" source="conv_420_422" source-port="CrCb422" target="conv_422_444" target-port="CrCb422"/>
+        <fifo-connection size="1048576" source="conv_422_444" source-port="Cr" target="ycrcb_to_rgb" target-port="Cr"/>
+        <fifo-connection size="1048576" source="conv_422_444" source-port="Cb" target="ycrcb_to_rgb" target-port="Cb"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="rgb_to_ycrcb_Cr_conv_444_422_Cr" target="conv_444_422" target-port="Cr"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="rgb_to_ycrcb_Cb_conv_444_422_Cb" target="conv_444_422" target-port="Cb"/>
+        <fifo-connection size="1048576" source="conv_444_422" source-port="CrCb422" target="conv_422_420" target-port="CrCb422"/>
+    </connections>
+</configuration>

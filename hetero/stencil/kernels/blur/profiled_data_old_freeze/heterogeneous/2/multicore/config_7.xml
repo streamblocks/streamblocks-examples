@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <partitioning>
+        <partition id="0">
+            <instance id="display"/>
+            <instance id="system_plink_0"/>
+        </partition>
+        <partition id="1">
+            <instance id="parse"/>
+            <instance id="source"/>
+        </partition>
+    </partitioning>
+    <connections>
+        <fifo-connection size="1048576" source="source" source-port="Out" target="parse" target-port="Byte"/>
+        <fifo-connection size="1048576" source="parse" source-port="SOI" target="system_plink_0" target-port="parse_SOI_soi_up_SOI_IN"/>
+        <fifo-connection size="1048576" source="parse" source-port="SOI" target="display" target-port="SOI"/>
+        <fifo-connection size="1048576" source="system_plink_0" source-port="raster_to_mb_YCbCr_display_In" target="display" target-port="In"/>
+        <fifo-connection size="1048576" source="parse" source-port="Data" target="system_plink_0" target-port="parse_Data_huffman_Bit"/>
+        <fifo-connection size="1048576" source="parse" source-port="HT" target="system_plink_0" target-port="parse_HT_huffman_HT"/>
+        <fifo-connection size="1048576" source="parse" source-port="SOI" target="system_plink_0" target-port="parse_SOI_huffman_SOI"/>
+        <fifo-connection size="1048576" source="parse" source-port="SOI" target="system_plink_0" target-port="parse_SOI_iq_Y_SOI"/>
+        <fifo-connection size="1048576" source="parse" source-port="SOI" target="system_plink_0" target-port="parse_SOI_iq_Cb_SOI"/>
+        <fifo-connection size="1048576" source="parse" source-port="SOI" target="system_plink_0" target-port="parse_SOI_iq_Cr_SOI"/>
+        <fifo-connection size="1048576" source="parse" source-port="QT" target="system_plink_0" target-port="parse_QT_splitQT_QT"/>
+    </connections>
+</configuration>
