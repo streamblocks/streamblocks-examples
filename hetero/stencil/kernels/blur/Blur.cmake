@@ -144,7 +144,23 @@ streamblocks_systemc(
   TARGET_PATH generated/systemc/JpegBlurOptNetwork
 )
 
+streamblocks(
+  JpegBlurOptNetwork_multicore
+  PLATFORM multicore
+  PARTITIONING
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurOptNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH build/opt_profile/jpegblur/fpga_only
+)
 
+streamblocks(
+  JpegBlurOptNetwork_hls
+  PLATFORM vivado-hls
+  PARTITIONING
+  QID hetero.stencil.kernels.GuassianBlur.JpegBlurOptNetwork
+  SOURCE_PATH ${JpegBlurNetwork_SOURCES}
+  TARGET_PATH build/opt_profile/jpegblur/fpga_only
+)
 
 streamblocks(
   JpegBlurSerialNetwork_MC
@@ -183,6 +199,6 @@ streamblocks(
 
 
 
-foreach(index RANGE 0 4)  
+foreach(index RANGE 0 5)  
   jpegblur_gen(${index} JpegBlurSerialNetwork serial_profile)
 endforeach()

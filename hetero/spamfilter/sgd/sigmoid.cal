@@ -3,7 +3,7 @@ namespace hetero.spamfilter.sgd:
 
   @pipeline(flush=true)
   actor Sigmoid() float Exponent ==> float Sig:
-
+    
     List(type: float, size=512) sig_pos = [ 
       0.5,0.5019531150659532,0.5039061705290805,0.5058591067938315,
       0.5078118642792044,0.5097643834260159,0.5117166047041654,0.5136684686198906,

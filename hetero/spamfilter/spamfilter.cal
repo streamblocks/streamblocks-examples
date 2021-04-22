@@ -81,12 +81,16 @@ namespace hetero.spamfilter:
         NUM_EPOCHS = NUM_EPOCHS,
         NUM_FEATURES = 1024,
         NUM_ITERS = 4500
-      );
+      ){
+        partition = "hw";
+      };
 
       kernel = SpamFilterKernel(
         NUM_FEATURES = 1024,
         NUM_TRAINING = 4500
-      );
+      ){
+        partition = "hw";
+      };
 
       feature_conv = FloatToBytes();
 

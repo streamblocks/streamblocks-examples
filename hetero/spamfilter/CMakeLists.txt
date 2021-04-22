@@ -20,6 +20,32 @@ streamblocks(
   PLATFORM multicore
   SOURCE_PATH ${spamfilter_SORUCES}
   TARGET_PATH build/generated/sw
-  # EXPERIMENTAL
+  EXPERIMENTAL
 )
 
+
+
+
+streamblocks(
+  spamfilter_multicore
+  QID hetero.spamfilter.SimpleSpamFilterEpochs
+  PLATFORM multicore
+  SOURCE_PATH ${spamfilter_SORUCES}
+  TARGET_PATH build/generated/hetero
+  EXPERIMENTAL
+  PARTITIONING
+)
+
+streamblocks(
+  spamfilter_hls
+  QID hetero.spamfilter.SimpleSpamFilterEpochs
+  PLATFORM vivado-hls
+  SOURCE_PATH ${spamfilter_SORUCES}
+  TARGET_PATH build/generated/hetero
+  EXPERIMENTAL
+  PARTITIONING
+)
+
+add_custom_target(spamfilter_hetero
+  DEPENDS spamfilter_multicore spamfilter_hls
+)
