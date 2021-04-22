@@ -1,41 +1,41 @@
 
 import StreamDispatcher
 import HashCollector
+import numpy as np
+
 
 class ParallelSHA():
 
+    def __init__(self, num_pes, strings_per_pe, min_size, max_size):
+        self.size = num_pes
+        self.strings_per_pe = strings_per_pe
+        self.min_size = min_size
+        self.max_size = max_size
 
-  def __init__(self, num_pes, strings_per_pe, min_size, max_size):
-    self.size = num_pes
-    self.strings_per_pe = strings_per_pe
-    self.min_size = min_size
-    self.max_size = max_size
+    def getPEInstances(self):
 
-  def getPEInstances(self):
-
-    pes = ""
-    for ix in range(0, self.size):
-      pes += """
+        pes = ""
+        for ix in range(0, self.size):
+            pes += """
       pe{index} = SHA1();
-      """.format(index = ix)
-    return pes
-  
+      """.format(index=ix)
+        return pes
 
-  def getConnections(self):
+    def getConnections(self):
 
-    connections = ""
+        connections = ""
 
-    for ix in range(0, self.size):
+        for ix in range(0, self.size):
 
-      connections += """
+            connections += """
       dispatcher.stream{index} --> pe{index}.text;
       pe{index}.hash --> collector.stream{index};
-      """.format(index = ix)
-    return connections
-  
-  def getNetwork(self):
+      """.format(index=ix)
+        return connections
 
-    actor = """
+    def getNetwork(self):
+
+        actor = """
   network ParallelSHA() uint strings ==> uint hashes:
 
     entities
@@ -52,16 +52,16 @@ class ParallelSHA():
       strings --> dispatcher.stringStream {{bufferSize={buff_size};}};
      
       {connections}
-      collector.hashStream --> hashes;
+      collector.hashStream --> hashes {{bufferSize={buff_size};}};
   end
-  """.format(peInstances = self.getPEInstances(), 
-    connections = self.getConnections(),
-    buff_size = self.max_size * self.size)
-    return actor
+  """.format(peInstances=self.getPEInstances(),
+             connections=self.getConnections(),
+             buff_size=int(np.max([self.max_size * self.size, 1048576])))
+        return actor
 
-  def getActors(self):
-    
-    return """
+    def getActors(self):
+
+        return """
 namespace hetero.security.sha:
   import entity ART.art_Sink_txt; 
   actor IntToCharCast() uint In ==> uint(size = 8) Out:
@@ -92,23 +92,29 @@ namespace hetero.security.sha:
   end
 end
     """.format(
-      dispatcher = StreamDispatcher.getStreamDispatcher(self.size),
-      collector = HashCollector.getHashCollector(self.size),
-      network = self.getNetwork(),
-      num_strings=self.strings_per_pe * self.size,
-      min_size=self.min_size - 4,
-      max_size=self.max_size - 4)
+            dispatcher=StreamDispatcher.getStreamDispatcher(self.size),
+            collector=HashCollector.getHashCollector(self.size),
+            network=self.getNetwork(),
+            num_strings=self.strings_per_pe * self.size,
+            min_size=self.min_size - 4,
+            max_size=self.max_size - 4)
 
 
 if __name__ == "__main__":
 
-  import argparse
+    import argparse
 
-  parser = argparse.ArgumentParser(description="Generate a parallel SHA1 network")
-  parser.add_argument('--num-pes', type=int, help="number of SHA1 processing elements", required=True)
-  parser.add_argument('--min-size', type=int, help="Minimum string size", required=True)
-  parser.add_argument('--max-size', type=int, help='maximum string size', required=True)
-  parser.add_argument('--strings-per-pe', type=int, help='number of strings per pe', required=True)
-  
-  args = parser.parse_args()
-  print(ParallelSHA(args.num_pes, args.strings_per_pe, args.min_size, args.max_size).getActors())
+    parser = argparse.ArgumentParser(
+        description="Generate a parallel SHA1 network")
+    parser.add_argument('--num-pes', type=int,
+                        help="number of SHA1 processing elements", required=True)
+    parser.add_argument('--min-size', type=int,
+                        help="Minimum string size", required=True)
+    parser.add_argument('--max-size', type=int,
+                        help='maximum string size', required=True)
+    parser.add_argument('--strings-per-pe', type=int,
+                        help='number of strings per pe', required=True)
+
+    args = parser.parse_args()
+    print(ParallelSHA(args.num_pes, args.strings_per_pe,
+                      args.min_size, args.max_size).getActors())

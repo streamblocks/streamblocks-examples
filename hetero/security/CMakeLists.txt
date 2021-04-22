@@ -48,3 +48,38 @@ streamblocks(
     SOURCE_PATH ${sha1_SOURCES}
     TARGET_PATH generated/sw
 )
+
+
+streamblocks(
+    ParallelSHANetwork_software
+    PLATFORM multicore
+    QID hetero.security.sha.ParallelSHA1Network
+    SOURCE_PATH ${sha1_SOURCES}
+    TARGET_PATH generated/parallelsha/software
+)
+
+
+streamblocks_systemc(
+    ParallelSHANetwork_SYSTEMC
+    QID hetero.security.sha.ParallelSHA1Network
+    SOURCE_PATH ${sha1_SOURCES}
+    TARGET_PATH generated/parallelsha/systemc
+)
+
+streamblocks(
+  ParallelSHA1Network_HLS 
+  PLATFORM vivado-hls
+  QID hetero.security.sha.ParallelSHA1Network
+  SOURCE_PATH ${sha1_SOURCES}
+  TARGET_PATH generated/parallelsha/hetero
+  PARTITIONING
+)
+
+streamblocks(
+    ParallelSHA1Network_multicore 
+    PLATFORM multicore
+    QID hetero.security.sha.ParallelSHA1Network
+    SOURCE_PATH ${sha1_SOURCES}
+    TARGET_PATH generated/parallelsha/hetero
+    PARTITIONING
+)
