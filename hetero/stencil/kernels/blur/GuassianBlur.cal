@@ -261,7 +261,7 @@ namespace hetero.stencil.kernels.GuassianBlur:
   //     window_size := 2 * w + 3;
   //     pixels_left := w * h - window_size;
   //   end
-
+  
   //   function wrap_inc(uint index) --> uint:
   //     if index := MAX_WINDOW then
   //       0;

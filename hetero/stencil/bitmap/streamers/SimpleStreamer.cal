@@ -12,7 +12,7 @@ namespace hetero.stencil.bitmap.streamers:
     uint(size = 8) Alpha,
     uint(size = 32) Height,
     uint(size = 32) Width,
-    uint(size = 32) BitsPerPixel:
+    uint(size = 16) BitsPerPixel:
       entities
         header_parser = HeaderParser();
         info_parser = InfoHeaderParser();

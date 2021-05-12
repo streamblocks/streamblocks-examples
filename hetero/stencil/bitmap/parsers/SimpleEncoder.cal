@@ -7,7 +7,7 @@ namespace hetero.stencil.bitmap.encoders:
     uint(size = 8)  Alpha,
     uint(size = 32) Width, 
     uint(size = 32) Height,
-    uint(size = 32) BitsPerPixel ==>
+    uint(size = 16) BitsPerPixel ==>
     uint(size = 8) ByteStream:
 
     uint NUM_BYTES_ADDR                  = 0;
