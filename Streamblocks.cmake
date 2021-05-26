@@ -19,7 +19,7 @@ function (streamblocks TARGET)
 
   # Extra arguments and settings
   # -- on/off settings
-  set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE EXPERIMENTAL)
+  set(streamblocks_settings PARTITIONING SYSTEMC ACTION_PROFILE EXPERIMENTAL NO_PIPELINING)
   
   # -- value settings
   set(streamblocks_value_settings 
@@ -78,6 +78,11 @@ function (streamblocks TARGET)
     list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set partitioning=on)
   endif()
 
+   # --set partitioning
+  if (STREAMBLOCKS_ARGS_NO_PIPELINING)
+   list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set disable-pipelining=on)
+  endif()
+
   # --set experimental network elaboration
   if (STREAMBLOCKS_ARGS_EXPERIMENTAL)
     list(APPEND STREAMBLOCKS_SETTINGS_OPTIONS --set experimental-network-elaboration=on)
@@ -124,7 +129,7 @@ function (streamblocks TARGET)
   # message(STATUS "SOURCE_PATH_STRING: ${SOURCE_PATH_STRING}")
 
   
-  make_absolute_path_list(TARGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
+  set(TARGET_PATH_STRING ${STREAMBLOCKS_ARGS_TARGET_PATH})
   message(STATUS "Adding target ${TARGET} for entity ${STREAMBLOCKS_ARGS_QID}")
 
   

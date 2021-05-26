@@ -70,6 +70,7 @@ function(jpegblur_gen CONFIG_IDX NETWORK PREFIX)
     SOURCE_PATH ${JpegBlurNetwork_SOURCES}
     TARGET_PATH ${OUTPUT_PATH}
     XCF_SOURCE_PATH ${THIS_CONFIG}
+    QUEUE_DEPTH 1024
   )
 
   streamblocks(
@@ -199,6 +200,6 @@ streamblocks(
 
 
 
-foreach(index RANGE 0 5)  
-  jpegblur_gen(${index} JpegBlurSerialNetwork serial_profile)
+foreach(index RANGE 0 12)  
+  jpegblur_gen(${index} JpegBlurNetwork profiled_data_zcu)
 endforeach()
