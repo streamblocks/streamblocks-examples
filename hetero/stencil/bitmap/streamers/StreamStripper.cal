@@ -50,6 +50,7 @@ namespace hetero.stencil.bitmap.streamers:
       bpp := _bpp;
       row_size := ((bpp * w + 31) / 32) * 4;
       padding := row_size - w * (bpp / 8);
+      // println("W: " + w + " H: " + h + " bpp: " + bpp);
       stream_state := PIXEL_STREAM;
       x_count := 0;
       y_count := 0;

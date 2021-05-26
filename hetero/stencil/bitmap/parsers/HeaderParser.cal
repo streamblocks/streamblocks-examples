@@ -69,6 +69,7 @@ namespace hetero.stencil.bitmap.parsers:
     pixel_stream: action ByteStream:[b] ==> PixelStream:[b]
     guard addr < bmp_size and addr >= pixel_offset
     do
+      // println("streamig: " + b);
       addr := addr + 1;
     end
 

@@ -49,10 +49,8 @@ namespace hetero.stencil.bitmap.parsers:
           (bytes[BITS_PER_PIXEL_ADDR + 1] as uint(size=32)) << 8)
       // uint(size = 32) bpp := bytesToWord(bytes, BITS_PER_PIXEL_ADDR)
     do
-      println("Bpp : " + bpp);
-      foreach int i in 0..39 do
-        println("byte[" + i + "] = " + bytes[i]);
-      end
+    //  println("W: " + w + " H: " + h + " bpp: " + bpp);
+     
       left_over_header := bytesToWord(bytes, NUM_BYTES_ADDR) - 40;
     end
 

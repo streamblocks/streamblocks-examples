@@ -1,6 +1,6 @@
 namespace hetero.stencil.kernels.utils:
   
-  @pipeline(flushing=true)
+  // @pipeline(flushing=true)
   actor Splitter(type DTYPE) DTYPE In ==> DTYPE Left, DTYPE Right:
     split: action In:[t] ==> Left:[t], Right:[t] end
   end

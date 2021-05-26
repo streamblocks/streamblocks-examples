@@ -8,33 +8,44 @@ namespace hetero.stencil.kernels.GuassianBlur:
   import entity hetero.stencil.kernels.utils.Splitter;
 
   @pipeline(flushing=true)
-  actor GuassianBlurPartialCompute(type DTYPE)
-    DTYPE Col_p1, // Ref(x = 1, y = _)
-    DTYPE Col_p0, // Ref(x = 0, y = _)
-    DTYPE Col_n1  // Ref(x = -1, y = _)
-    ==> DTYPE Out:
+  actor GuassianBlurCompute(type DTYPE)
 
-    compute: action Col_p1:[t0], Col_p0:[t1], Col_n1:[t2] ==>
-      Out:[t0 + (t1 << 1) + t2] 
+    DTYPE Ref0, // pixel(x = 1, y = 1)
+    DTYPE Ref1, // pixel(x = 0, y = 1)
+    DTYPE Ref2, // pixel(x = -1, y = 1)
+    DTYPE Ref3, // pixel(x = 1, y = 0)
+    DTYPE Ref4, // pixel(x = 0, y = 0)
+    DTYPE Ref5, // pixel(x = -1, y = 0)
+    DTYPE Ref6, // pixel(x = 1, y = -1)
+    DTYPE Ref7, // pixel(x = 0, y = -1)
+    DTYPE Ref8  // pixel(x = -1, y = 0)
+    ==>
+    DTYPE Out:
+
+    compute: action 
+      Ref0 : [t0] , // pixel(x = 1, y = 1)
+      Ref1 : [t1] , // pixel(x = 0, y = 1)
+      Ref2 : [t2] , // pixel(x = -1, y = 1)
+      Ref3 : [t3] , // pixel(x = 1, y = 0)
+      Ref4 : [t4] , // pixel(x = 0, y = 0)
+      Ref5 : [t5] , // pixel(x = -1, y = 0)
+      Ref6 : [t6] , // pixel(x = 1, y = -1)
+      Ref7 : [t7] , // pixel(x = 0, y = -1)
+      Ref8 : [t8]   // pixel(x = -1, y = 0)
+      ==>
+      Out:[
+        (
+          (t0 + t1 * 2 + t2) +
+          (t3 + t4 * 2 + t5) * 2 +
+          (t6 + t7 * 2 + t8)
+        ) / 16
+      ]
     end
-
   end
-
-  @pipeline(flushing=true)
-  actor GuassianBlurComputeAggregator(type DTYPE)
-    DTYPE Row_p1,
-    DTYPE Row_p0,
-    DTYPE Row_n1 ==> DTYPE Out:
-
-    aggregate: action Row_p1:[t0], Row_p0:[t1], Row_n1:[t2] ==>
-      Out:[((t0 + t2) + (t1 << 1)) >> 4]
-    end
-  end
-
   
   network GuassianBlurKernel()
     uint(size = 8) In,
-    uint Width, uint Height ==> uint(size = 8) Out:
+    uint(size = 32) Width, uint(size = 32) Height ==> uint(size = 8) Out:
 
     var 
       int X_UB = -2;
@@ -126,10 +137,10 @@ namespace hetero.stencil.kernels.GuassianBlur:
       s6 = Splitter(DTYPE: uint(size=8));
       s7 = Splitter(DTYPE: uint(size=8));
 
-      col_p1_compute = GuassianBlurPartialCompute(DTYPE : uint(size = 8));
-      col_p0_compute = GuassianBlurPartialCompute(DTYPE : uint(size = 8));
-      col_n1_compute = GuassianBlurPartialCompute(DTYPE : uint(size = 8));
-      row_agg_compute = GuassianBlurComputeAggregator(DTYPE: uint(size = 8));
+     
+
+      compute = GuassianBlurCompute(DTYPE : uint(size = 8));
+
     structure
 
       In --> s0.In;
@@ -158,21 +169,17 @@ namespace hetero.stencil.kernels.GuassianBlur:
       s7.Left --> f7.In { bufferSize = 4; };
       s7.Right --> f8.In { bufferSize = 4; };
 
-      f0.Out --> col_p1_compute.Col_p1 { bufferSize = 4; };
-      f1.Out --> col_p1_compute.Col_p0 { bufferSize = 4; };
-      f2.Out --> col_p1_compute.Col_n1 { bufferSize = 4; };
 
-      f3.Out --> col_p0_compute.Col_p1 { bufferSize = 4; };
-      f4.Out --> col_p0_compute.Col_p0 { bufferSize = 4; };
-      f5.Out --> col_p0_compute.Col_n1 { bufferSize = 4; };
+      f0.Out --> compute.Ref0 { bufferSize = 4; };
+      f1.Out --> compute.Ref1 { bufferSize = 4; };
+      f2.Out --> compute.Ref2 { bufferSize = 4; };
+      f3.Out --> compute.Ref3 { bufferSize = 4; };
+      f4.Out --> compute.Ref4 { bufferSize = 4; };
+      f5.Out --> compute.Ref5 { bufferSize = 4; };
+      f6.Out --> compute.Ref6 { bufferSize = 4; };
+      f7.Out --> compute.Ref7 { bufferSize = 4; };
+      f8.Out --> compute.Ref8 { bufferSize = 4; };
 
-      f6.Out --> col_n1_compute.Col_p1 { bufferSize = 4; };
-      f7.Out --> col_n1_compute.Col_p0 { bufferSize = 4; };
-      f8.Out --> col_n1_compute.Col_n1 { bufferSize = 4; };
-
-      col_p1_compute.Out --> row_agg_compute.Row_p1 { bufferSize = 4; };
-      col_p0_compute.Out --> row_agg_compute.Row_p0 { bufferSize = 4; };
-      col_n1_compute.Out --> row_agg_compute.Row_n1 { bufferSize = 4; };
 
       Width  --> f0.Width; 
       Height --> f0.Height; 
@@ -201,14 +208,15 @@ namespace hetero.stencil.kernels.GuassianBlur:
       Width  --> f8.Width; 
       Height --> f8.Height; 
       
-      row_agg_compute.Out --> Out;
+      // row_agg_compute.Out --> Out;
+      compute.Out --> Out;
       
   end
 
   network GuassianBlurNetworkSingle()
     uint(size = 8) PixelStream,
-    uint(size = 8) Width,
-    uint(size = 8) Height ==>
+    uint(size = 32) Width,
+    uint(size = 32) Height ==>
     uint(size = 8) Out:
   
     entities
@@ -240,69 +248,10 @@ namespace hetero.stencil.kernels.GuassianBlur:
   end
 
 
-  // actor GuassianBlurNaiveKernel(int MAX_WINDOW) 
-  //   uint(size = 8) In,
-  //   uint Width, uint Height ==> uint(size = 8) Out:
-
-  //   List(type : uint(size = 8), size=MAX_WINDOW + 1) window_buffer;
-    
-  //   uint tail := 0;
-  //   uint head := 0;
-  //   uint width := 0;
-  //   uint height := 0;
-  //   uint window_size := 0;
-  //   uint pixel_index := 0;
-  //   wait_wh: action Width:[w], Height:[h] ==>
-  //   do
-  //     width := w;
-  //     height := h;
-  //     tail := 0;
-  //     head := 0;
-  //     window_size := 2 * w + 3;
-  //     pixels_left := w * h - window_size;
-  //   end
-  
-  //   function wrap_inc(uint index) --> uint:
-  //     if index := MAX_WINDOW then
-  //       0;
-  //     else
-  //       index + 1;
-  //     end
-  //   end
-  //   read.inital_window: action In:[pixel] ==>
-  //   guard head < window_size
-  //   do
-  //     window_buffer[head] := pixel;
-  //     if head := MAX_WINDOW then
-  //       head := 0;
-  //     else
-  //       head := head + 1;
-  //     end
-  //   end
-
-  //   read.compute: action In:[pixel] ==> Out:[res]
-  //   var uint(size = 8) res
-  //   guard pixel_index < 
-  //   do
-  //     /// compute the output pixel
-  //     res := (
-  //       (window_buffer[tail] + 2 * window_buffer[tail + 1] + window_buffer[tail + 2]) +
-  //       (window_buffer[tail + w] + 2 * window_buffer[tail + w + 1] + window_buffer[tail + w + 2]) * 2
-  //       (window_buffer[tail + 2 * w] + 2 * window_buffer[tail + 2 * w + 1] + window_buffer[tail + 2 * w + 2])
-  //     ) / 16;
-  //     // read in the new pixel
-  //     window_buffer[head] := pixel;
-
-  //     tail := wrap_inc(tail);
-  //     head := wrap_inc(head);
-  //     pixel_index  := pixel_index + 1;
-  //   end
-
-  // end
 
     actor GuassianBlurNaiveKernel(uint MAX_X, uint MAX_Y) 
       uint(size = 8) In,
-      uint Width, uint Height ==> uint(size = 8) Out:
+      uint(size = 32) Width, uint(size = 32) Height ==> uint(size = 8) Out:
     
       repeat 
         begin 
@@ -361,8 +310,8 @@ namespace hetero.stencil.kernels.GuassianBlur:
 
     network GuassianBlurNaiveNetworkSingle()
       uint(size = 8) PixelStream,
-      uint(size = 8) Width,
-      uint(size = 8) Height ==>
+      uint(size = 32) Width,
+      uint(size = 32) Height ==>
       uint(size = 8) Out:
   
     entities
@@ -377,7 +326,7 @@ namespace hetero.stencil.kernels.GuassianBlur:
       );
 
       kernel = GuassianBlurNaiveKernel(
-        MAX_X = 256, MAX_Y = 256
+        MAX_X = 1024, MAX_Y = 1024
       );
 
 

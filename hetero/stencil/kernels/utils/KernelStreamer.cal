@@ -33,19 +33,25 @@ namespace hetero.stencil.kernels.utils:
     end
 
     read_h_w: action Width:[w], Height:[h] ==> 
-      PaddedWidth:[w + ((stencil_x_pos - stencil_x_neg))],
-      PaddedHeight:[h + ((stencil_y_pos - stencil_x_neg))]
+      PaddedWidth:[pw],
+      PaddedHeight:[ph]
     guard idle
+    var uint(size = 32) pw, uint(size = 32) ph
     do 
       orig_h := h;
       orig_w := w;
       x_index := stencil_x_neg;
       y_index := stencil_y_neg;
-
+      // println("H: " + h + " W: " + w);
+      idle := false;
       if (h != 0 and w != 0) then
-        idle := false;
+        pw := w + ((stencil_x_pos - stencil_x_neg));
+        ph := h + ((stencil_y_pos - stencil_x_neg));
       else
-        idle := true;
+        idle := false;
+        y_index := (orig_h + stencil_y_pos);
+        pw := 0;
+        ph := 0;
       end
     end
 
@@ -65,6 +71,7 @@ namespace hetero.stencil.kernels.utils:
       ) and idle = false
       
     do
+      // println("padding : (" + x_index + )
       inc_index();
     end
     
@@ -128,7 +135,7 @@ namespace hetero.stencil.kernels.utils:
 
 
   actor AlphaFilter() 
-    uint(size = 32) WidthIn, uint(size = 32) HeightIn, uint(size = 32) BitsPerPixelIn
+    uint(size = 32) WidthIn, uint(size = 32) HeightIn, uint(size = 16) BitsPerPixelIn
     ==>
     uint(size = 32) WidthOut, uint(size = 32) HeightOut
     :

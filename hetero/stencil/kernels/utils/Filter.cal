@@ -6,7 +6,7 @@ namespace hetero.stencil.kernels.utils:
     the kernel computation. All of the input ports can have a buffer size
     of 1.
    */
-  @pipeline(flushing=true)
+
   actor DynamicFilter(
     type DTYPE,
     int x_lb_offset, int x_ub_offset, 
@@ -14,8 +14,8 @@ namespace hetero.stencil.kernels.utils:
     int x_offset, int y_offset) 
 
     DTYPE In, 
-    uint  Width,
-    uint  Height
+    uint(size = 32)  Width,
+    uint(size = 32)  Height
     ==> DTYPE Out:
 
     int x_index := 0;
@@ -81,7 +81,11 @@ namespace hetero.stencil.kernels.utils:
       y_lb := y_lb_offset + 0;
       y_ub := y_ub_offset + y_dim;
       
-      idle := false;
+      if (x_dim != 0) and (y_dim != 0) then
+        idle := false;
+      else
+        idle := true;
+      end
 
       x_index := 0;
       y_index := 0;
