@@ -1,57 +1,64 @@
 StreamBlocks Example Repository
 ===============================
 
-Welcome to the StreamBlocks examples repository. This repository contains a set of dataflow applications that you can use with the StreamBlocks dataflow compiler. 
+Welcome to the StreamBlocks examples repository. This repository contains a set of dataflow applications that you can use with the StreamBlocks dataflow compiler.
 
-This README file is organized as follows:
-1. Getting started
-2. How to download this repository
-3. Available applications
-4. Dependencies
-5. Support
 
-### 1. Getting started
 
-This is a collection of examples geared at teaching the user to code in CAL. This is a under developement repository and more examples are going to follow.
+# Dependencies
 
-To use these applications, first you need to compile the Streamblocks compiler. See instructions on [streamblocks-platfroms](https://github.com/streamblocks/streamblocks-platforms/blob/master/README.md).
+We assume you have a working Vivado/Vitis installtion (2019.2) and have gone
+through setting up
+[streamblocks-platfroms](https://github.com/streamblocks/streamblocks-platforms/blob/master/README.md).
 
-### 2. How to download this repository
 
-To get a local copy of the StreamBlocks examples repository, clone this repository to the local system with the following commmand:
+
+# Cloning the repository
+We assume you have cloned `streamblocks-platforms` in some local directory such
+as `/home/mahyar/streamblocks/streamblocks-platforms`. Then set the environment
+variable `STREAMBLOCKS_HOME` to point to `/home/mahyar/streamblocks`.
+
+```bash
+> export STREAMBLOCKS_HOME=...
 ```
-git clone https://github.com/streamblocks/streamblocks-examples streamblocks-examples
-```
+And clone the this repository in `${STREAMBLOCKS_HOME}`
 
-### 3. Available applications
-
-Example        | Description           | Key Concepts | Keywords
----------------|-----------------------|--------------|----------
-[system/][]    | A project for using external actors, functions, and procedures supported by the actors runtime <br>   |  How to write external actors function and procedures  |  external<br> 
-[simple/][]    | Simple examples of Dataflow Applications | How to define actors, processes and how to connect them|  actor<br>  action<br>  process<br>  network<br>  import <br>
-[jpeg/][]      | A 4:2:0 YUV movie JPEG decoder description in CAL<br> | How to define state machines in CAL, functions, procedures, instantiation of networks and external actors |  import entity <br>  fsm<br>  priority<br>  function<br>  procedure<br> 
-[smith-waterman/][] | A systolic array implementation of Smith-Waterman algorithm in CAL<br> | Mixing actors and processes. Defining hierarchical namespaces, global procedures and functions |  import entity <br>  fsm<br>  priority<br>  function<br>  procedure<br> 
-### 4. Dependencies
-
-The generated C multithread source code of Streamblocks has the following dependencies: CMake, libxml2 and (optionaly) libsdl2.
-
-On Ubuntu :
-
-```
-sudo apt-get install libxml2-dev libsdl2-dev cmake cmake-curses-gui
-```
-On Mac :
-
-```
-brew install libxml2 sdl2 cmake
+```bash
+> cd ${STREAMBLOCKS_HOME}
+> git clone git@github.com:streamblocks/streamblocks-platforms.git
 ```
 
-### 5. Support
+Some of the examples use the [`Streamblocks.cmake`](Streamblocks.cmake) as a
+helper fo building StreamBlocks projects. This script requires a valid
+`$STREAMBLOCKS_HOME` environment variable. So make sure if you are trying to
+build a project, you have the correct variable.
 
-If you have an issue with one of the CAL examples please create a new issue in this repository.
 
-[.]:.
-[system/]:system/
-[simple/]:simple/
-[jpeg/]:jpeg/
-[smith-waterman/]:smith-waterman/
+If you wish to generate heterogeneous code, ensure a working Vitis 2019.2
+installation. Newer versions of Vitis may work, but are not supported right now
+by `streamblocks-platform`. As usual, you need to source `settings64.sh` from
+your Vitis installation directory and also have the environment variable `XILINX_XRT`
+point to your `XRT` installation directory (e.g., `export XILINX_XRT=/opt/xilinx/xrt`)
+
+
+
+# Running an example
+
+
+Let's try compiling the [`RVC-MPEG4SP`](rvc-mpeg4sp) program.
+```
+> cd rvc-mpeg4sp
+> cmake .. -DCMAKE_BUILD_TYPE=Release -DTARGET=hw -DXCF_CONFIG=configuration_0.xcf
+> cmake --build .
+```
+This should take a while because we are generating an FPGA bitstream, if you just
+want to quickly go through the example set `-DTARGET=hw_emu` to finish up compilation
+faster.
+
+There are various configuration files that place different actors on hardware,
+feel free to give them a shot by changing the `XCF_CONFIG` option.
+
+We encourage you to take a look at the corresponding
+[`CMakeLists.txt`](rvc-mpeg4sp/CMakeLists.txt) file to get inspired on how you
+can write your own.
+
